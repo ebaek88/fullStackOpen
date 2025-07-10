@@ -1,72 +1,58 @@
 import { useState } from "react";
 
-const StatisticsOverall = ({ feedbacks }) => {
-  const all = feedbacks.reduce((acc, feedback) => acc + feedback.quantity, 0);
-  const total = feedbacks.reduce(
-    (acc, feedback) => acc + feedback.quantity * feedback.value,
-    0
-  );
-  const average = total / all;
-  const positivePercentage =
-    (feedbacks.filter((feedback) => (feedback.name = "good"))[0].quantity /
-      all) *
-    100;
-  console.log(average);
-  console.log(positivePercentage);
-  return (
-    <>
-      <li style={{ listStyle: "none" }}>all {all}</li>
-      <li style={{ listStyle: "none" }}>average {average}</li>
-      <li style={{ listStyle: "none" }}>positive {positivePercentage} %</li>
-    </>
-  );
-};
-
-const StatisticsRow = ({ name, quantity }) => {
+const StatisticLine = ({ text, value }) => {
   return (
     <li style={{ listStyle: "none" }}>
-      {name} {quantity}
+      {text} {value}
+      {text === "positive" ? " %" : ""}
     </li>
   );
 };
 
 const Statistics = ({ feedbacks }) => {
-  // Rendering each feedback
-  let statisticsRows = feedbacks.map((feedback, index) => (
-    <StatisticsRow
-      name={feedback.name}
-      quantity={feedback.quantity}
-      key={index}
-    />
-  ));
-  // Rendering the overall statistics
-  statisticsRows = statisticsRows.concat(
-    <StatisticsOverall feedbacks={feedbacks} key={feedbacks.length} />
+  // Calculating the overall statistics
+  const all = feedbacks.reduce((acc, feedback) => acc + feedback.value, 0);
+  const total = feedbacks.reduce(
+    (acc, feedback) => acc + feedback.value * feedback.point,
+    0
   );
+  const average = total / all;
+  const positivePercentage =
+    (feedbacks.filter((feedback) => (feedback.name = "good"))[0].value / all) *
+    100;
 
-  return feedbacks.every((feedback) => feedback.quantity === 0) ? (
+  feedbacks = feedbacks.concat([
+    { text: "all", value: all },
+    { text: "average", value: average },
+    { text: "positive", value: positivePercentage },
+  ]);
+
+  // Rendering each feedback
+  const statisticLines = feedbacks.map((feedback, index) => (
+    <StatisticLine text={feedback.text} value={feedback.value} key={index} />
+  ));
+
+  return feedbacks.every(
+    (feedback) => feedback.value === 0 || Number.isNaN(feedback.value)
+  ) ? (
     <>
       <p>No feedback given</p>
     </>
   ) : (
     <>
       <h1>statistics</h1>
-      <ul style={{ padding: "0px" }}>{statisticsRows}</ul>
+      <ul style={{ padding: "0px" }}>{statisticLines}</ul>
     </>
   );
 };
 
-const FeedbackButton = ({ name, handler }) => {
-  return <button onClick={handler}>{name}</button>;
+const Button = ({ text, handler }) => {
+  return <button onClick={handler}>{text}</button>;
 };
 
 const Feedback = ({ feedbacks }) => {
   const feedbackComponents = feedbacks.map((feedback, index) => (
-    <FeedbackButton
-      name={feedback.name}
-      handler={feedback.handler}
-      key={index}
-    />
+    <Button text={feedback.text} handler={feedback.handler} key={index} />
   ));
   return (
     <>
@@ -87,9 +73,9 @@ const App = () => {
   const increaseBad = () => setBad(bad + 1);
 
   const feedbacks = [
-    { name: "good", quantity: good, value: 1, handler: increaseGood },
-    { name: "neutral", quantity: neutral, value: 0, handler: increaseNeutral },
-    { name: "bad", quantity: bad, value: -1, handler: increaseBad },
+    { text: "good", value: good, point: 1, handler: increaseGood },
+    { text: "neutral", value: neutral, point: 0, handler: increaseNeutral },
+    { text: "bad", value: bad, point: -1, handler: increaseBad },
   ];
 
   return (
