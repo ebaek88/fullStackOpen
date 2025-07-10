@@ -44,7 +44,11 @@ const Statistics = ({ feedbacks }) => {
     <StatisticsOverall feedbacks={feedbacks} key={feedbacks.length} />
   );
 
-  return (
+  return feedbacks.every((feedback) => feedback.quantity === 0) ? (
+    <>
+      <p>No feedback given</p>
+    </>
+  ) : (
     <>
       <h1>statistics</h1>
       <ul style={{ padding: "0px" }}>{statisticsRows}</ul>
