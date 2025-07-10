@@ -2,10 +2,13 @@ import { useState } from "react";
 
 const StatisticLine = ({ text, value }) => {
   return (
-    <li style={{ listStyle: "none" }}>
-      {text} {value}
-      {text === "positive" ? " %" : ""}
-    </li>
+    <tr>
+      <td>{text}</td>
+      <td>
+        {value}
+        {text === "positive" ? " %" : ""}
+      </td>
+    </tr>
   );
 };
 
@@ -41,7 +44,9 @@ const Statistics = ({ feedbacks }) => {
   ) : (
     <>
       <h1>statistics</h1>
-      <ul style={{ padding: "0px" }}>{statisticLines}</ul>
+      <table>
+        <tbody>{statisticLines}</tbody>
+      </table>
     </>
   );
 };
