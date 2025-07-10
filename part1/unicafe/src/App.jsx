@@ -1,17 +1,49 @@
 import { useState } from "react";
 
-const StatisticsRow = ({ name, value }) => {
+const StatisticsOverall = ({ feedbacks }) => {
+  const all = feedbacks.reduce((acc, feedback) => acc + feedback.quantity, 0);
+  const total = feedbacks.reduce(
+    (acc, feedback) => acc + feedback.quantity * feedback.value,
+    0
+  );
+  const average = total / all;
+  const positivePercentage =
+    (feedbacks.filter((feedback) => (feedback.name = "good"))[0].quantity /
+      all) *
+    100;
+  console.log(average);
+  console.log(positivePercentage);
+  return (
+    <>
+      <li style={{ listStyle: "none" }}>all {all}</li>
+      <li style={{ listStyle: "none" }}>average {average}</li>
+      <li style={{ listStyle: "none" }}>positive {positivePercentage} %</li>
+    </>
+  );
+};
+
+const StatisticsRow = ({ name, quantity }) => {
   return (
     <li style={{ listStyle: "none" }}>
-      {name} {value}
+      {name} {quantity}
     </li>
   );
 };
 
 const Statistics = ({ feedbacks }) => {
-  const statisticsRows = feedbacks.map((feedback, index) => (
-    <StatisticsRow name={feedback.name} value={feedback.value} key={index} />
+  // Rendering each feedback
+  let statisticsRows = feedbacks.map((feedback, index) => (
+    <StatisticsRow
+      name={feedback.name}
+      quantity={feedback.quantity}
+      key={index}
+    />
   ));
+  // Rendering the overall statistics
+  statisticsRows = statisticsRows.concat(
+    <StatisticsOverall feedbacks={feedbacks} key={feedbacks.length} />
+  );
+
   return (
     <>
       <h1>statistics</h1>
@@ -51,9 +83,9 @@ const App = () => {
   const increaseBad = () => setBad(bad + 1);
 
   const feedbacks = [
-    { name: "good", value: good, handler: increaseGood },
-    { name: "neutral", value: neutral, handler: increaseNeutral },
-    { name: "bad", value: bad, handler: increaseBad },
+    { name: "good", quantity: good, value: 1, handler: increaseGood },
+    { name: "neutral", quantity: neutral, value: 0, handler: increaseNeutral },
+    { name: "bad", quantity: bad, value: -1, handler: increaseBad },
   ];
 
   return (
