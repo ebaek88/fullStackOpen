@@ -12,7 +12,7 @@ const StatisticLine = ({ text, value }) => {
   );
 };
 
-const Statistics = ({ feedbacks }) => {
+const Statistics = ({ feedbacks, idGenerator }) => {
   // Calculating the overall statistics
   const all = feedbacks.reduce((acc, feedback) => acc + feedback.value, 0);
   const total = feedbacks.reduce(
@@ -25,14 +25,18 @@ const Statistics = ({ feedbacks }) => {
     100;
 
   feedbacks = feedbacks.concat([
-    { text: "all", value: all },
-    { text: "average", value: average },
-    { text: "positive", value: positivePercentage },
+    { id: idGenerator++, text: "all", value: all },
+    { id: idGenerator++, text: "average", value: average },
+    { id: idGenerator++, text: "positive", value: positivePercentage },
   ]);
-
+  console.log(idGenerator);
   // Rendering each feedback
-  const statisticLines = feedbacks.map((feedback, index) => (
-    <StatisticLine text={feedback.text} value={feedback.value} key={index} />
+  const statisticLines = feedbacks.map((feedback) => (
+    <StatisticLine
+      text={feedback.text}
+      value={feedback.value}
+      key={feedback.id}
+    />
   ));
 
   return feedbacks.every(
@@ -56,8 +60,8 @@ const Button = ({ text, handler }) => {
 };
 
 const Feedback = ({ feedbacks }) => {
-  const feedbackComponents = feedbacks.map((feedback, index) => (
-    <Button text={feedback.text} handler={feedback.handler} key={index} />
+  const feedbackComponents = feedbacks.map((feedback) => (
+    <Button text={feedback.text} handler={feedback.handler} key={feedback.id} />
   ));
   return (
     <>
@@ -68,6 +72,8 @@ const Feedback = ({ feedbacks }) => {
 };
 
 const App = () => {
+  let idGenerator = 0;
+
   // saves clicks of each button to its own state
   const [good, setGood] = useState(0);
   const [neutral, setNeutral] = useState(0);
@@ -78,15 +84,33 @@ const App = () => {
   const increaseBad = () => setBad(bad + 1);
 
   const feedbacks = [
-    { text: "good", value: good, point: 1, handler: increaseGood },
-    { text: "neutral", value: neutral, point: 0, handler: increaseNeutral },
-    { text: "bad", value: bad, point: -1, handler: increaseBad },
+    {
+      id: idGenerator++,
+      text: "good",
+      value: good,
+      point: 1,
+      handler: increaseGood,
+    },
+    {
+      id: idGenerator++,
+      text: "neutral",
+      value: neutral,
+      point: 0,
+      handler: increaseNeutral,
+    },
+    {
+      id: idGenerator++,
+      text: "bad",
+      value: bad,
+      point: -1,
+      handler: increaseBad,
+    },
   ];
 
   return (
     <div>
       <Feedback feedbacks={feedbacks} />
-      <Statistics feedbacks={feedbacks} />
+      <Statistics feedbacks={feedbacks} idGenerator={idGenerator} />
     </div>
   );
 };

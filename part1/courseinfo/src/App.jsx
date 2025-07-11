@@ -3,8 +3,8 @@ const Header = ({ name }) => {
 };
 
 const Content = ({ parts }) => {
-  const partComponents = parts.map((part, index) => (
-    <Part name={part.name} exercises={part.exercises} key={index} />
+  const partComponents = parts.map((part) => (
+    <Part name={part.name} exercises={part.exercises} key={part.id} />
   ));
 
   return <>{partComponents}</>;
@@ -24,18 +24,23 @@ const Total = ({ parts }) => {
 };
 
 const App = () => {
+  let idGenerator = 0;
+
   const course = {
     name: "Half Stack application development",
     parts: [
       {
+        id: idGenerator++,
         name: "Fundamentals of React",
         exercises: 10,
       },
       {
+        id: idGenerator++,
         name: "Using props to pass data",
         exercises: 7,
       },
       {
+        id: idGenerator++,
         name: "State of a component",
         exercises: 14,
       },
