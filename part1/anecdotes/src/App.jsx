@@ -1,9 +1,37 @@
 import { useState } from "react";
 
+const DisplayMostVote = ({ anecdote, vote }) => {
+  return (
+    <>
+      <h1>Anecdote with most votes</h1>
+      <div>{anecdote}</div>
+      <VoteDisplay vote={vote} />
+    </>
+  );
+};
+
+const VoteDisplay = ({ vote }) => {
+  return <div>has {vote} votes</div>;
+};
+
 const Button = ({ text, handler }) => {
   return (
     <>
       <button onClick={handler}>{text}</button>
+    </>
+  );
+};
+
+const DisplayAnecdote = ({ anecdote, handlers, vote }) => {
+  return (
+    <>
+      <h1>Anecdote of the day</h1>
+      <div>{anecdote}</div>
+      <VoteDisplay vote={vote} />
+      <div>
+        <Button text={"vote"} handler={handlers.voteHandler} />
+        <Button text={"next anecdote"} handler={handlers.randomHandler} />
+      </div>
     </>
   );
 };
@@ -33,15 +61,27 @@ const App = () => {
     newVotes[selected] += 1;
     setVotes(newVotes);
   };
-  // console.log(votes);
+
+  const handlers = {
+    randomHandler: randomHandler,
+    voteHandler: voteHandler,
+  };
+
+  // Find the anecdote with most votes
+  const anecdotesSorted = [...anecdotes].sort((a, b) => {
+    return votes[anecdotes.indexOf(b)] - votes[anecdotes.indexOf(a)];
+  });
+  const anecdoteWithMostVotes = anecdotesSorted[0];
+  const mostVotes = votes[anecdotes.indexOf(anecdoteWithMostVotes)];
+
   return (
     <>
-      <div>{anecdotes[selected]}</div>
-      <div>has {votes[selected]} votes</div>
-      <div>
-        <Button text={"vote"} handler={voteHandler} />
-        <Button text={"next anecdote"} handler={randomHandler} />
-      </div>
+      <DisplayAnecdote
+        anecdote={anecdotes[selected]}
+        handlers={handlers}
+        vote={votes[selected]}
+      />
+      <DisplayMostVote anecdote={anecdoteWithMostVotes} vote={mostVotes} />
     </>
   );
 };
