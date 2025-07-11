@@ -35,6 +35,12 @@ const App = () => {
 
   const addName = (evt) => {
     evt.preventDefault();
+    // Checks if the newly put name already exists in the phonebook.
+    // If so, an alert message pops up.
+    if (persons.some((person) => person.name === newName)) {
+      alert(`${newName} is already added to phonebook`);
+      return;
+    }
     const personObject = {
       name: newName,
     };
