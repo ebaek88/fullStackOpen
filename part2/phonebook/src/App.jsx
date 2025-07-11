@@ -1,68 +1,7 @@
 import { useState } from "react";
-
-const SearchBar = ({ filterText, onChange }) => {
-  return (
-    <div>
-      <label htmlFor="searchbar">filter shown with</label>
-      <input
-        type="text"
-        value={filterText}
-        onChange={onChange}
-        id="searchbar"
-      />
-    </div>
-  );
-};
-
-const DisplayLine = ({ name, number }) => {
-  return (
-    <li style={{ listStyle: "none" }}>
-      {name} {number}
-    </li>
-  );
-};
-
-const Display = ({ persons, filterText }) => {
-  const displayLines = [];
-  persons.forEach((person) => {
-    if (
-      person.name.indexOf(filterText) === -1 &&
-      person.number.indexOf(filterText) === -1
-    ) {
-      return;
-    }
-    displayLines.push(
-      <DisplayLine key={person.id} name={person.name} number={person.number} />
-    );
-  });
-  // console.log(displayLines);
-  return <ul style={{ padding: "0px" }}>{displayLines}</ul>;
-};
-
-const AddNew = (props) => {
-  const newName = props.newName;
-  const newNumber = props.newNumber;
-  const onSubmit = props.onSubmit;
-  const onNameChange = props.onNameChange;
-  const onNumberChange = props.onNumberChange;
-
-  return (
-    <>
-      <form name="new-entry" onSubmit={onSubmit}>
-        <div>
-          name: <input id="name" value={newName} onChange={onNameChange} />
-        </div>
-        <div>
-          number:{" "}
-          <input id="number" value={newNumber} onChange={onNumberChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
-    </>
-  );
-};
+import Filter from "./components/Filter.jsx";
+import Persons from "./components/Persons.jsx";
+import PersonForm from "./components/PersonForm.jsx";
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -71,10 +10,13 @@ const App = () => {
     { name: "Dan Abramov", number: "12-43-234345", id: 3 },
     { name: "Mary Poppendieck", number: "39-23-6423122", id: 4 },
   ]);
+
+  /** States */
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filterText, setFilterText] = useState("");
 
+  /** Event handlers */
   const addNew = (evt) => {
     evt.preventDefault();
     const trimmedNewName = newName.trim();
@@ -141,9 +83,9 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <SearchBar filterText={filterText} onChange={handleFilterTextChange} />
+      <Filter filterText={filterText} onChange={handleFilterTextChange} />
       <h2>add a new</h2>
-      <AddNew
+      <PersonForm
         newName={newName}
         newNumber={newNumber}
         onNameChange={handleNameChange}
@@ -151,7 +93,7 @@ const App = () => {
         onNumberChange={handleNumberChange}
       />
       <h2>Numbers</h2>
-      <Display persons={persons} filterText={filterText} />
+      <Persons persons={persons} filterText={filterText} />
     </div>
   );
 };
