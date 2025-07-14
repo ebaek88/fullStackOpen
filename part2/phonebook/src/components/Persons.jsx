@@ -1,12 +1,12 @@
-const DisplayLine = ({ name, number }) => {
+const DisplayLine = ({ id, name, number, deleteHandler }) => {
   return (
-    <li style={{ listStyle: "none" }}>
-      {name} {number}
+    <li id={id} style={{ listStyle: "none" }}>
+      {name} {number} <button onClick={deleteHandler}>delete</button>
     </li>
   );
 };
 
-const Persons = ({ persons, filterText }) => {
+const Persons = ({ persons, filterText, deleteHandler }) => {
   const displayLines = [];
   persons.forEach((person) => {
     if (
@@ -16,7 +16,13 @@ const Persons = ({ persons, filterText }) => {
       return;
     }
     displayLines.push(
-      <DisplayLine key={person.id} name={person.name} number={person.number} />
+      <DisplayLine
+        key={person.id}
+        name={person.name}
+        number={person.number}
+        deleteHandler={deleteHandler}
+        id={person.id}
+      />
     );
   });
   // console.log(displayLines);

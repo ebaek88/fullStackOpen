@@ -35,12 +35,18 @@ const App = () => {
         `The entry ${trimmedNewName} ${trimmedNewNumber} is already added to phonebook`
       );
       return;
-    } else {
-      // if the same name exists but the number is new, direct to editExistingPerson()
-      if (persons.some((person) => person.name === trimmedNewName)) {
-        // editExistingPerson(trimmedNewName);
-        return;
-      }
+    }
+
+    // if no name or number is entered, the new entry should be denied
+    if (trimmedNewName.length === 0 || trimmedNewNumber.length === 0) {
+      alert("Both the name and the number need to be entered.");
+      return;
+    }
+
+    // if the same name exists but the number is new, direct to editExistingPerson()
+    if (persons.some((person) => person.name === trimmedNewName)) {
+      // editExistingPerson(trimmedNewName);
+      return;
     }
 
     const maxId =
@@ -53,12 +59,43 @@ const App = () => {
       id: String(maxId + 1),
     };
 
-    phonebookService.create(newPersonObject).then((res) => {
-      console.log(res);
-      setPersons(persons.concat(res.data));
-      setNewName("");
-      setNewNumber("");
-    });
+    phonebookService
+      .create(newPersonObject)
+      .then((res) => {
+        console.log(res);
+        setPersons(persons.concat(res.data));
+        setNewName("");
+        setNewNumber("");
+      })
+      .catch((error) => {
+        alert(error.message);
+        setNewName("");
+        setNewNumber("");
+      });
+  };
+
+  const deleteHandler = (evt) => {
+    const id = evt.target.closest("li").getAttribute("id");
+    const name = persons.find((person) => person.id === id).name;
+    if (id === null || name === undefined) {
+      alert("Cannot delete the entry because it is not in the database.");
+      return;
+    }
+
+    if (!confirm(`Delete ${name} ?`)) {
+      return;
+    } else {
+      phonebookService
+        .deleteId(id)
+        .then((res) => {
+          console.log(res.data);
+          const newPersons = persons.filter(
+            (person) => person.id !== res.data.id
+          );
+          setPersons(newPersons);
+        })
+        .catch((error) => console.log(error.message));
+    }
   };
 
   // const editExistingPerson = (name) => {
@@ -104,7 +141,11 @@ const App = () => {
         onNumberChange={handleNumberChange}
       />
       <h2>Numbers</h2>
-      <Persons persons={persons} filterText={filterText} />
+      <Persons
+        persons={persons}
+        filterText={filterText}
+        deleteHandler={deleteHandler}
+      />
     </div>
   );
 };
