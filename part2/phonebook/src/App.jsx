@@ -13,9 +13,12 @@ const App = () => {
 
   /** useEffect */
   useEffect(() => {
-    phonebookService.getAll().then((response) => {
-      setPersons(response.data);
-    });
+    phonebookService
+      .getAll()
+      .then((initialPersons) => {
+        setPersons(initialPersons);
+      })
+      .catch((error) => console.log(error.message));
   }, []);
 
   /** Event handlers */
@@ -25,27 +28,36 @@ const App = () => {
     const trimmedNewNumber = newNumber.trim();
     // Checks if the newly put entry already exists in the phonebook.
     // If so, an alert message pops up.
-    if (
-      persons.some(
-        (person) =>
-          person.name === trimmedNewName && person.number === trimmedNewNumber
-      )
-    ) {
-      alert(
-        `The entry ${trimmedNewName} ${trimmedNewNumber} is already added to phonebook`
-      );
-      return;
+    const existingPerson = persons.find(
+      (person) => person.name === trimmedNewName
+    );
+    // console.log(existingPerson);
+
+    if (existingPerson) {
+      if (
+        existingPerson.id &&
+        existingPerson.number &&
+        existingPerson.number === trimmedNewNumber
+      ) {
+        alert(
+          `The entry ${trimmedNewName} ${trimmedNewNumber} is already added to phonebook`
+        );
+        return;
+      } else if (existingPerson.id && existingPerson.name) {
+        if (
+          confirm(
+            `${existingPerson.name} is already added to phonebook, replace the old number with a new one?`
+          )
+        ) {
+          editExistingPerson(existingPerson, trimmedNewNumber);
+          return;
+        }
+      }
     }
 
     // if no name or number is entered, the new entry should be denied
     if (trimmedNewName.length === 0 || trimmedNewNumber.length === 0) {
       alert("Both the name and the number need to be entered.");
-      return;
-    }
-
-    // if the same name exists but the number is new, direct to editExistingPerson()
-    if (persons.some((person) => person.name === trimmedNewName)) {
-      // editExistingPerson(trimmedNewName);
       return;
     }
 
@@ -61,9 +73,9 @@ const App = () => {
 
     phonebookService
       .create(newPersonObject)
-      .then((res) => {
-        console.log(res);
-        setPersons(persons.concat(res.data));
+      .then((returnedPerson) => {
+        // console.log(returnedPerson);
+        setPersons(persons.concat(returnedPerson));
         setNewName("");
         setNewNumber("");
       })
@@ -87,31 +99,44 @@ const App = () => {
     } else {
       phonebookService
         .deleteId(id)
-        .then((res) => {
-          console.log(res.data);
+        .then((deletedPerson) => {
+          // console.log(deletedPerson);
           const newPersons = persons.filter(
-            (person) => person.id !== res.data.id
+            (person) => person.id !== deletedPerson.id
           );
           setPersons(newPersons);
         })
-        .catch((error) => console.log(error.message));
+        .catch((error) => alert(error.message));
     }
   };
 
-  // const editExistingPerson = (name) => {
-  //   // If the newly put entry's name is already existing in the phonebook but the number is not
-  //   // , copy the existing number and id into a new entry.
-  //   if (persons.some((person) => person.name === trimmedNewName)) {
-  //     personObject.id = persons.find(
-  //       (person) => person.name === trimmedNewName
-  //     ).id;
-  //     newPersons.splice(
-  //       newPersons.findIndex((person) => person.name === trimmedNewName),
-  //       1,
-  //       personObject
-  //     );
-  //   }
-  // };
+  // If the newly put entry's name is already existing in the phonebook but the number is not
+  // , copy the existing number and id into a new entry.
+  const editExistingPerson = (existingPerson, newNumberToEnter) => {
+    if (newNumberToEnter.length === 0) {
+      alert(
+        "The new number to update is empty. Please enter the number again."
+      );
+      return;
+    }
+    const newPerson = { ...existingPerson, number: newNumberToEnter };
+    phonebookService
+      .update(newPerson.id, newPerson)
+      .then((updatedPerson) => {
+        setPersons(
+          persons.map((person) =>
+            person.id === newPerson.id ? updatedPerson : person
+          )
+        );
+        setNewName("");
+        setNewNumber("");
+      })
+      .catch((error) => {
+        alert(error.message);
+        setNewName("");
+        setNewNumber("");
+      });
+  };
 
   const handleNameChange = (evt) => {
     // console.log(evt.target.value);
