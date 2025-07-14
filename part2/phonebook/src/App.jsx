@@ -37,37 +37,46 @@ const App = () => {
         `The entry ${trimmedNewName} ${trimmedNewNumber} is already added to phonebook`
       );
       return;
+    } else {
+      // if the same name exists but the number is new, direct to editExistingPerson()
+      if (persons.some((person) => person.name === trimmedNewName)) {
+        // editExistingPerson(trimmedNewName);
+        return;
+      }
     }
 
-    const personObject = {
+    const maxId =
+      persons.length > 0
+        ? Math.max(...persons.map((person) => Number(person.id)))
+        : 0;
+    const newPersonObject = {
       name: trimmedNewName,
       number: trimmedNewNumber,
+      id: String(maxId + 1),
     };
-    let newPersons = [...persons];
 
-    // If the newly put entry's name is already existing in the phonebook but the number is not
-    // , copy the existing number and id into a new entry.
-    if (persons.some((person) => person.name === trimmedNewName)) {
-      personObject.id = persons.find(
-        (person) => person.name === trimmedNewName
-      ).id;
-      newPersons.splice(
-        newPersons.findIndex((person) => person.name === trimmedNewName),
-        1,
-        personObject
-      );
-    } else {
-      // If the entry is a brand new one, create a new entry.
-      personObject.id = persons.length + 1;
-      newPersons = newPersons.concat(personObject);
-    }
-
-    // console.log("Current persons: ", persons);
-    // console.log("New persons: ", newPersons);
-    setPersons(newPersons);
-    setNewName("");
-    setNewNumber("");
+    axios.post(`http://localhost:3001/persons`, newPersonObject).then((res) => {
+      console.log(res);
+      setPersons(persons.concat(res.data));
+      setNewName("");
+      setNewNumber("");
+    });
   };
+
+  // const editExistingPerson = (name) => {
+  //   // If the newly put entry's name is already existing in the phonebook but the number is not
+  //   // , copy the existing number and id into a new entry.
+  //   if (persons.some((person) => person.name === trimmedNewName)) {
+  //     personObject.id = persons.find(
+  //       (person) => person.name === trimmedNewName
+  //     ).id;
+  //     newPersons.splice(
+  //       newPersons.findIndex((person) => person.name === trimmedNewName),
+  //       1,
+  //       personObject
+  //     );
+  //   }
+  // };
 
   const handleNameChange = (evt) => {
     // console.log(evt.target.value);
