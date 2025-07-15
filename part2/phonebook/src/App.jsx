@@ -3,6 +3,7 @@ import phonebookService from "./services/api.js";
 import Filter from "./components/Filter.jsx";
 import Persons from "./components/Persons.jsx";
 import PersonForm from "./components/PersonForm.jsx";
+import Notification from "./components/Notification.jsx";
 
 const App = () => {
   /** States */
@@ -10,15 +11,25 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filterText, setFilterText] = useState("");
+  const [notiMessage, setNotiMessage] = useState(null);
 
   /** useEffect */
   useEffect(() => {
     phonebookService
       .getAll()
       .then((initialPersons) => {
+        setNotiMessage("Loaded initial data successfully!");
+        setTimeout(() => {
+          setNotiMessage(null);
+        }, 1000);
         setPersons(initialPersons);
       })
-      .catch((error) => console.log(error.message));
+      .catch((error) => {
+        setNotiMessage(error.message);
+        setTimeout(() => {
+          setNotiMessage(null);
+        }, 3000);
+      });
   }, []);
 
   /** Event handlers */
@@ -39,9 +50,12 @@ const App = () => {
         existingPerson.number &&
         existingPerson.number === trimmedNewNumber
       ) {
-        alert(
+        setNotiMessage(
           `The entry ${trimmedNewName} ${trimmedNewNumber} is already added to phonebook`
         );
+        setTimeout(() => {
+          setNotiMessage(null);
+        }, 3000);
         return;
       } else if (existingPerson.id && existingPerson.name) {
         if (
@@ -57,7 +71,10 @@ const App = () => {
 
     // if no name or number is entered, the new entry should be denied
     if (trimmedNewName.length === 0 || trimmedNewNumber.length === 0) {
-      alert("Both the name and the number need to be entered.");
+      setNotiMessage("Both the name and the number need to be entered.");
+      setTimeout(() => {
+        setNotiMessage(null);
+      }, 3000);
       return;
     }
 
@@ -74,13 +91,19 @@ const App = () => {
     phonebookService
       .create(newPersonObject)
       .then((returnedPerson) => {
-        // console.log(returnedPerson);
+        setNotiMessage(`Added ${returnedPerson.name}!`);
+        setTimeout(() => {
+          setNotiMessage(null);
+        }, 3000);
         setPersons(persons.concat(returnedPerson));
         setNewName("");
         setNewNumber("");
       })
       .catch((error) => {
-        alert(error.message);
+        setNotiMessage(error.message);
+        setTimeout(() => {
+          setNotiMessage(null);
+        }, 3000);
         setNewName("");
         setNewNumber("");
       });
@@ -90,7 +113,12 @@ const App = () => {
     const id = evt.target.closest("li").getAttribute("id");
     const name = persons.find((person) => person.id === id).name;
     if (id === null || name === undefined) {
-      alert("Cannot delete the entry because it is not in the database.");
+      setNotiMessage(
+        "Cannot delete the entry because it is not in the database."
+      );
+      setTimeout(() => {
+        setNotiMessage(null);
+      }, 3000);
       return;
     }
 
@@ -100,13 +128,21 @@ const App = () => {
       phonebookService
         .deleteId(id)
         .then((deletedPerson) => {
-          // console.log(deletedPerson);
+          setNotiMessage(`Deleted ${deletedPerson.name}!`);
+          setTimeout(() => {
+            setNotiMessage(null);
+          }, 3000);
           const newPersons = persons.filter(
             (person) => person.id !== deletedPerson.id
           );
           setPersons(newPersons);
         })
-        .catch((error) => alert(error.message));
+        .catch((error) => {
+          setNotiMessage(error.message);
+          setTimeout(() => {
+            setNotiMessage(null);
+          }, 3000);
+        });
     }
   };
 
@@ -114,15 +150,22 @@ const App = () => {
   // , copy the existing number and id into a new entry.
   const editExistingPerson = (existingPerson, newNumberToEnter) => {
     if (newNumberToEnter.length === 0) {
-      alert(
+      setNotiMessage(
         "The new number to update is empty. Please enter the number again."
       );
+      setTimeout(() => {
+        setNotiMessage(null);
+      }, 3000);
       return;
     }
     const newPerson = { ...existingPerson, number: newNumberToEnter };
     phonebookService
       .update(newPerson.id, newPerson)
       .then((updatedPerson) => {
+        setNotiMessage(`Updated ${updatedPerson.name}'s number!`);
+        setTimeout(() => {
+          setNotiMessage(null);
+        }, 3000);
         setPersons(
           persons.map((person) =>
             person.id === newPerson.id ? updatedPerson : person
@@ -132,7 +175,13 @@ const App = () => {
         setNewNumber("");
       })
       .catch((error) => {
-        alert(error.message);
+        console.log(error.message);
+        setNotiMessage(
+          `Information of ${newPerson.name} has already been removed from server`
+        );
+        setTimeout(() => {
+          setNotiMessage(null);
+        }, 3000);
         setNewName("");
         setNewNumber("");
       });
@@ -156,6 +205,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notiMessage} />
       <Filter filterText={filterText} onChange={handleFilterTextChange} />
       <h2>add a new</h2>
       <PersonForm
