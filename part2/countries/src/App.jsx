@@ -1,67 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-
-/** components */
-const SearchBar = ({ onChange }) => {
-  return (
-    <div>
-      find countries <input type="text" onChange={onChange} />
-    </div>
-  );
-};
-
-const ResultRow = ({ country, showCountryHandler }) => {
-  return (
-    <li style={{ listStyle: "none" }}>
-      {country.name.common}{" "}
-      <button onClick={() => showCountryHandler(country)}>Show</button>
-    </li>
-  );
-};
-
-const CountryInfo = ({ country }) => {
-  const languages = [];
-  for (const language in country.languages) {
-    languages.push(<li key={language}>{country.languages[language]}</li>);
-  }
-
-  return (
-    <div className="country-info">
-      <h1>{country.name.common}</h1>
-      <div>
-        <p>Capital: {country.capital}</p>
-        <p>Area(in km^2): {country.area}</p>
-      </div>
-      <h2>Languages</h2>
-      <ul>{languages}</ul>
-      <img src={country.flags.png} alt={country.flags.alt} />
-    </div>
-  );
-};
-
-const Result = ({ countries, showCountryHandler }) => {
-  if (countries && countries.length > 10) {
-    return <p>Too many matches, specify another filter</p>;
-  } else if (countries && countries.length > 1) {
-    return (
-      <ul>
-        {countries.map((country) => (
-          <ResultRow
-            key={country.cca3}
-            country={country}
-            showCountryHandler={showCountryHandler}
-          />
-        ))}
-      </ul>
-    );
-  } else if (countries && countries.length === 1) {
-    // If only one country is found.
-    const country = countries[0];
-    return <CountryInfo country={country} />;
-  } else {
-    return <p>No countries found</p>;
-  }
-};
+import SearchBar from "./components/SearchBar.jsx";
+import Result from "./components/Result.jsx";
 
 const App = () => {
   /** states */
@@ -69,10 +9,12 @@ const App = () => {
   const [queries, setQueries] = useState(null);
   const [queriedCountries, setQueriedCountries] = useState(null);
   const [countryToShow, setCountryToShow] = useState(null);
+  const [weatherLocation, setWeatherLocation] = useState([64, 26]);
+  const [weatherData, setWeatherData] = useState(null);
 
-  /** functions */
+  /** effects */
   useEffect(() => {
-    if (queries !== null) {
+    if (queries) {
       console.log("fetching country info...");
       axios
         .get("https://studies.cs.helsinki.fi/restcountries/api/all")
@@ -97,12 +39,32 @@ const App = () => {
     if (countryToShow) {
       console.log("showing country info...");
       setQueriedCountries([countryToShow]);
+      console.log(countryToShow.latlng);
+      setWeatherLocation([...countryToShow.latlng]);
     }
   }, [countryToShow]);
 
+  useEffect(() => {
+    if (weatherLocation.length > 0) {
+      console.log("fetching weather info...");
+      const api_key = import.meta.env.VITE_API_KEY;
+      axios
+        .get(
+          `https://api.openweathermap.org/data/2.5/weather?lat=${weatherLocation[0]}&lon=${weatherLocation[1]}&units=metric&exclude=minutely&appid=${api_key}`
+        )
+        .then((response) => {
+          console.log(response);
+          setWeatherData({ ...response.data });
+          console.log(weatherData);
+        })
+        .catch((error) => console.log(error.message));
+    }
+  }, [weatherLocation]);
+
+  /** functions */
   const showCountryHandler = (country) => setCountryToShow(country);
 
-  const handleChange = (evt) => {
+  const handleValueChange = (evt) => {
     // console.log(evt.target.value);
     setValue(evt.target.value);
     // query(value); -> since the update of the state(setValue) is async
@@ -125,10 +87,11 @@ const App = () => {
 
   return (
     <div className="container">
-      <SearchBar onChange={handleChange} />
+      <SearchBar onChange={handleValueChange} />
       <Result
         countries={queriedCountries}
         showCountryHandler={showCountryHandler}
+        weatherData={weatherData}
       />
     </div>
   );
