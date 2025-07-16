@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+/** components */
 const SearchBar = ({ onChange }) => {
   return (
     <div>
@@ -9,18 +10,23 @@ const SearchBar = ({ onChange }) => {
   );
 };
 
-const ResultRow = ({ name }) => {
-  return <li style={{ listStyle: "none" }}>{name}</li>;
+const ResultRow = ({ country, showCountryHandler }) => {
+  return (
+    <li style={{ listStyle: "none" }}>
+      {country.name.common}{" "}
+      <button onClick={() => showCountryHandler(country)}>Show</button>
+    </li>
+  );
 };
 
 const CountryInfo = ({ country }) => {
   const languages = [];
   for (const language in country.languages) {
-    languages.push(<li>{country.languages[language]}</li>);
+    languages.push(<li key={language}>{country.languages[language]}</li>);
   }
 
   return (
-    <>
+    <div className="country-info">
       <h1>{country.name.common}</h1>
       <div>
         <p>Capital: {country.capital}</p>
@@ -29,18 +35,22 @@ const CountryInfo = ({ country }) => {
       <h2>Languages</h2>
       <ul>{languages}</ul>
       <img src={country.flags.png} alt={country.flags.alt} />
-    </>
+    </div>
   );
 };
 
-const Result = ({ countries }) => {
+const Result = ({ countries, showCountryHandler }) => {
   if (countries && countries.length > 10) {
     return <p>Too many matches, specify another filter</p>;
   } else if (countries && countries.length > 1) {
     return (
       <ul>
         {countries.map((country) => (
-          <ResultRow key={country.cca3} name={country.name.common} />
+          <ResultRow
+            key={country.cca3}
+            country={country}
+            showCountryHandler={showCountryHandler}
+          />
         ))}
       </ul>
     );
@@ -57,8 +67,10 @@ const App = () => {
   /** states */
   const [value, setValue] = useState("");
   const [queries, setQueries] = useState(null);
-  const [countries, setCountries] = useState(null);
+  const [queriedCountries, setQueriedCountries] = useState(null);
+  const [countryToShow, setCountryToShow] = useState(null);
 
+  /** functions */
   useEffect(() => {
     if (queries !== null) {
       console.log("fetching country info...");
@@ -75,14 +87,23 @@ const App = () => {
               return country.name.common.includes(queries[0]);
             }
           });
-          setCountries(filtered);
+          setQueriedCountries(filtered);
         })
         .catch((error) => console.log(error.message));
     }
   }, [queries]);
 
+  useEffect(() => {
+    if (countryToShow) {
+      console.log("showing country info...");
+      setQueriedCountries([countryToShow]);
+    }
+  }, [countryToShow]);
+
+  const showCountryHandler = (country) => setCountryToShow(country);
+
   const handleChange = (evt) => {
-    console.log(evt.target.value);
+    // console.log(evt.target.value);
     setValue(evt.target.value);
     // query(value); -> since the update of the state(setValue) is async
     // , use evt.target.value for the argument of query fn
@@ -91,7 +112,7 @@ const App = () => {
 
   const query = (value) => {
     const beforeCapitalized = value.trim();
-    // console.log(beforeCapitalized);
+    console.log(beforeCapitalized);
     let capitalizedQuery = "";
     if (beforeCapitalized.length > 0) {
       capitalizedQuery =
@@ -103,9 +124,12 @@ const App = () => {
   };
 
   return (
-    <div>
+    <div className="container">
       <SearchBar onChange={handleChange} />
-      <Result countries={countries} />
+      <Result
+        countries={queriedCountries}
+        showCountryHandler={showCountryHandler}
+      />
     </div>
   );
 };
