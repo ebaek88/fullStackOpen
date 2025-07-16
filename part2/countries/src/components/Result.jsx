@@ -8,8 +8,6 @@ const ResultRow = ({ country, showCountryHandler }) => {
 };
 
 const CountryInfo = ({ country, weatherData }) => {
-  console.log(country);
-  console.log(weatherData.weather[0]);
   const languages = [];
   for (const language in country.languages) {
     languages.push(<li key={language}>{country.languages[language]}</li>);
@@ -27,15 +25,26 @@ const CountryInfo = ({ country, weatherData }) => {
         <ul>{languages}</ul>
         <img src={country.flags.png} alt={country.flags.alt} />
       </div>
-      <div className="country-weather">
-        <h2>Weather in {country.capital}</h2>
-        Temperature: {weatherData.main.temp}
-        <img
-          src={`https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`}
-          alt={weatherData.current.weather[0].description}
-        />
-        Wind: {weatherData.wind.speed}
-      </div>
+      {weatherData && (
+        <div className="country-weather">
+          <h2>Weather in {weatherData.name}</h2>
+          <p>{weatherData.weather[0].description}</p>
+          <p>Current Temperature: {weatherData.main.temp} Celsius</p>
+          <p>
+            Lowest Temperature of the day: {weatherData.main.temp_min} Celsius
+          </p>
+          <p>
+            Highest Temperature of the day: {weatherData.main.temp_max} Celsius
+          </p>
+          <div className="weather-icon">
+            <img
+              src={`https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`}
+              alt={weatherData.weather[0].description}
+            />
+          </div>
+          <p>Wind: {weatherData.wind.speed} m/s</p>
+        </div>
+      )}
     </div>
   );
 };
