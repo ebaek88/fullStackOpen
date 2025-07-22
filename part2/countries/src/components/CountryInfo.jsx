@@ -1,18 +1,41 @@
-const ResultRow = ({ country, showCountryHandler }) => {
-  return (
-    <li style={{ listStyle: "none" }}>
-      {country.name.common}{" "}
-      <button onClick={() => showCountryHandler(country)}>Show</button>
-    </li>
-  );
-};
+import { useState, useEffect } from "react";
+import axios from "axios";
 
-const CountryInfo = ({ country, weatherData }) => {
+const CountryInfo = ({ country }) => {
+  /** states */
+  const [weatherLocation, setWeatherLocation] = useState(null);
+  const [weatherData, setWeatherData] = useState(null);
+
+  /** effects */
+  useEffect(() => {
+    if (!country) return;
+    // console.log("showing country info...");
+    setWeatherLocation([country.capital, country.cca2.toLowerCase()]);
+    setWeatherData(null); // reset weather data when showing a new country
+  }, [country]);
+
+  useEffect(() => {
+    if (!weatherLocation || weatherLocation.length === 0) return;
+    // console.log("fetching weather info...");
+    const api_key = import.meta.env.VITE_API_KEY;
+    axios
+      .get(
+        `https://api.openweathermap.org/data/2.5/weather?q=${weatherLocation[0]},${weatherLocation[1]}&units=metric&exclude=minutely&appid=${api_key}`
+      )
+      .then((response) => {
+        // console.log(response);
+        setWeatherData({ ...response.data });
+        // console.log(weatherData);
+      })
+      .catch((error) => console.log(error.message));
+  }, [weatherLocation]);
+
   const languages = [];
   for (const language in country.languages) {
     languages.push(<li key={language}>{country.languages[language]}</li>);
   }
 
+  /** JSX */
   return (
     <div className="country-container">
       <div className="country-info">
@@ -49,28 +72,4 @@ const CountryInfo = ({ country, weatherData }) => {
   );
 };
 
-const Result = ({ countries, showCountryHandler, weatherData }) => {
-  if (countries && countries.length > 10) {
-    return <p>Too many matches, specify another filter</p>;
-  } else if (countries && countries.length > 1) {
-    return (
-      <ul>
-        {countries.map((country) => (
-          <ResultRow
-            key={country.cca3}
-            country={country}
-            showCountryHandler={showCountryHandler}
-          />
-        ))}
-      </ul>
-    );
-  } else if (countries && countries.length === 1) {
-    // If only one country is found.
-    const country = countries[0];
-    return <CountryInfo country={country} weatherData={weatherData} />;
-  } else {
-    return <p>No countries found</p>;
-  }
-};
-
-export default Result;
+export default CountryInfo;
