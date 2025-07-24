@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
+app.use(express.json());
 
+// Initial data
 let persons = [
   {
     id: "1",
@@ -23,6 +25,12 @@ let persons = [
     number: "39-23-6423122",
   },
 ];
+
+// Helper function
+const generateId = () => {
+  const randomNum = Math.floor(Math.random() * 100000000 + 1);
+  return randomNum.toString();
+};
 
 app.get("/", (request, response) => {
   response.send("<h1>Hello World!</h1>");
@@ -59,6 +67,24 @@ app.delete("/api/persons/:id", (request, response) => {
   persons = persons.filter((person) => person.id !== id);
 
   response.status(204).end();
+});
+
+app.post("/api/persons", (request, response) => {
+  const body = request.body;
+
+  if (!(body.name || body.number)) {
+    return response.status(400).json({ error: "content missing" });
+  }
+
+  const person = {
+    name: body.name,
+    number: body.number,
+    id: generateId(),
+  };
+
+  persons = persons.concat(person);
+
+  response.json(person);
 });
 
 const PORT = 3001;
