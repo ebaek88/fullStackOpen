@@ -32,6 +32,7 @@ const generateId = () => {
   return randomNum.toString();
 };
 
+// REST handlers
 app.get("/", (request, response) => {
   response.send("<h1>Hello World!</h1>");
 });
@@ -72,8 +73,12 @@ app.delete("/api/persons/:id", (request, response) => {
 app.post("/api/persons", (request, response) => {
   const body = request.body;
 
-  if (!(body.name || body.number)) {
+  if (!(body.name && body.number)) {
     return response.status(400).json({ error: "content missing" });
+  }
+
+  if (persons.some((person) => person.name === body.name)) {
+    return response.status(400).json({ error: "name must be unique" });
   }
 
   const person = {
