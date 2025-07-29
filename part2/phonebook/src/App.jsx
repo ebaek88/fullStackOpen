@@ -13,22 +13,22 @@ const App = () => {
   const [filterText, setFilterText] = useState("");
   const [notiMessage, setNotiMessage] = useState(null);
 
+  /** Helper functions */
+  const showNotification = (msg, timeout = 3000) => {
+    setNotiMessage(msg);
+    setTimeout(() => setNotiMessage(null), timeout);
+  };
+
   /** useEffect */
   useEffect(() => {
     phonebookService
       .getAll()
       .then((initialPersons) => {
-        setNotiMessage("Loaded initial data successfully!");
-        setTimeout(() => {
-          setNotiMessage(null);
-        }, 1000);
+        showNotification("Loaded initial data successfully!");
         setPersons(initialPersons);
       })
       .catch((error) => {
-        setNotiMessage(error.message);
-        setTimeout(() => {
-          setNotiMessage(null);
-        }, 3000);
+        showNotification(error.message);
       });
   }, []);
 
@@ -42,68 +42,61 @@ const App = () => {
     const existingPerson = persons.find(
       (person) => person.name === trimmedNewName
     );
-    // console.log(existingPerson);
 
     if (existingPerson) {
-      if (
+      // If there already exists the same name and the same number, do not proceed further.
+      const isSameNumber =
         existingPerson.id &&
         existingPerson.number &&
-        existingPerson.number === trimmedNewNumber
-      ) {
-        setNotiMessage(
+        existingPerson.number === trimmedNewNumber;
+      if (isSameNumber) {
+        showNotification(
           `The entry ${trimmedNewName} ${trimmedNewNumber} is already added to phonebook`
         );
-        setTimeout(() => {
-          setNotiMessage(null);
-        }, 3000);
         return;
-      } else if (existingPerson.id && existingPerson.name) {
-        if (
-          confirm(
-            `${existingPerson.name} is already added to phonebook, replace the old number with a new one?`
-          )
-        ) {
-          editExistingPerson(existingPerson, trimmedNewNumber);
-          return;
-        }
+      }
+
+      // If the same name already exists, but a different number, if confirmed, edit the existing entry.
+      const canUpdate =
+        existingPerson.id &&
+        existingPerson.name &&
+        confirm(
+          `${existingPerson.name} is already added to phonebook, replace the old number with a new one?`
+        );
+
+      if (canUpdate) {
+        editExistingPerson(existingPerson, trimmedNewNumber);
+        return;
       }
     }
 
-    // if no name or number is entered, the new entry should be denied
+    // if no name or number is entered, the new entry should be denied.
     if (trimmedNewName.length === 0 || trimmedNewNumber.length === 0) {
-      setNotiMessage("Both the name and the number need to be entered.");
-      setTimeout(() => {
-        setNotiMessage(null);
-      }, 3000);
+      showNotification("Both the name and the number need to be entered.");
       return;
     }
 
-    const maxId =
-      persons.length > 0
-        ? Math.max(...persons.map((person) => Number(person.id)))
-        : 0;
+    // const maxId =
+    //   persons.length > 0
+    //     ? Math.max(...persons.map((person) => Number(person.id)))
+    //     : 0; <- now the DB will take care of the id
+
     const newPersonObject = {
       name: trimmedNewName,
       number: trimmedNewNumber,
-      id: String(maxId + 1),
+      // id: String(maxId + 1),
     };
 
     phonebookService
       .create(newPersonObject)
       .then((returnedPerson) => {
-        setNotiMessage(`Added ${returnedPerson.name}!`);
-        setTimeout(() => {
-          setNotiMessage(null);
-        }, 3000);
+        showNotification(`Added ${returnedPerson.name}!`);
         setPersons(persons.concat(returnedPerson));
         setNewName("");
         setNewNumber("");
       })
       .catch((error) => {
-        setNotiMessage(error.message);
-        setTimeout(() => {
-          setNotiMessage(null);
-        }, 3000);
+        showNotification(error.message);
         setNewName("");
         setNewNumber("");
       });
@@ -113,12 +106,9 @@ const App = () => {
     const id = evt.target.closest("li").getAttribute("id");
     const name = persons.find((person) => person.id === id).name;
     if (id === null || name === undefined) {
-      setNotiMessage(
+      showNotification(
         "Cannot delete the entry because it is not in the database."
       );
-      setTimeout(() => {
-        setNotiMessage(null);
-      }, 3000);
       return;
     }
 
@@ -128,20 +118,14 @@ const App = () => {
       phonebookService
         .deleteId(id)
         .then((deletedPerson) => {
-          setNotiMessage(`Deleted ${deletedPerson.name}!`);
-          setTimeout(() => {
-            setNotiMessage(null);
-          }, 3000);
+          showNotification(`Deleted ${deletedPerson.name}!`);
           const newPersons = persons.filter(
             (person) => person.id !== deletedPerson.id
           );
           setPersons(newPersons);
         })
         .catch((error) => {
-          setNotiMessage(error.message);
-          setTimeout(() => {
-            setNotiMessage(null);
-          }, 3000);
+          showNotification(error.message);
         });
     }
   };
@@ -150,22 +134,16 @@ const App = () => {
   // , copy the existing number and id into a new entry.
   const editExistingPerson = (existingPerson, newNumberToEnter) => {
     if (newNumberToEnter.length === 0) {
-      setNotiMessage(
+      showNotification(
         "The new number to update is empty. Please enter the number again."
       );
-      setTimeout(() => {
-        setNotiMessage(null);
-      }, 3000);
       return;
     }
     const newPerson = { ...existingPerson, number: newNumberToEnter };
     phonebookService
       .update(newPerson.id, newPerson)
       .then((updatedPerson) => {
-        setNotiMessage(`Updated ${updatedPerson.name}'s number!`);
-        setTimeout(() => {
-          setNotiMessage(null);
-        }, 3000);
+        showNotification(`Updated ${updatedPerson.name}'s number!`);
         setPersons(
           persons.map((person) =>
             person.id === newPerson.id ? updatedPerson : person
@@ -176,12 +154,9 @@ const App = () => {
       })
       .catch((error) => {
         console.log(error.message);
-        setNotiMessage(
+        showNotification(
           `Information of ${newPerson.name} has already been removed from server`
         );
-        setTimeout(() => {
-          setNotiMessage(null);
-        }, 3000);
         setNewName("");
         setNewNumber("");
       });

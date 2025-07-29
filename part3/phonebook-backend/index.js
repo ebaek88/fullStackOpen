@@ -72,16 +72,15 @@ app.get("/info", (request, response) => {
 });
 
 app.get("/api/persons/:id", (request, response) => {
-  const id = request.params.id;
-  const person = persons.find((person) => person.id === id);
-
-  if (!person) {
-    response
-      .status(404)
-      .json({ error: "The person requested CANNOT be retrieved." });
-  } else {
-    response.json(person);
-  }
+  Person.findById(request.params.id).then((person) => {
+    if (!person) {
+      response
+        .status(404)
+        .json({ error: "The person requested CANNOT be retrieved." });
+    } else {
+      response.json(person);
+    }
+  });
 });
 
 app.delete("/api/persons/:id", (request, response) => {
@@ -98,19 +97,28 @@ app.post("/api/persons", (request, response) => {
     return response.status(400).json({ error: "content missing" });
   }
 
-  if (persons.some((person) => person.name === body.name)) {
-    return response.status(400).json({ error: "name must be unique" });
-  }
+  // For now, editing an existing person is not functional.
+  // I will refactor it so that PUT request is functional in the near future.
+  Person.find({})
+    .then((persons) => {
+      // If there exists the same name and the same number, do not proceed further and return status 400.
+      if (
+        persons.some(
+          (person) => person.name === body.name && person.number === body.number
+        )
+      ) {
+        return response.status(400).json({ error: "entry must be unique" });
+      }
 
-  const person = {
-    name: body.name,
-    number: body.number,
-    id: generateId(),
-  };
+      const person = new Person({
+        name: body.name,
+        number: body.number,
+      });
 
-  persons = persons.concat(person);
-
-  response.json(person);
+      return person.save();
+    })
+    .then((savedPerson) => response.json(savedPerson))
+    .catch((error) => console.log(error.message));
 });
 
 const PORT = process.env.PORT;
