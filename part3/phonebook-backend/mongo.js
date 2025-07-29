@@ -11,6 +11,12 @@ const url = `mongodb+srv://fullstack:${password}@cluster0.yjvbxla.mongodb.net/ph
 
 mongoose.set("strictQuery", false);
 
+mongoose.connect(url).catch((err) => {
+  console.log("Connection error: ", err.message);
+  mongoose.connection.close();
+  return;
+});
+
 const personSchema = new mongoose.Schema({
   name: String,
   number: String,
@@ -33,4 +39,18 @@ const addPerson = (name, number) => {
     .finally(() => mongoose.connection.close());
 };
 
-addPerson(process.argv[3], process.argv[4]);
+const retrievePeople = () => {
+  Person.find({})
+    .then((result) => {
+      result.forEach((person) => {
+        console.log(`${person.name} ${person.number}`);
+      });
+    })
+    .catch((err) => console.log(err.message))
+    .finally(() => mongoose.connection.close());
+};
+
+// If there are no arguments for Person fields, just retrieve all entries in the DB.
+process.argv[3] && process.argv[4]
+  ? addPerson(process.argv[3], process.argv[4])
+  : retrievePeople();
