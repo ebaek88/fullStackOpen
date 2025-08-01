@@ -51,36 +51,40 @@ app.get("/", (request, response) => {
   response.send("<h1>Hello World!</h1>");
 });
 
-app.get("/api/persons", (request, response) => {
+app.get("/api/persons", (request, response, next) => {
   Person.find({})
     .then((persons) => {
       response.json(persons);
     })
-    .catch((err) => console.log(err.message));
+    .catch((error) => next(error));
 });
 
-app.get("/info", (request, response) => {
-  Person.find({}).then((persons) => {
-    response.send(
-      `<p>Phonebook has info for ${persons.length} ${
-        persons.length > 1 ? "people" : "person"
-      }</p>
-      <p>${Date(response.get("Date"))}</p>`
-    ); // The "Date" of the response header is a Date object.
-    // Therefore, it needs to be converted into a string.
-  });
+app.get("/info", (request, response, next) => {
+  Person.find({})
+    .then((persons) => {
+      response.send(
+        `<p>Phonebook has info for ${persons.length} ${
+          persons.length > 1 ? "people" : "person"
+        }</p>
+        <p>${Date(response.get("Date"))}</p>`
+      ); // The "Date" of the response header is a Date object.
+      // Therefore, it needs to be converted into a string.
+    })
+    .catch((error) => next(error));
 });
 
-app.get("/api/persons/:id", (request, response) => {
-  Person.findById(request.params.id).then((person) => {
-    if (!person) {
-      response
-        .status(404)
-        .json({ error: "The person requested CANNOT be retrieved." });
-    } else {
-      response.json(person);
-    }
-  });
+app.get("/api/persons/:id", (request, response, next) => {
+  Person.findById(request.params.id)
+    .then((person) => {
+      if (!person) {
+        response
+          .status(404)
+          .json({ error: "The person requested CANNOT be retrieved." });
+      } else {
+        response.json(person);
+      }
+    })
+    .catch((error) => next(error));
 });
 
 app.delete("/api/persons/:id", (request, response, next) => {
@@ -91,7 +95,7 @@ app.delete("/api/persons/:id", (request, response, next) => {
     .catch((error) => next(error));
 });
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
   const body = request.body;
 
   if (!(body.name && body.number)) {
@@ -119,8 +123,25 @@ app.post("/api/persons", (request, response) => {
       return person.save();
     })
     .then((savedPerson) => response.json(savedPerson))
-    .catch((error) => console.log(error.message));
+    .catch((error) => next(error));
 });
+
+// Error-handling middleware
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: "unknown endpoint " });
+};
+app.use(unknownEndpoint);
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
+};
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
