@@ -15,8 +15,21 @@ mongoose
   });
 
 const personSchema = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: {
+    type: String,
+    minLength: [3, "The name should be at least 3 characters long!"],
+    required: [true, "Name required!"],
+  },
+  number: {
+    type: String,
+    validate: {
+      validator: function (v) {
+        return /^(\d{2,3})-(\d{5,})$/.test(v);
+      },
+      message: (props) => `${props.value} is not a valid phone number!`,
+    },
+    required: [true, "Phone number required!"],
+  },
 });
 
 // Formatting the document objects returned by Mongoose

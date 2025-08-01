@@ -78,27 +78,22 @@ const App = () => {
       return;
     }
 
-    // const maxId =
-    //   persons.length > 0
-    //     ? Math.max(...persons.map((person) => Number(person.id)))
-    //     : 0; <- now the DB will take care of the id
-
     const newPersonObject = {
       name: trimmedNewName,
       number: trimmedNewNumber,
-      // id: String(maxId + 1),
     };
 
     phonebookService
       .create(newPersonObject)
-      .then((returnedPerson) => {
-        showNotification(`Added ${returnedPerson.name}!`);
-        setPersons(persons.concat(returnedPerson));
+      .then((createdPerson) => {
+        showNotification(`Added ${createdPerson.name}!`);
+        setPersons(persons.concat(createdPerson));
         setNewName("");
         setNewNumber("");
       })
       .catch((error) => {
-        showNotification(error.message);
+        console.log(error.response.data.error);
+        showNotification(error.response.data.error);
         setNewName("");
         setNewNumber("");
       });
@@ -153,10 +148,8 @@ const App = () => {
         setNewNumber("");
       })
       .catch((error) => {
-        console.log(error.message);
-        showNotification(
-          `Information of ${newPerson.name} has already been removed from server`
-        );
+        console.log(error.response.data.error);
+        showNotification(error.response.data.error);
         setNewName("");
         setNewNumber("");
       });
