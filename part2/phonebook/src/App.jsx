@@ -67,6 +67,8 @@ const App = () => {
       if (canUpdate) {
         editExistingPerson(existingPerson, trimmedNewNumber);
         return;
+      } else {
+        return;
       }
     }
 
@@ -117,11 +119,9 @@ const App = () => {
     } else {
       phonebookService
         .deleteId(id)
-        .then((deletedPerson) => {
-          showNotification(`Deleted ${deletedPerson.name}!`);
-          const newPersons = persons.filter(
-            (person) => person.id !== deletedPerson.id
-          );
+        .then(() => {
+          showNotification(`Deleted ${name}!`);
+          const newPersons = persons.filter((person) => person.id !== id);
           setPersons(newPersons);
         })
         .catch((error) => {
@@ -133,7 +133,7 @@ const App = () => {
   // If the newly put entry's name is already existing in the phonebook but the number is not
   // , copy the existing number and id into a new entry.
   const editExistingPerson = (existingPerson, newNumberToEnter) => {
-    if (newNumberToEnter.length === 0) {
+    if (!newNumberToEnter.length) {
       showNotification(
         "The new number to update is empty. Please enter the number again."
       );
