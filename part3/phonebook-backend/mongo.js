@@ -32,7 +32,7 @@ const addPerson = (name, number) => {
 
   person
     .save()
-    .then((result) => {
+    .then(() => {
       console.log(`added ${name} ${number} to phonebook`);
     })
     .catch((err) => console.log(err.message))

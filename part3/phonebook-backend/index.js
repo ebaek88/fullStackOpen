@@ -9,7 +9,7 @@ app.use(express.json());
 // app.use(cors({ origin: "*" }));
 app.use(express.static("dist"));
 
-morgan.token("body", (request, response) => {
+morgan.token("body", (request) => {
   return JSON.stringify(request.body);
 });
 app.use(
@@ -59,7 +59,7 @@ app.get("/api/persons/:id", (request, response, next) => {
 
 app.delete("/api/persons/:id", (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
-    .then((result) => {
+    .then(() => {
       response.status(204).end();
     })
     .catch((error) => next(error));
