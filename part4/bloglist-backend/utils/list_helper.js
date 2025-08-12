@@ -17,15 +17,15 @@ const mostBlogs = (blogs) => {
   if (blogs.length === 0) return undefined;
 
   const authorCounts = _.countBy(blogs, (blog) => blog.author);
-  const sortedAuthorCounts = Object.entries(authorCounts).toSorted(
-    (a, b) => b[1] - a[1]
-  );
-  const mostProlificAuthor = {
-    author: sortedAuthorCounts[0][0],
-    blogs: sortedAuthorCounts[0][1],
-  };
-
-  return mostProlificAuthor;
+  // const sortedAuthorCounts = Object.entries(authorCounts).toSorted(
+  //   (a, b) => b[1] - a[1]
+  // );
+  // const mostProlificAuthor = {
+  //   author: sortedAuthorCounts[0][0],
+  //   blogs: sortedAuthorCounts[0][1],
+  // };
+  const mostProlificAuthor = _.max(Object.entries(authorCounts));
+  return { author: mostProlificAuthor[0], blogs: mostProlificAuthor[1] };
 };
 
 const mostLikes = (blogs) => {
