@@ -84,6 +84,26 @@ test("a valid blog can be added", async () => {
   assert(titles.includes("Canonical string reduction"));
 });
 
+test("the likes property of a new blog defaults to 0 if it is added without the property", async () => {
+  const newBlog = {
+    title: "First class tests",
+    author: "Robert C. Martin",
+    url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
+  };
+
+  await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .expect(201)
+    .expect("Content-Type", /application\/json/);
+
+  const response = await api.get("/api/blogs");
+  const recentlyAddedBlog = response.body.find(
+    (blog) => blog.title === newBlog.title
+  );
+  assert.strictEqual(recentlyAddedBlog.likes, 0);
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
