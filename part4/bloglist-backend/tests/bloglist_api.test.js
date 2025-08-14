@@ -121,7 +121,7 @@ describe("when there are initially some blogs saved", () => {
       assert.strictEqual(recentlyAddedBlog.likes, 0);
     });
 
-    test("fails with statuscode 400 if a blog without the title or url properties is not added", async () => {
+    test("fails with statuscode 400 if a blog without the title or url properties is added", async () => {
       const newBlog = {
         author: "Dooly",
       };
@@ -148,16 +148,82 @@ describe("when there are initially some blogs saved", () => {
       assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1);
     });
 
-    test("fails with statuscode 204 if blog does not exist", async () => {
+    test("fails with statuscode 404 if blog does not exist", async () => {
       const validNonexistingId = await helper.nonExistingId();
 
-      await api.delete(`/api/blogs/${validNonexistingId}`).expect(204);
+      await api.delete(`/api/blogs/${validNonexistingId}`).expect(404);
     });
 
     test("fails with statuscode 400 if id is invalid", async () => {
       const invalidId = "5a3d5da59070081a82a3445";
 
       await api.delete(`/api/blogs/${invalidId}`).expect(400);
+    });
+  });
+
+  describe("update of a blog", () => {
+    test("succeeds with statuscode 200", async () => {
+      const blogsAtStart = await helper.blogsInDb();
+
+      const blogToUpdate = {
+        ...blogsAtStart[0],
+        title: "haha",
+        likes: -1000,
+      };
+
+      await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send(blogToUpdate)
+        .expect(200)
+        .expect("Content-Type", /application\/json/);
+
+      const blogsAtEnd = await helper.blogsInDb();
+      const titles = blogsAtEnd.map((blog) => blog.title);
+      assert(titles.includes("haha"));
+
+      const likes = blogsAtEnd.map((blog) => blog.likes);
+      assert(likes.some((like) => like === -1000));
+    });
+
+    test("the likes property of a new blog defaults to 0 if it is added without the property", async () => {
+      const blogsAtStart = await helper.blogsInDb();
+
+      const blogToUpdate = {
+        ...blogsAtStart[0],
+        title: "haha",
+      };
+      delete blogToUpdate.likes;
+
+      await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send(blogToUpdate)
+        .expect(200)
+        .expect("Content-Type", /application\/json/);
+
+      const blogsAtEnd = await helper.blogsInDb();
+      const likes = blogsAtEnd.map((blog) => blog.likes);
+      assert.strictEqual(
+        likes.some((like) => like === 0),
+        true
+      );
+    });
+
+    test("fails with statuscode 400 if a blog without the title or url properties is updated", async () => {
+      const blogsAtStart = await helper.blogsInDb();
+
+      const blogToUpdate = {
+        ...blogsAtStart[0],
+      };
+      // delete blogToUpdate.title;
+      delete blogToUpdate.url;
+
+      await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send(blogToUpdate)
+        .expect(400);
+
+      const blogsAtEnd = await helper.blogsInDb();
+      assert.deepStrictEqual(blogsAtEnd[0], blogsAtStart[0]);
     });
   });
 });

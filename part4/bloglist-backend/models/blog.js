@@ -11,7 +11,10 @@ const blogSchema = new mongoose.Schema({
     type: String,
     required: [true, "URL required!"],
   },
-  likes: Number,
+  likes: {
+    type: Number,
+    default: 0,
+  },
 });
 
 // Formatting the document objects returned by Mongoose
