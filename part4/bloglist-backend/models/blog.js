@@ -2,9 +2,15 @@ const mongoose = require("mongoose");
 
 // Setting up DB schema and object model from it
 const blogSchema = new mongoose.Schema({
-  title: String,
+  title: {
+    type: String,
+    required: [true, "Title required!"],
+  },
   author: String,
-  url: String,
+  url: {
+    type: String,
+    required: [true, "URL required!"],
+  },
   likes: Number,
 });
 

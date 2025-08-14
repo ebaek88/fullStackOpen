@@ -1,7 +1,7 @@
 const personsRouter = require("express").Router();
 const Person = require("../models/person.js");
 
-personsRouter.get("/", (request, response) => {
+personsRouter.get("/", (request, response, next) => {
   Person.find({})
     .then((persons) => {
       response.json(persons);
