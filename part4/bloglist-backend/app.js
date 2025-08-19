@@ -25,9 +25,14 @@ app.use(express.json());
 morgan.token("body", (request, response) => {
   return JSON.stringify(request.body);
 });
-app.use(
-  morgan(":method :url :status :res[content-length] - :response-time ms :body")
-);
+
+if (process.env.NODE_ENV !== "test") {
+  app.use(
+    morgan(
+      ":method :url :status :res[content-length] - :response-time ms :body"
+    )
+  );
+}
 
 app.use("/api/blogs", blogsRouter);
 app.use("/api/users", usersRouter);
