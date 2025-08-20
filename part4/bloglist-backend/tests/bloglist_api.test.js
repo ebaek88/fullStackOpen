@@ -86,6 +86,7 @@ describe("when there are initially some blogs saved", () => {
         author: "Edsger W. Dijkstra",
         url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
         likes: 12,
+        userId: "68a3f90ad91320ef1e29bdb2",
       };
 
       await api
@@ -106,6 +107,7 @@ describe("when there are initially some blogs saved", () => {
         title: "First class tests",
         author: "Robert C. Martin",
         url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
+        userId: "68a3f90ad91320ef1e29bdb2",
       };
 
       await api
@@ -121,12 +123,34 @@ describe("when there are initially some blogs saved", () => {
       assert.strictEqual(recentlyAddedBlog.likes, 0);
     });
 
-    test("fails with statuscode 400 if a blog without the title or url properties is added", async () => {
+    test("fails with statuscode 400 and appropriate message if a blog without the title or url properties is added", async () => {
       const newBlog = {
+        url: "https://www.google.com",
         author: "Dooly",
+        userId: "68a3f90ad91320ef1e29bdb2",
       };
 
-      await api.post("/api/blogs").send(newBlog).expect(400);
+      await api
+        .post("/api/blogs")
+        .send(newBlog)
+        .expect(400, { error: "content missing" });
+
+      const blogsAtEnd = await helper.blogsInDb();
+      assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length);
+    });
+
+    test("fails with statuscode 400 and appropriate message if userId is missing", async () => {
+      const newBlog = {
+        title: "Important notes about dinosaurs",
+        url: "https://www.google.com",
+        author: "Dooly",
+        likes: 37,
+      };
+
+      await api
+        .post("/api/blogs")
+        .send(newBlog)
+        .expect(400, { error: "userId missing or not valid" });
 
       const blogsAtEnd = await helper.blogsInDb();
       assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length);
