@@ -16,6 +16,34 @@ const initialBlogs = [
   },
 ];
 
+const userId = "68a3f90ad91320ef1e29bdb2";
+
+// creating initial notes with user "root"
+const createInitialBlogs = async () => {
+  const blogModels = initialBlogs.map((blog) => {
+    return new Blog({
+      title: blog.title,
+      author: blog.author,
+      url: blog.url,
+      likes: blog.likes,
+      user: userId,
+    });
+  });
+
+  try {
+    // DO NOT USE ASYNC FUNCTION INSIDE forEach. Instead, use promise array and Promise.all()
+    const promiseArray = blogModels.map((blogModel) => blogModel.save());
+    await Promise.all(promiseArray);
+  } catch (err) {
+    console.error(err.message);
+  }
+};
+
+const initialUser = {
+  username: "test",
+  password: "bbcBbc998&",
+};
+
 const nonExistingId = async () => {
   const blog = new Blog({
     title: "willremovethissoon",
@@ -39,4 +67,10 @@ const usersInDb = async () => {
   return users.map((user) => user.toJSON());
 };
 
-module.exports = { initialBlogs, nonExistingId, blogsInDb, usersInDb };
+module.exports = {
+  createInitialBlogs,
+  initialUser,
+  nonExistingId,
+  blogsInDb,
+  usersInDb,
+};
