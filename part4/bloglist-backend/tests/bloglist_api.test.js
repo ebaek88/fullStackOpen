@@ -189,7 +189,7 @@ describe("when there are initially some blogs saved", () => {
       await api
         .post("/api/blogs")
         .send(newBlog)
-        .expect(401, { error: "token invalid" });
+        .expect(401, { error: "token nonexisting" });
 
       const blogsAtEnd = await helper.blogsInDb();
       assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
@@ -269,7 +269,7 @@ describe("when there are initially some blogs saved", () => {
 
       await api
         .delete(`/api/blogs/${blogToDelete.id}`)
-        .expect(401, { error: "token invalid" });
+        .expect(401, { error: "token nonexisting" });
 
       const blogsAtEnd = await helper.blogsInDb();
       assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
