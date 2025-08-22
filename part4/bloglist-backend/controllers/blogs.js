@@ -64,7 +64,34 @@ blogsRouter.post("/", async (request, response, next) => {
 });
 
 blogsRouter.delete("/:id", async (request, response, next) => {
+  // Check if login has been made beforehand
+  const decodedToken = jwt.verify(request.token, process.env.SECRET);
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: "token invalid" });
+  }
+
   try {
+    // Check if the token is issued to a valid user
+    const user = await User.findById(decodedToken.id);
+    if (!user) {
+      return response
+        .status(400)
+        .json({ error: "userId missing or not valid" });
+    }
+
+    // Check if the blog to be deleted has been created by the user logged in
+    const blogToDelete = await Blog.findById(request.params.id);
+    if (!blogToDelete) {
+      return response.status(404).end();
+    }
+
+    if (blogToDelete.user.toString() !== user._id.toString()) {
+      return response.status(401).json({
+        error: "a note can be deleted only by the user who created it",
+      });
+    }
+
+    // Delete the blog
     const result = await Blog.findByIdAndDelete(request.params.id);
     result ? response.status(204).end() : response.status(404).end();
   } catch (error) {

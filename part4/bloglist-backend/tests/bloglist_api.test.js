@@ -133,8 +133,7 @@ describe("when there are initially some blogs saved", () => {
       const newBlog = {
         title: "First class tests",
         author: "Robert C. Martin",
-        url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
-        userId: "68a3f90ad91320ef1e29bdb2",
+        url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.html",
       };
 
       await api
@@ -198,11 +197,21 @@ describe("when there are initially some blogs saved", () => {
   });
 
   describe("deletion of a blog", async () => {
-    test("succeeds with status code 204 if id is valid", async () => {
+    test("succeeds with status code 204 if logged in user and id are valid", async () => {
       const blogsAtStart = await helper.blogsInDb();
-      const blogToDelete = blogsAtStart[0];
+      const blogToDelete = blogsAtStart[blogsAtStart.length - 1];
 
-      await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+      const loginInfo = {
+        username: helper.initialUser.username,
+        password: helper.initialUser.password,
+      };
+      const loginResponse = await api.post("/api/login").send(loginInfo);
+      const authToken = loginResponse.body.token;
+
+      await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .set("Authorization", `Bearer ${authToken}`)
+        .expect(204);
 
       const blogsAtEnd = await helper.blogsInDb();
 
@@ -213,15 +222,80 @@ describe("when there are initially some blogs saved", () => {
     });
 
     test("fails with statuscode 404 if blog does not exist", async () => {
+      const blogsAtStart = await helper.blogsInDb();
+
+      const loginInfo = {
+        username: helper.initialUser.username,
+        password: helper.initialUser.password,
+      };
+      const loginResponse = await api.post("/api/login").send(loginInfo);
+      const authToken = loginResponse.body.token;
+
       const validNonexistingId = await helper.nonExistingId();
 
-      await api.delete(`/api/blogs/${validNonexistingId}`).expect(404);
+      await api
+        .delete(`/api/blogs/${validNonexistingId}`)
+        .set("Authorization", `Bearer ${authToken}`)
+        .expect(404);
+
+      const blogsAtEnd = await helper.blogsInDb();
+      assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
     });
 
     test("fails with statuscode 400 if id is invalid", async () => {
+      const blogsAtStart = await helper.blogsInDb();
+
+      const loginInfo = {
+        username: helper.initialUser.username,
+        password: helper.initialUser.password,
+      };
+      const loginResponse = await api.post("/api/login").send(loginInfo);
+      const authToken = loginResponse.body.token;
+
       const invalidId = "5a3d5da59070081a82a3445";
 
-      await api.delete(`/api/blogs/${invalidId}`).expect(400);
+      await api
+        .delete(`/api/blogs/${invalidId}`)
+        .set("Authorization", `Bearer ${authToken}`)
+        .expect(400);
+
+      const blogsAtEnd = await helper.blogsInDb();
+      assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
+    });
+
+    test("fails with status code 401 and appropriate message if authentication token is missing", async () => {
+      const blogsAtStart = await helper.blogsInDb();
+      const blogToDelete = blogsAtStart[blogsAtStart.length - 1];
+
+      await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .expect(401, { error: "token invalid" });
+
+      const blogsAtEnd = await helper.blogsInDb();
+      assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
+    });
+
+    test("fails with status code 401 and appropriate message if the logged in user and the blog creator are not the same", async () => {
+      const blogsAtStart = await helper.blogsInDb();
+      const blogToDelete = blogsAtStart[blogsAtStart.length - 1];
+
+      const loginInfo = {
+        username: "root",
+        password: "Q1w2e3r4!",
+      };
+
+      const loginResponse = await api.post("/api/login").send(loginInfo);
+      const authToken = loginResponse.body.token;
+
+      await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .set("Authorization", `Bearer ${authToken}`)
+        .expect(401, {
+          error: "a note can be deleted only by the user who created it",
+        });
+
+      const blogsAtEnd = await helper.blogsInDb();
+      assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
     });
   });
 

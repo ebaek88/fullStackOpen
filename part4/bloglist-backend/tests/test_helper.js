@@ -16,7 +16,7 @@ const initialBlogs = [
   },
 ];
 
-const userId = "68a3f90ad91320ef1e29bdb2";
+const userId = "68a666af578993e657a57c51";
 
 // creating initial notes with user "root"
 const createInitialBlogs = async () => {
