@@ -25,6 +25,7 @@ blogsRouter.get("/:id", async (request, response, next) => {
 
 blogsRouter.post(
   "/",
+  middleware.tokenExtractor,
   middleware.userExtractor,
   async (request, response, next) => {
     const body = request.body;
@@ -59,6 +60,7 @@ blogsRouter.post(
 
 blogsRouter.delete(
   "/:id",
+  middleware.tokenExtractor,
   middleware.userExtractor,
   async (request, response, next) => {
     try {
@@ -88,6 +90,7 @@ blogsRouter.delete(
 
 blogsRouter.put(
   "/:id",
+  middleware.tokenExtractor,
   middleware.userExtractor,
   async (request, response, next) => {
     const { title, author, url, likes } = request.body;
