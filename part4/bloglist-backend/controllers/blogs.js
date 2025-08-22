@@ -89,28 +89,47 @@ blogsRouter.delete(
   }
 );
 
-blogsRouter.put("/:id", async (request, response, next) => {
-  const { title, author, url, likes } = request.body;
+blogsRouter.put(
+  "/:id",
+  middleware.userExtractor,
+  async (request, response, next) => {
+    const { title, author, url, likes } = request.body;
 
-  try {
-    const blog = await Blog.findById(request.params.id);
+    try {
+      // Retrieve information about the logged in user from the userExtractor middleware
+      const user = request.user;
 
-    if (!blog) {
-      return response.status(404).end();
+      // Check if the blog to be updated has been created by the user logged in
+      const blogToUpdate = await Blog.findById(request.params.id);
+
+      if (!blogToUpdate) {
+        return response.status(404).end();
+      }
+
+      if (blogToUpdate.user.toString() !== user._id.toString()) {
+        return response.status(401).json({
+          error: "a note can be updated only by the user who created it",
+        });
+      }
+
+      // Update the blog
+      blogToUpdate.title = title;
+      blogToUpdate.author = author;
+      blogToUpdate.url = url;
+      blogToUpdate.likes = likes || 0;
+
+      blogToUpdate.validateSync();
+
+      const updatedBlog = await blogToUpdate.save();
+      // After saving the updated note, we need to update the blogs list in User as well.
+      user.blogs = user.blogs.concat(updatedBlog._id);
+      await user.save();
+
+      response.json(updatedBlog);
+    } catch (error) {
+      next(error);
     }
-
-    blog.title = title;
-    blog.author = author;
-    blog.url = url;
-    blog.likes = likes || 0;
-
-    blog.validateSync();
-
-    const updatedBlog = await blog.save();
-    response.json(updatedBlog);
-  } catch (error) {
-    next(error);
   }
-});
+);
 
 module.exports = blogsRouter;

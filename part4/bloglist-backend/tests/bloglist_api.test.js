@@ -303,14 +303,23 @@ describe("when there are initially some blogs saved", () => {
     test("succeeds with statuscode 200", async () => {
       const blogsAtStart = await helper.blogsInDb();
 
+      const loginInfo = {
+        username: helper.initialUser.username,
+        password: helper.initialUser.password,
+      };
+
+      const loginResponse = await api.post("/api/login").send(loginInfo);
+      const authToken = loginResponse.body.token;
+
       const blogToUpdate = {
-        ...blogsAtStart[0],
+        ...blogsAtStart[blogsAtStart.length - 1],
         title: "haha",
         likes: -1000,
       };
 
       await api
         .put(`/api/blogs/${blogToUpdate.id}`)
+        .set("Authorization", `Bearer ${authToken}`)
         .send(blogToUpdate)
         .expect(200)
         .expect("Content-Type", /application\/json/);
@@ -321,25 +330,36 @@ describe("when there are initially some blogs saved", () => {
 
       const likes = blogsAtEnd.map((blog) => blog.likes);
       assert(likes.some((like) => like === -1000));
+      assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
     });
 
     test("the likes property of a new blog defaults to 0 if it is added without the property", async () => {
       const blogsAtStart = await helper.blogsInDb();
 
+      const loginInfo = {
+        username: helper.initialUser.username,
+        password: helper.initialUser.password,
+      };
+
+      const loginResponse = await api.post("/api/login").send(loginInfo);
+      const authToken = loginResponse.body.token;
+
       const blogToUpdate = {
-        ...blogsAtStart[0],
+        ...blogsAtStart[blogsAtStart.length - 1],
         title: "haha",
       };
       delete blogToUpdate.likes;
 
       await api
         .put(`/api/blogs/${blogToUpdate.id}`)
+        .set("Authorization", `Bearer ${authToken}`)
         .send(blogToUpdate)
         .expect(200)
         .expect("Content-Type", /application\/json/);
 
       const blogsAtEnd = await helper.blogsInDb();
       const likes = blogsAtEnd.map((blog) => blog.likes);
+      assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
       assert.strictEqual(
         likes.some((like) => like === 0),
         true
@@ -349,19 +369,118 @@ describe("when there are initially some blogs saved", () => {
     test("fails with statuscode 400 if a blog without the title or url properties is updated", async () => {
       const blogsAtStart = await helper.blogsInDb();
 
-      const blogToUpdate = {
-        ...blogsAtStart[0],
+      const loginInfo = {
+        username: helper.initialUser.username,
+        password: helper.initialUser.password,
       };
-      // delete blogToUpdate.title;
-      delete blogToUpdate.url;
+
+      const loginResponse = await api.post("/api/login").send(loginInfo);
+      const authToken = loginResponse.body.token;
+
+      const blogToUpdate = {
+        ...blogsAtStart[blogsAtStart.length - 1],
+      };
+      delete blogToUpdate.title;
+      // delete blogToUpdate.url;
 
       await api
         .put(`/api/blogs/${blogToUpdate.id}`)
+        .set("Authorization", `Bearer ${authToken}`)
         .send(blogToUpdate)
         .expect(400);
 
       const blogsAtEnd = await helper.blogsInDb();
-      assert.deepStrictEqual(blogsAtEnd[0], blogsAtStart[0]);
+      assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
+      assert.deepStrictEqual(
+        blogsAtEnd[blogsAtEnd.length - 1],
+        blogsAtStart[blogsAtStart.length - 1]
+      );
+    });
+
+    test("fails with status code 401 and appropriate message if the logged in user and tne note creator are not the same", async () => {
+      const blogsAtStart = await helper.blogsInDb();
+
+      const loginInfo = {
+        username: "root",
+        password: "Q1w2e3r4!",
+      };
+
+      const loginResponse = await api.post("/api/login").send(loginInfo);
+      const authToken = loginResponse.body.token;
+
+      const blogToUpdate = {
+        ...blogsAtStart[blogsAtStart.length - 1],
+        title: "haha",
+        likes: -100,
+      };
+
+      await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .set("Authorization", `Bearer ${authToken}`)
+        .send(blogToUpdate)
+        .expect(401, {
+          error: "a note can be updated only by the user who created it",
+        })
+        .expect("Content-Type", /application\/json/);
+
+      const blogsAtEnd = await helper.blogsInDb();
+      assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
+      assert.deepStrictEqual(
+        blogsAtEnd[blogsAtEnd.length - 1],
+        blogsAtStart[blogsAtStart.length - 1]
+      );
+    });
+
+    test("fails with status code 404 if the blog to update is missing", async () => {
+      const blogsAtStart = await helper.blogsInDb();
+      const falseBlogId = "68a3968fe9e5d2b874ccaa2e";
+
+      const loginInfo = {
+        username: helper.initialUser.username,
+        password: helper.initialUser.password,
+      };
+
+      const loginResponse = await api.post("/api/login").send(loginInfo);
+      const authToken = loginResponse.body.token;
+
+      const blogToUpdate = {
+        ...blogsAtStart[blogsAtStart.length - 1],
+        title: "not gonna work",
+        url: "https://naver.com",
+      };
+
+      await api
+        .put(`/api/blogs/${falseBlogId}`)
+        .set("Authorization", `Bearer ${authToken}`)
+        .send(blogToUpdate)
+        .expect(404);
+
+      const blogsAtEnd = await helper.blogsInDb();
+      assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
+      assert.deepStrictEqual(
+        blogsAtEnd[blogsAtEnd.length - 1],
+        blogsAtStart[blogsAtStart.length - 1]
+      );
+    });
+
+    test("fails with status code 401 and appropriate message if authentication token is missing", async () => {
+      const blogsAtStart = await helper.blogsInDb();
+      const blogToUpdate = {
+        ...blogsAtStart[blogsAtStart.length - 1],
+        title: "hello:)",
+        url: "https://microsoft.com",
+      };
+
+      await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .expect(401, { error: "token nonexisting" });
+
+      const blogsAtEnd = await helper.blogsInDb();
+      assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
+      assert.deepStrictEqual(
+        blogsAtEnd[blogsAtEnd.length - 1],
+        blogsAtStart[blogsAtStart.length - 1]
+      );
     });
   });
 });
