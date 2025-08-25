@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Blog from "./components/Blog.jsx";
 import Login from "./components/Login.jsx";
+import NewBlog from "./components/NewBlog.jsx";
 import blogService from "./services/blogs.js";
 import loginService from "./services/login.js";
 
@@ -10,6 +11,9 @@ const App = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
+  const [url, setUrl] = useState("");
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -20,9 +24,11 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
       setUser(user);
+      blogService.setToken(user.token);
     }
   }, []);
 
+  // Handlers related to login and logout
   const handleLogin = async (evt) => {
     evt.preventDefault();
 
@@ -31,13 +37,14 @@ const App = () => {
       if (!user) return; // when the login failed, user becomes undefined
 
       window.localStorage.setItem("loggedBloglistUser", JSON.stringify(user));
+      blogService.setToken(user.token);
       setUser(user);
       setUsername("");
       setPassword("");
-    } catch (error) {
-      console.error(error.response.status);
-      console.error(error.response.data);
-      console.log("Error", error.message);
+    } catch (err) {
+      console.error(err.response.status);
+      console.error(err.response.data);
+      console.log("Error", err.message);
     }
   };
 
@@ -54,6 +61,41 @@ const App = () => {
     setUser(null);
   };
 
+  // Handlers related to adding a new blog
+  const addBlog = async (evt) => {
+    evt.preventDefault();
+
+    const newBlog = {
+      title: title,
+      author: author,
+      url: url,
+    };
+
+    try {
+      const returnedBlog = await blogService.create(newBlog);
+      setBlogs(blogs.concat(returnedBlog));
+      setTitle("");
+      setAuthor("");
+      setUrl("");
+      console.log(`Added blog ${returnedBlog.title} successfully!`);
+    } catch (err) {
+      console.error(err.response.status);
+      console.error(err.response.data);
+    }
+  };
+
+  const handleTitleChange = (evt) => {
+    setTitle(evt.target.value);
+  };
+
+  const handleAuthorChange = (evt) => {
+    setAuthor(evt.target.value);
+  };
+
+  const handleUrlChange = (evt) => {
+    setUrl(evt.target.value);
+  };
+
   return (
     <div>
       {!user && (
@@ -67,10 +109,19 @@ const App = () => {
       )}
       {user && (
         <>
-          <h2>blogs</h2>
           <p>
             {user.name} logged in <button onClick={handleLogout}>logout</button>
           </p>
+          <NewBlog
+            addBlog={addBlog}
+            title={title}
+            author={author}
+            url={url}
+            handleTitleChange={handleTitleChange}
+            handleAuthorChange={handleAuthorChange}
+            handleUrlChange={handleUrlChange}
+          />
+          <h2>blogs</h2>
           {blogs.map((blog) => (
             <Blog key={blog.id} blog={blog} />
           ))}
