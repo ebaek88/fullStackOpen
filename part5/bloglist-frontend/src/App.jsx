@@ -4,6 +4,7 @@ import Login from "./components/Login.jsx";
 import NewBlog from "./components/NewBlog.jsx";
 import blogService from "./services/blogs.js";
 import loginService from "./services/login.js";
+import Notification from "./components/Notification.jsx";
 
 // The error object structure is specific to Axios
 const App = () => {
@@ -14,9 +15,25 @@ const App = () => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
+  const [message, setMessage] = useState(null);
 
+  // For useEffect, callbacks need to be synchronous in order to prevent race condition.
+  // In order to use async functions as callbacks, wrap them around synch ones.
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
+    const fetchBlogs = async () => {
+      try {
+        const initialBlogs = await blogService.getAll();
+        setBlogs(initialBlogs);
+      } catch (error) {
+        console.error(error.response.status);
+        console.error(error.response.data);
+        showNotification(
+          `Blogs cannot be fetched from the server: ${error.response.data.error}`
+        );
+      }
+    };
+
+    fetchBlogs();
   }, []);
 
   useEffect(() => {
@@ -27,6 +44,14 @@ const App = () => {
       blogService.setToken(user.token);
     }
   }, []);
+
+  // Helper function to render Notification component
+  const showNotification = (msg, timeout = 3000) => {
+    setMessage(msg);
+    setTimeout(() => {
+      setMessage(null);
+    }, timeout);
+  };
 
   // Handlers related to login and logout
   const handleLogin = async (evt) => {
@@ -41,10 +66,11 @@ const App = () => {
       setUser(user);
       setUsername("");
       setPassword("");
+      showNotification(`Welcome ${user.username}!`);
     } catch (err) {
       console.error(err.response.status);
       console.error(err.response.data);
-      console.log("Error", err.message);
+      showNotification(`wrong credentials: ${err.response.data.error}`);
     }
   };
 
@@ -59,6 +85,7 @@ const App = () => {
   const handleLogout = () => {
     window.localStorage.clear();
     setUser(null);
+    showNotification("Logged out successfully!");
   };
 
   // Handlers related to adding a new blog
@@ -77,10 +104,15 @@ const App = () => {
       setTitle("");
       setAuthor("");
       setUrl("");
-      console.log(`Added blog ${returnedBlog.title} successfully!`);
+      showNotification(
+        `A new blog ${returnedBlog.title} by ${returnedBlog.author} added!`
+      );
     } catch (err) {
       console.error(err.response.status);
       console.error(err.response.data);
+      showNotification(
+        `Blog cannot be added to the server: ${err.response.data.error}`
+      );
     }
   };
 
@@ -98,6 +130,7 @@ const App = () => {
 
   return (
     <div>
+      <Notification message={message} />
       {!user && (
         <Login
           handleLogin={handleLogin}
