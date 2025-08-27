@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog.jsx";
 import Login from "./components/Login.jsx";
 import NewBlog from "./components/NewBlog.jsx";
@@ -10,12 +10,7 @@ import Togglable from "./components/Togglable.jsx";
 // The error object structure is specific to Axios
 const App = () => {
   const [blogs, setBlogs] = useState([]);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
   const [message, setMessage] = useState(null);
 
   // For useEffect, callbacks need to be synchronous in order to prevent race condition.
@@ -46,6 +41,9 @@ const App = () => {
     }
   }, []);
 
+  // Reference to the Togglable component that contains the NewBlog component.
+  const newBlogRef = useRef();
+
   // Helper function to render Notification component
   const showNotification = (msg, timeout = 3000) => {
     setMessage(msg);
@@ -55,18 +53,15 @@ const App = () => {
   };
 
   // Handlers related to login and logout
-  const handleLogin = async (evt) => {
-    evt.preventDefault();
-
+  const handleLogin = async (loginUser) => {
     try {
-      const user = await loginService.login({ username, password });
+      const user = await loginService.login(loginUser);
       if (!user) return; // when the login failed, user becomes undefined
 
       window.localStorage.setItem("loggedBloglistUser", JSON.stringify(user));
       blogService.setToken(user.token);
       setUser(user);
-      setUsername("");
-      setPassword("");
+
       showNotification(`Welcome ${user.username}!`);
     } catch (err) {
       console.error(err.response.status);
@@ -75,36 +70,18 @@ const App = () => {
     }
   };
 
-  const handleUsernameChange = (evt) => {
-    setUsername(evt.target.value);
-  };
-
-  const handlePasswordChange = (evt) => {
-    setPassword(evt.target.value);
-  };
-
   const handleLogout = () => {
     window.localStorage.clear();
     setUser(null);
     showNotification("Logged out successfully!");
   };
 
-  // Handlers related to adding a new blog
-  const addBlog = async (evt) => {
-    evt.preventDefault();
-
-    const newBlog = {
-      title: title,
-      author: author,
-      url: url,
-    };
-
+  // Handler related to adding a new blog
+  const addBlog = async (blogObject) => {
+    newBlogRef.current.toggleVisibility();
     try {
-      const returnedBlog = await blogService.create(newBlog);
+      const returnedBlog = await blogService.create(blogObject);
       setBlogs(blogs.concat(returnedBlog));
-      setTitle("");
-      setAuthor("");
-      setUrl("");
       showNotification(
         `A new blog ${returnedBlog.title} by ${returnedBlog.author} added successfully!`
       );
@@ -117,45 +94,17 @@ const App = () => {
     }
   };
 
-  const handleTitleChange = (evt) => {
-    setTitle(evt.target.value);
-  };
-
-  const handleAuthorChange = (evt) => {
-    setAuthor(evt.target.value);
-  };
-
-  const handleUrlChange = (evt) => {
-    setUrl(evt.target.value);
-  };
-
   return (
     <div>
       <Notification message={message} />
-      {!user && (
-        <Login
-          handleLogin={handleLogin}
-          username={username}
-          password={password}
-          handleUsernameChange={handleUsernameChange}
-          handlePasswordChange={handlePasswordChange}
-        />
-      )}
+      {!user && <Login tryLogin={handleLogin} />}
       {user && (
         <>
           <p>
             {user.name} logged in <button onClick={handleLogout}>logout</button>
           </p>
-          <Togglable buttonLabel={"create new blog"}>
-            <NewBlog
-              addBlog={addBlog}
-              title={title}
-              author={author}
-              url={url}
-              handleTitleChange={handleTitleChange}
-              handleAuthorChange={handleAuthorChange}
-              handleUrlChange={handleUrlChange}
-            />
+          <Togglable buttonLabel={"create new blog"} ref={newBlogRef}>
+            <NewBlog createBlog={addBlog} />
           </Togglable>
           <h2>blogs</h2>
           {blogs.map((blog) => (

@@ -1,10 +1,19 @@
-const Login = ({
-  handleLogin,
-  username,
-  password,
-  handleUsernameChange,
-  handlePasswordChange,
-}) => {
+import { useState } from "react";
+
+const Login = ({ tryLogin }) => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = (evt) => {
+    evt.preventDefault();
+
+    const loginUser = { username, password };
+    tryLogin(loginUser);
+
+    setUsername("");
+    setPassword("");
+  };
+
   return (
     <div>
       <h2>log in to application</h2>
@@ -15,7 +24,7 @@ const Login = ({
             <input
               type="text"
               value={username}
-              onChange={handleUsernameChange}
+              onChange={(evt) => setUsername(evt.target.value)}
             />
           </label>
         </div>
@@ -25,7 +34,7 @@ const Login = ({
             <input
               type="password"
               value={password}
-              onChange={handlePasswordChange}
+              onChange={(evt) => setPassword(evt.target.value)}
             />
           </label>
         </div>
