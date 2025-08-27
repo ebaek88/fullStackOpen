@@ -1,11 +1,5 @@
 const Notification = ({ message }) => {
-  const successPrompts = [
-    "added",
-    "Deleted",
-    "Updated",
-    "Welcome",
-    "successfully",
-  ];
+  const successPrompts = ["Deleted", "Updated", "Welcome", "successfully"];
 
   if (message === null) return null;
 
