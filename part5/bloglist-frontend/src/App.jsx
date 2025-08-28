@@ -120,6 +120,17 @@ const App = () => {
     }
   };
 
+  // Handlers for sorting blogs by likes
+  const sortByLikeAscending = () => {
+    const sortedBlogs = [...blogs].sort((a, b) => a.likes - b.likes);
+    setBlogs(sortedBlogs);
+  };
+
+  const sortByLikeDescending = () => {
+    const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes);
+    setBlogs(sortedBlogs);
+  };
+
   return (
     <div>
       <Notification message={message} />
@@ -133,6 +144,15 @@ const App = () => {
             <NewBlog createBlog={addBlog} />
           </Togglable>
           <h2>blogs</h2>
+          <div>
+            <button onClick={sortByLikeDescending}>
+              sort by like(descending order)
+            </button>
+            &nbsp;
+            <button onClick={sortByLikeAscending}>
+              sort by like(ascending order)
+            </button>
+          </div>
           {blogs.map((blog) => (
             <Blog
               key={blog.id}
