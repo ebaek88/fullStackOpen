@@ -81,6 +81,8 @@ const App = () => {
     newBlogRef.current.toggleVisibility();
     try {
       const returnedBlog = await blogService.create(blogObject);
+      // This is for retaining the user info in detail, since the server returns only the userId
+      returnedBlog.user = { ...user };
       setBlogs(blogs.concat(returnedBlog));
       showNotification(
         `A new blog ${returnedBlog.title} by ${returnedBlog.author} added successfully!`
@@ -102,7 +104,7 @@ const App = () => {
     try {
       const returnedBlog = await blogService.update(id, updatedBlog);
       // This is for retaining the user info in detail, since the server returns only the userId
-      returnedBlog.user = blogToUpdate.user;
+      returnedBlog.user = { ...blogToUpdate.user };
       setBlogs(blogs.map((blog) => (blog.id === id ? returnedBlog : blog)));
     } catch (error) {
       console.error(error.response.status);
@@ -131,6 +133,36 @@ const App = () => {
     setBlogs(sortedBlogs);
   };
 
+  // Handler to delete a blog
+  const deleteBlog = async (id) => {
+    const blogToDelete = blogs.find((blog) => blog.id === id);
+    if (!blogToDelete) return;
+
+    try {
+      if (
+        window.confirm(
+          `Removing blog ${blogToDelete.title} by ${blogToDelete.author}`
+        )
+      ) {
+        await blogService.deleteBlog(id);
+        showNotification(`Deleted note ${blogToDelete.content} successfully!`);
+        setBlogs(blogs.filter((blog) => blog.id !== id));
+      }
+    } catch (error) {
+      if (error.response.status === 404) {
+        showNotification(
+          `The blog ${blogToDelete.content} has already been removed.`
+        );
+        setBlogs(blogs.filter((blog) => blog.id !== id));
+      } else {
+        showNotification(
+          `Cannot be deleted from the server: ${error.response.data.error}`
+        );
+      }
+    }
+  };
+
+  // render components
   return (
     <div>
       <Notification message={message} />
@@ -157,7 +189,9 @@ const App = () => {
             <Blog
               key={blog.id}
               blog={blog}
+              loggedInUser={user}
               likeFunction={() => increaseLike(blog.id)}
+              deleteFunction={() => deleteBlog(blog.id)}
             />
           ))}
         </>
