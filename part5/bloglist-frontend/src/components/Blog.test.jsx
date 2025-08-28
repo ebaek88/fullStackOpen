@@ -16,11 +16,8 @@ describe("<Blog />", () => {
     id: "68ade79ddd6036b4ac913731",
   };
 
-  beforeEach(() => {
-    render(<Blog blog={blog} />);
-  });
-
   test("the blog's title and author are visible, but not the url and the likes", async () => {
+    render(<Blog blog={blog} />);
     const titleAndAuthor = await screen.findByText(
       `${blog.title} - by ${blog.author}`
     );
@@ -35,6 +32,7 @@ describe("<Blog />", () => {
 
   test("the blog's url and number of likes are shown when the view button has been clicked", async () => {
     const user = userEvent.setup();
+    render(<Blog blog={blog} />);
     const button = screen.getByText("view");
     await user.click(button);
 
@@ -43,5 +41,20 @@ describe("<Blog />", () => {
 
     expect(urlElement).toBeVisible();
     expect(likesElement).toBeVisible();
+  });
+
+  test("when the like button is clicked twice, the event handler of the button is called twice", async () => {
+    const user = userEvent.setup();
+    const mockHandler = vi.fn();
+    render(<Blog blog={blog} likeFunction={mockHandler} />);
+
+    const viewButton = screen.getByText("view");
+    await user.click(viewButton);
+
+    const likeButton = screen.getByText("like");
+    await user.click(likeButton);
+    await user.click(likeButton);
+
+    expect(mockHandler.mock.calls).toHaveLength(2);
   });
 });
