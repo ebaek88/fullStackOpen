@@ -94,6 +94,30 @@ const App = () => {
     }
   };
 
+  // Handler related to increase a like by 1
+  const increaseLike = async (id) => {
+    const blogToUpdate = blogs.find((blog) => blog.id === id);
+    const updatedBlog = { ...blogToUpdate, likes: blogToUpdate.likes + 1 };
+
+    try {
+      const returnedBlog = await blogService.update(id, updatedBlog);
+      setBlogs(blogs.map((blog) => (blog.id === id ? returnedBlog : blog)));
+    } catch (error) {
+      console.error(error.response.status);
+      console.error(error.response.data);
+      if (error.response.status === 404) {
+        showNotification(
+          `The blog ${blogToUpdate.title} has already been removed.`
+        );
+        setBlogs(blogs.filter((blog) => blog.id !== id));
+      } else {
+        showNotification(
+          `Cannot be updated from the server: ${error.response.data.error}`
+        );
+      }
+    }
+  };
+
   return (
     <div>
       <Notification message={message} />
@@ -108,7 +132,11 @@ const App = () => {
           </Togglable>
           <h2>blogs</h2>
           {blogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} />
+            <Blog
+              key={blog.id}
+              blog={blog}
+              likeFunction={() => increaseLike(blog.id)}
+            />
           ))}
         </>
       )}
