@@ -101,6 +101,8 @@ const App = () => {
 
     try {
       const returnedBlog = await blogService.update(id, updatedBlog);
+      // This is for retaining the user info in detail, since the server returns only the userId
+      returnedBlog.user = blogToUpdate.user;
       setBlogs(blogs.map((blog) => (blog.id === id ? returnedBlog : blog)));
     } catch (error) {
       console.error(error.response.status);

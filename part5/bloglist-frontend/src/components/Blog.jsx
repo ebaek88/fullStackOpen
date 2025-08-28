@@ -13,8 +13,6 @@ const Blog = ({ blog, likeFunction }) => {
     marginBottom: 5,
   };
 
-  // console.log(blog.user);
-
   return (
     <div style={blogStyle}>
       <div>
@@ -26,7 +24,7 @@ const Blog = ({ blog, likeFunction }) => {
         <p>
           likes {blog.likes} <button onClick={likeFunction}>like</button>
         </p>
-        {blog.user.name || " "}
+        {blog.user.name || ""}
       </div>
     </div>
   );
