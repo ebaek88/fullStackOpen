@@ -1,5 +1,5 @@
 const { test, expect, beforeEach, describe } = require("@playwright/test");
-const { loginWith } = require("./helper.js");
+const { loginWith, createBlog } = require("./helper.js");
 
 describe("Blog app", () => {
   beforeEach(async ({ page, request }) => {
@@ -58,31 +58,35 @@ describe("Blog app", () => {
       await page.getByRole("button").filter({ hasText: "create" }).click();
 
       await expect(page.locator(".success")).toBeVisible();
+      await expect(page.locator(".blog-entry")).toBeVisible();
       await expect(page.getByText("hello world - by admin ")).toBeVisible();
       await expect(
         page.getByRole("button").filter({ hasText: "view" })
       ).toBeVisible();
     });
 
-    test("a blog can be liked", async ({ page }) => {
-      // creating a new blog
-      await page
-        .getByRole("button")
-        .filter({ hasText: "create new blog" })
-        .click();
-      await page.getByLabel("title").fill("hello world");
-      await page.getByLabel("author").fill("admin");
-      await page.getByLabel("url").fill("localhost:3003");
-      await page.getByRole("button").filter({ hasText: "create" }).click();
+    describe("and a blog exists", () => {
+      beforeEach(async ({ page }) => {
+        await createBlog(page, "hello world", "admin", "localhost:3003");
+      });
 
-      // "liking" the newly created blog
-      await page.getByRole("button").filter({ hasText: "view" }).click();
-      await page.getByText("like", { exact: true }).click();
+      test("a blog can be liked", async ({ page }) => {
+        // "liking" the newly created blog
+        await page.getByRole("button").filter({ hasText: "view" }).click();
+        await page.getByText("like", { exact: true }).click();
 
-      // checking if the number of likes has increased from 0 to 1
-      await expect(page.getByText("likes", { exact: false })).toContainText(
-        "1"
-      );
+        // checking if the number of likes has increased from 0 to 1
+        await expect(page.getByText("likes", { exact: false })).toContainText(
+          "1"
+        );
+      });
+
+      test("a blog can be removed by its creator", async ({ page }) => {
+        page.on("dialog", async (dialog) => await dialog.accept());
+        await page.getByRole("button").filter({ hasText: "view" }).click();
+        await page.getByRole("button").filter({ hasText: "remove" }).click();
+        await expect(page.locator(".blog-entry")).not.toBeVisible();
+      });
     });
   });
 });
