@@ -82,10 +82,34 @@ describe("Blog app", () => {
       });
 
       test("a blog can be removed by its creator", async ({ page }) => {
+        // You have to register the dialog(alert, prompt, confirm, beforeunload) handler
+        // BEFORE the action that triggers the dialog
         page.on("dialog", async (dialog) => await dialog.accept());
         await page.getByRole("button").filter({ hasText: "view" }).click();
         await page.getByRole("button").filter({ hasText: "remove" }).click();
         await expect(page.locator(".blog-entry")).not.toBeVisible();
+      });
+
+      test("a blog cannot be removed by users other than its creator", async ({
+        page,
+        request,
+      }) => {
+        // log out first
+        await page.getByRole("button").filter({ hasText: "logout" }).click();
+        // then create another random user
+        await request.post("http://localhost:3003/api/users", {
+          data: {
+            name: "random user",
+            username: "random",
+            password: "Q1w2e3r4!",
+          },
+        });
+        // then log in with the random user
+        await loginWith(page, "random", "Q1w2e3r4!");
+        await page.getByRole("button").filter({ hasText: "view" }).click();
+        await expect(
+          page.getByRole("button").filter({ hasText: "remove" })
+        ).not.toBeVisible();
       });
     });
   });
