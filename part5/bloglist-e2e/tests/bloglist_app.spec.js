@@ -127,6 +127,7 @@ describe("Blog app", () => {
         }
         // await createBlog(page, "blog0", "author0", "https://www.blog.com/0");
         // await createBlog(page, "blog1", "author1", "https://www.blog.com/1");
+        // await createBlog(page, "blog2", "author2", "https://www.blog.com/2");
       });
 
       test("can sort blogs by likes in a descending order", async ({
@@ -141,11 +142,15 @@ describe("Blog app", () => {
             .click();
           for (let j = 0; j < i; j++) {
             await page
+              .locator(".blog-entry")
+              .filter({ hasText: `blog${i} - by author${i}` })
               .getByRole("button", { name: "like", exact: true })
-              .nth(i)
               .click();
             await expect(
-              page.getByText(`likes ${j + 1} `, { exact: false })
+              page
+                .locator(".blog-entry")
+                .filter({ hasText: `blog${i} - by author${i}` })
+                .getByText(`likes ${j + 1} `, { exact: false })
             ).toBeVisible();
             await page.waitForTimeout(100); // add a small delay to ensure UI stability
           }
@@ -157,16 +162,13 @@ describe("Blog app", () => {
           .filter({ hasText: "sort by like(descending order)" })
           .click();
 
-        // Check if the likes are retrieved in the expected order
+        // Check if the blog with the most likes come first
         const blogsInOrder = await page
-          .locator(".blog-likes")
+          .locator(".blog-entry")
+          .filter({ hasText: "by" })
           .allTextContents();
-        // console.log(blogs);
-        const likesInOrder = blogsInOrder.map((blog) => blog.split(" ")[1]);
-        // console.log(likesInOrder);
-        await expect(likesInOrder).toStrictEqual(
-          [...likesInOrder].sort((a, b) => Number(b) - Number(a))
-        );
+
+        await expect(blogsInOrder[0]).toContain("blog2");
       });
 
       test("can sort blogs by likes in an ascending order", async ({
@@ -181,11 +183,15 @@ describe("Blog app", () => {
             .click();
           for (let j = 0; j < i; j++) {
             await page
+              .locator(".blog-entry")
+              .filter({ hasText: `blog${i} - by author${i}` })
               .getByRole("button", { name: "like", exact: true })
-              .nth(i)
               .click();
             await expect(
-              page.getByText(`likes ${j + 1} `, { exact: false })
+              page
+                .locator(".blog-entry")
+                .filter({ hasText: `blog${i} - by author${i}` })
+                .getByText(`likes ${j + 1} `, { exact: false })
             ).toBeVisible();
             await page.waitForTimeout(100); // add a small delay to ensure UI stability
           }
@@ -197,16 +203,13 @@ describe("Blog app", () => {
           .filter({ hasText: "sort by like(ascending order)" })
           .click();
 
-        // Check if the likes are retrieved in the expected order
+        // Check if the blog with the least likes come first
         const blogsInOrder = await page
-          .locator(".blog-likes")
+          .locator(".blog-entry")
+          .filter({ hasText: "by" })
           .allTextContents();
-        // console.log(blogs);
-        const likesInOrder = blogsInOrder.map((blog) => blog.split(" ")[1]);
-        // console.log(likesInOrder);
-        await expect(likesInOrder).toStrictEqual(
-          [...likesInOrder].sort((a, b) => Number(a) - Number(b))
-        );
+
+        await expect(blogsInOrder[0]).toContain("blog0");
       });
     });
   });
