@@ -14,14 +14,14 @@ const Blog = ({ blog, loggedInUser, likeFunction, deleteFunction }) => {
   };
 
   return (
-    <div className="blog-entry" style={blogStyle}>
-      <div>
+    <div style={blogStyle}>
+      <div className="blog-entry">
         {blog.title} - by {blog.author}{" "}
         <button onClick={toggleVisibility}>{visible ? "hide" : "view"}</button>
       </div>
       <div style={{ display: visible ? "" : "none" }}>
         <div>{blog.url}</div>
-        <div>
+        <div className="blog-likes">
           likes {blog.likes} <button onClick={likeFunction}>like</button>
         </div>
         <div>{blog.user.name || ""}</div>

@@ -1,10 +1,11 @@
 const { test, expect, beforeEach, describe } = require("@playwright/test");
 const { loginWith, createBlog } = require("./helper.js");
+const { assert } = require("console");
 
 describe("Blog app", () => {
   beforeEach(async ({ page, request }) => {
-    await request.post("http://localhost:3003/api/testing/reset");
-    await request.post("http://localhost:3003/api/users", {
+    await request.post("/api/testing/reset");
+    await request.post("/api/users", {
       data: {
         name: "test user",
         username: "test",
@@ -12,7 +13,7 @@ describe("Blog app", () => {
       },
     });
 
-    await page.goto("http://localhost:5173");
+    await page.goto("/");
   });
 
   test("login form is shown", async ({ page }) => {
@@ -97,7 +98,7 @@ describe("Blog app", () => {
         // log out first
         await page.getByRole("button").filter({ hasText: "logout" }).click();
         // then create another random user
-        await request.post("http://localhost:3003/api/users", {
+        await request.post("/api/users", {
           data: {
             name: "random user",
             username: "random",
@@ -110,6 +111,102 @@ describe("Blog app", () => {
         await expect(
           page.getByRole("button").filter({ hasText: "remove" })
         ).not.toBeVisible();
+      });
+    });
+
+    describe("and several blogs exist", () => {
+      beforeEach(async ({ page }) => {
+        const numBlogs = Array.from({ length: 3 }, (_, idx) => idx);
+        for (const num of numBlogs) {
+          await createBlog(
+            page,
+            `blog${num}`,
+            `author${num}`,
+            `https://www.blog.com/${num}`
+          );
+        }
+        // await createBlog(page, "blog0", "author0", "https://www.blog.com/0");
+        // await createBlog(page, "blog1", "author1", "https://www.blog.com/1");
+      });
+
+      test("can sort blogs by likes in a descending order", async ({
+        page,
+      }) => {
+        for (let i = 0; i < 3; i++) {
+          await page
+            .locator(".blog-entry")
+            .filter({ hasText: `blog${i} - by author${i}` })
+            .getByRole("button")
+            .filter({ hasText: "view" })
+            .click();
+          for (let j = 0; j < i; j++) {
+            await page
+              .getByRole("button", { name: "like", exact: true })
+              .nth(i)
+              .click();
+            await expect(
+              page.getByText(`likes ${j + 1} `, { exact: false })
+            ).toBeVisible();
+            await page.waitForTimeout(100); // add a small delay to ensure UI stability
+          }
+        }
+
+        // Sort by likes in a descending order
+        await page
+          .getByRole("button")
+          .filter({ hasText: "sort by like(descending order)" })
+          .click();
+
+        // Check if the likes are retrieved in the expected order
+        const blogsInOrder = await page
+          .locator(".blog-likes")
+          .allTextContents();
+        // console.log(blogs);
+        const likesInOrder = blogsInOrder.map((blog) => blog.split(" ")[1]);
+        // console.log(likesInOrder);
+        await expect(likesInOrder).toStrictEqual(
+          [...likesInOrder].sort((a, b) => Number(b) - Number(a))
+        );
+      });
+
+      test("can sort blogs by likes in an ascending order", async ({
+        page,
+      }) => {
+        for (let i = 0; i < 3; i++) {
+          await page
+            .locator(".blog-entry")
+            .filter({ hasText: `blog${i} - by author${i}` })
+            .getByRole("button")
+            .filter({ hasText: "view" })
+            .click();
+          for (let j = 0; j < i; j++) {
+            await page
+              .getByRole("button", { name: "like", exact: true })
+              .nth(i)
+              .click();
+            await expect(
+              page.getByText(`likes ${j + 1} `, { exact: false })
+            ).toBeVisible();
+            await page.waitForTimeout(100); // add a small delay to ensure UI stability
+          }
+        }
+
+        // Sort by likes in an ascending order
+        await page
+          .getByRole("button")
+          .filter({ hasText: "sort by like(ascending order)" })
+          .click();
+
+        // Check if the likes are retrieved in the expected order
+        const blogsInOrder = await page
+          .locator(".blog-likes")
+          .allTextContents();
+        // console.log(blogs);
+        const likesInOrder = blogsInOrder.map((blog) => blog.split(" ")[1]);
+        // console.log(likesInOrder);
+        await expect(likesInOrder).toStrictEqual(
+          [...likesInOrder].sort((a, b) => Number(a) - Number(b))
+        );
       });
     });
   });

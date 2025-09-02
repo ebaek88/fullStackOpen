@@ -1,5 +1,3 @@
-const { title } = require("process");
-
 const loginWith = async (page, username, password) => {
   await page.getByLabel("username").fill(username);
   await page.getByLabel("password").fill(password);
