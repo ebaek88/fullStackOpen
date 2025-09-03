@@ -34,6 +34,10 @@ const reducer = (state = initialState, action) => {
       });
     case "NEW_ANECDOTE":
       return [...state, action.payload];
+    case "SORT_DESCENDING":
+      return [...state].sort((a, b) => b.votes - a.votes);
+    case "SORT_ASCENDING":
+      return [...state].sort((a, b) => a.votes - b.votes);
     default:
       return state;
   }
@@ -55,6 +59,18 @@ export const createAnecdote = (content) => {
       id: getId(),
       votes: 0,
     },
+  };
+};
+
+export const sortByVotesDesc = () => {
+  return {
+    type: "SORT_DESCENDING",
+  };
+};
+
+export const sortByVotesAsc = () => {
+  return {
+    type: "SORT_ASCENDING",
   };
 };
 
