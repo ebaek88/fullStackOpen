@@ -20,12 +20,6 @@ const AnecdoteList = () => {
   const vote = (id) => {
     // console.log("vote", id);
     dispatch(voteFor(id));
-
-    const anecText = anecdotes.find((anecdote) => anecdote.id === id).content;
-    if (anecText) {
-      dispatch(setNotification(`you voted '${anecText}'`));
-      setTimeout(() => dispatch(removeNotification()), 5000);
-    }
   };
 
   const sortAscending = () => dispatch(sortByVotesAsc());
@@ -42,7 +36,17 @@ const AnecdoteList = () => {
           <div>{anecdote.content}</div>
           <div>
             has {anecdote.votes}
-            <button onClick={() => vote(anecdote.id)}>vote</button>
+            <button
+              onClick={(evt) => {
+                vote(anecdote.id);
+                const anecdoteText =
+                  evt.target.parentElement.previousElementSibling.textContent;
+                dispatch(setNotification(`you voted '${anecdoteText}'`));
+                setTimeout(() => dispatch(removeNotification()), 5000);
+              }}
+            >
+              vote
+            </button>
           </div>
         </div>
       ))}
