@@ -1,4 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
+import anecdoteService from "../services/anecdotes.js";
 import {
   voteFor,
   sortByVotesAsc,
@@ -17,8 +18,14 @@ const AnecdoteList = () => {
   });
   const dispatch = useDispatch();
 
-  const vote = (id) => {
+  const vote = async (id) => {
     // console.log("vote", id);
+    const anecdoteToUpdate = anecdotes.find((anecdote) => anecdote.id === id);
+    const updatedAnecdote = {
+      ...anecdoteToUpdate,
+      votes: anecdoteToUpdate.votes + 1,
+    };
+    await anecdoteService.update(id, updatedAnecdote);
     dispatch(voteFor(id));
   };
 

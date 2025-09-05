@@ -9,7 +9,8 @@ import { createSlice } from "@reduxjs/toolkit";
 //   "Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.",
 // ];
 
-const getId = () => (100000 * Math.random()).toFixed(0);
+// Because json-server automatically creates id when requesting POST, you don't need getId function anymore.
+// const getId = () => (100000 * Math.random()).toFixed(0);
 
 // const asObject = (anecdote) => {
 //   return {
@@ -26,13 +27,7 @@ const anecdoteSlice = createSlice({
   initialState: [],
   reducers: {
     createAnecdote(state, action) {
-      const content = action.payload;
-      const newAnecdote = {
-        content,
-        id: getId(),
-        votes: 0,
-      };
-      return [...state, newAnecdote];
+      return [...state, action.payload];
     },
     voteFor(state, action) {
       const id = action.payload;
@@ -50,7 +45,7 @@ const anecdoteSlice = createSlice({
     sortByVotesAsc(state) {
       return [...state].sort((a, b) => a.votes - b.votes);
     },
-    setNotes(state, action) {
+    setAnecdotes(state, action) {
       return action.payload;
     },
   },
@@ -61,6 +56,6 @@ export const {
   voteFor,
   sortByVotesDesc,
   sortByVotesAsc,
-  setNotes,
+  setAnecdotes,
 } = anecdoteSlice.actions;
 export default anecdoteSlice.reducer;
