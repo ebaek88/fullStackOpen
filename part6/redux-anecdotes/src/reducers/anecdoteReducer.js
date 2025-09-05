@@ -35,7 +35,7 @@ const anecdoteSlice = createSlice({
 
 export const {
   appendAnecdote,
-  voteFor,
+  // voteFor,
   sortByVotesDesc,
   sortByVotesAsc,
   setAnecdotes,
@@ -52,6 +52,24 @@ export const createAnecdote = (content) => {
   return async (dispatch) => {
     const newAnecdote = await anecdoteService.createNew(content);
     dispatch(appendAnecdote(newAnecdote));
+  };
+};
+
+export const voteFor = (id) => {
+  return async (dispatch) => {
+    const anecdotes = await anecdoteService.getAll();
+    const [anecdoteToUpdate] = anecdotes.filter(
+      (anecdote) => anecdote.id === id
+    );
+    const updatedAnecdote = {
+      ...anecdoteToUpdate,
+      votes: anecdoteToUpdate.votes + 1,
+    };
+    const result = await anecdoteService.update(id, updatedAnecdote);
+    const updatedAnecdotes = anecdotes.map((anecdote) =>
+      anecdote.id !== id ? anecdote : result
+    );
+    dispatch(setAnecdotes(updatedAnecdotes));
   };
 };
 
