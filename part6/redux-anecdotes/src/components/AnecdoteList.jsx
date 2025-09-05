@@ -4,10 +4,7 @@ import {
   sortByVotesAsc,
   sortByVotesDesc,
 } from "../reducers/anecdoteReducer.js";
-import {
-  setNotification,
-  removeNotification,
-} from "../reducers/notificationReducer.js";
+import { setNotification } from "../reducers/notificationReducer.js";
 
 const AnecdoteList = () => {
   const anecdotes = useSelector(({ anecdotes, filter }) => {
@@ -41,7 +38,6 @@ const AnecdoteList = () => {
                 const anecdoteText =
                   evt.target.parentElement.previousElementSibling.textContent;
                 dispatch(setNotification(`you voted '${anecdoteText}'`));
-                setTimeout(() => dispatch(removeNotification()), 5000);
               }}
             >
               vote
