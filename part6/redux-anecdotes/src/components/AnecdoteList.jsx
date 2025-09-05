@@ -4,11 +4,15 @@ import {
   sortByVotesAsc,
   sortByVotesDesc,
 } from "../reducers/anecdoteReducer.js";
+import {
+  setNotification,
+  removeNotification,
+} from "../reducers/notificationReducer.js";
 
 const AnecdoteList = () => {
-  const anecdotes = useSelector((state) => {
-    return state.anecdotes.filter((anecdote) =>
-      anecdote.content.toLowerCase().includes(state.filter.toLowerCase())
+  const anecdotes = useSelector(({ anecdotes, filter }) => {
+    return anecdotes.filter((anecdote) =>
+      anecdote.content.toLowerCase().includes(filter.toLowerCase())
     );
   });
   const dispatch = useDispatch();
@@ -16,6 +20,12 @@ const AnecdoteList = () => {
   const vote = (id) => {
     // console.log("vote", id);
     dispatch(voteFor(id));
+
+    const anecText = anecdotes.find((anecdote) => anecdote.id === id).content;
+    if (anecText) {
+      dispatch(setNotification(`you voted '${anecText}'`));
+      setTimeout(() => dispatch(removeNotification()), 5000);
+    }
   };
 
   const sortAscending = () => dispatch(sortByVotesAsc());

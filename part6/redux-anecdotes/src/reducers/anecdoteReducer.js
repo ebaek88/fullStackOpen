@@ -53,62 +53,6 @@ const anecdoteSlice = createSlice({
   },
 });
 
-// const anecdoteReducer = (state = initialState, action) => {
-//   // console.log("state now: ", state);
-//   // console.log("action", action);
-//   console.log("ACTION: ", action);
-
-//   switch (action.type) {
-//     case "VOTE":
-//       return state.map((anecdote) => {
-//         if (anecdote.id === action.payload.id) {
-//           return { ...anecdote, votes: anecdote.votes + 1 };
-//         } else {
-//           return anecdote;
-//         }
-//       });
-//     case "NEW_ANECDOTE":
-//       return [...state, action.payload];
-//     case "SORT_DESCENDING":
-//       return [...state].sort((a, b) => b.votes - a.votes);
-//     case "SORT_ASCENDING":
-//       return [...state].sort((a, b) => a.votes - b.votes);
-//     default:
-//       return state;
-//   }
-// };
-
-// // action creators
-// export const voteFor = (id) => {
-//   return {
-//     type: "VOTE",
-//     payload: { id },
-//   };
-// };
-
-// export const createAnecdote = (content) => {
-//   return {
-//     type: "NEW_ANECDOTE",
-//     payload: {
-//       content,
-//       id: getId(),
-//       votes: 0,
-//     },
-//   };
-// };
-
-// export const sortByVotesDesc = () => {
-//   return {
-//     type: "SORT_DESCENDING",
-//   };
-// };
-
-// export const sortByVotesAsc = () => {
-//   return {
-//     type: "SORT_ASCENDING",
-//   };
-// };
-
 export const { createAnecdote, voteFor, sortByVotesDesc, sortByVotesAsc } =
   anecdoteSlice.actions;
 export default anecdoteSlice.reducer;
