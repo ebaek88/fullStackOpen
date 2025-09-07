@@ -6,3 +6,6 @@ export const getAnecdotes = async () => {
   const response = await axios.get(baseUrl);
   return response.data;
 };
+
+export const createAnecdote = (newAnecdote) =>
+  axios.post(baseUrl, newAnecdote).then((res) => res.data);

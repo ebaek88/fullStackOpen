@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 
 import { getAnecdotes } from "./requests.js";
@@ -18,7 +17,12 @@ const App = () => {
   }
 
   if (result.isError) {
-    return <div>anecdote service not available due to problems in server</div>;
+    return (
+      <div>
+        anecdote service not available due to problems in server:{" "}
+        {result.error.message}
+      </div>
+    );
   }
 
   const anecdotes = result.data;
