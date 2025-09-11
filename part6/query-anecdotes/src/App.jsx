@@ -6,7 +6,6 @@ import Notification from "./components/Notification.jsx";
 import AnecdoteContext from "./AnecdoteContext.jsx";
 
 const App = () => {
-  // const [notification, setNotification] = useState("");
   const [notification, notificationDispatch] = useContext(AnecdoteContext);
   // Need to use useRef. Because if notificationTimeoutId is just an ordinary variable,
   // every time the App component renders, the notificationTimeoutId variable is recreated, thus losing the previous info.
