@@ -1,11 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, useRef } from "react";
+import { useRef, useContext } from "react";
 import { getAnecdotes, voteFor } from "./requests.js";
-import AnecdoteForm from "./components/AnecdoteForm";
-import Notification from "./components/Notification";
+import AnecdoteForm from "./components/AnecdoteForm.jsx";
+import Notification from "./components/Notification.jsx";
+import AnecdoteContext from "./AnecdoteContext.jsx";
 
 const App = () => {
-  const [notification, setNotification] = useState("");
+  // const [notification, setNotification] = useState("");
+  const [notification, notificationDispatch] = useContext(AnecdoteContext);
   // Need to use useRef. Because if notificationTimeoutId is just an ordinary variable,
   // every time the App component renders, the notificationTimeoutId variable is recreated, thus losing the previous info.
   const notificationTimeoutId = useRef(null);
@@ -52,14 +54,16 @@ const App = () => {
     voteAnecdoteMutation.mutate({ ...anecdote, votes: anecdote.votes + 1 });
   };
 
-  const notificationHandler = (msg, time = 5000) => {
-    // console.log(notificationTimeoutId.current);
+  const voteNotificationHandler = (msg, time = 5000) => {
     clearTimeout(notificationTimeoutId.current);
 
-    setNotification(msg);
+    notificationDispatch({
+      type: "VOTE",
+      payload: msg,
+    });
 
     notificationTimeoutId.current = setTimeout(() => {
-      setNotification("");
+      notificationDispatch({ type: "CLEAR" });
     }, time);
   };
 
@@ -68,14 +72,21 @@ const App = () => {
       <h3>Anecdote app</h3>
 
       <Notification msg={notification} />
-      <AnecdoteForm notificationHandler={notificationHandler} />
+      <AnecdoteForm timeoutId={notificationTimeoutId} />
 
       {anecdotes.map((anecdote) => (
         <div key={anecdote.id}>
           <div>{anecdote.content}</div>
           <div>
             has {anecdote.votes}
-            <button onClick={() => handleVote(anecdote)}>vote</button>
+            <button
+              onClick={() => {
+                handleVote(anecdote);
+                voteNotificationHandler(anecdote.content);
+              }}
+            >
+              vote
+            </button>
           </div>
         </div>
       ))}

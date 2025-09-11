@@ -1,19 +1,44 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useContext } from "react";
 import { createAnecdote } from "../requests.js";
+import { useNotificationDispatch } from "../AnecdoteContext.jsx";
 
-const AnecdoteForm = ({ notificationHandler }) => {
+const AnecdoteForm = ({ timeoutId }) => {
+  const notificationDispatch = useNotificationDispatch();
+  const createNotificationHandler = (msg, time = 5000) => {
+    clearTimeout(timeoutId.current);
+
+    if (msg?.toLowerCase().includes("too short")) {
+      notificationDispatch({
+        type: "ERROR",
+        payload: msg,
+      });
+    } else {
+      notificationDispatch({
+        type: "CREATE",
+        payload: msg,
+      });
+    }
+
+    timeoutId.current = setTimeout(() => {
+      notificationDispatch({ type: "CLEAR" });
+    }, time);
+  };
+
   const queryClient = useQueryClient();
   const newAnecdoteMutation = useMutation({
     mutationFn: createAnecdote,
     onSuccess: (newAnecdote) => {
-      notificationHandler(`Successfull added ${newAnecdote.content}`);
+      createNotificationHandler(newAnecdote.content);
       const anecdotes = queryClient.getQueryData(["anecdotes"]);
       queryClient.setQueryData(["anecdotes"], anecdotes.concat(newAnecdote));
       // queryClient.invalidateQueries(["anecdotes"]);
     },
     onError: (error) => {
       console.log(error.response.data);
-      notificationHandler(error.response?.data?.error || "An error occurred");
+      createNotificationHandler(
+        error.response?.data?.error || "An error occurred"
+      );
     },
   });
 
