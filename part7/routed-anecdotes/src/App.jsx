@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Routes, Route, Link, useNavigate, useMatch } from "react-router-dom";
 
 const Menu = () => {
   const padding = {
@@ -20,12 +20,40 @@ const Menu = () => {
   );
 };
 
+const Anecdote = ({ anecdote }) => {
+  const navigate = useNavigate();
+  // Redirects to the homepage after 3 seconds
+  useEffect(() => {
+    !anecdote && setTimeout(() => navigate("/"), 3000);
+  }, []);
+  return (
+    <>
+      {anecdote ? (
+        <div>
+          <h2>{anecdote.content}</h2>
+          <div>{anecdote.author}</div>
+          <a href={anecdote.info} target="_blank" rel="noreferrer">
+            {anecdote.info}
+          </a>
+          <div>
+            votes: <strong>{anecdote.votes}</strong>
+          </div>
+        </div>
+      ) : (
+        <h2>anecdote not found 🤔</h2>
+      )}
+    </>
+  );
+};
+
 const AnecdoteList = ({ anecdotes }) => (
   <div>
     <h2>Anecdotes</h2>
     <ul>
       {anecdotes.map((anecdote) => (
-        <li key={anecdote.id}>{anecdote.content}</li>
+        <li key={anecdote.id}>
+          <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
+        </li>
       ))}
     </ul>
   </div>
@@ -114,6 +142,7 @@ const CreateNew = (props) => {
 };
 
 const App = () => {
+  // states
   const [anecdotes, setAnecdotes] = useState([
     {
       content: "If it hurts, do it more often",
@@ -133,6 +162,13 @@ const App = () => {
 
   const [notification, setNotification] = useState("");
 
+  // helper
+  const match = useMatch("/anecdotes/:id");
+  const anecdote = match
+    ? anecdotes.find((anecdote) => anecdote.id === Number(match.params.id))
+    : null;
+
+  // handlers
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000);
     setAnecdotes(anecdotes.concat(anecdote));
@@ -151,19 +187,22 @@ const App = () => {
     setAnecdotes(anecdotes.map((a) => (a.id === id ? voted : a)));
   };
 
+  // rendering
   return (
     <div>
-      <Router>
-        <div>
-          <h1>Software anecdotes</h1>
-          <Menu />
-          <Routes>
-            <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/create" element={<CreateNew addNew={addNew} />} />
-          </Routes>
-        </div>
-      </Router>
+      <div>
+        <h1>Software anecdotes</h1>
+        <Menu />
+        <Routes>
+          <Route path="/about" element={<About />} />
+          <Route
+            path="/anecdotes/:id"
+            element={<Anecdote anecdote={anecdote} />}
+          />
+          <Route path="/create" element={<CreateNew addNew={addNew} />} />
+          <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
+        </Routes>
+      </div>
       <Footer />
     </div>
   );
