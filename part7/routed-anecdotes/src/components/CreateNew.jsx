@@ -1,14 +1,10 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useField } from "../hooks";
 
 const CreateNew = (props) => {
-  // const [content, setContent] = useState("");
-  // const [author, setAuthor] = useState("");
-  // const [info, setInfo] = useState("");
-  const content = useField("text");
-  const author = useField("text");
-  const info = useField("text");
+  const [content, resetContent] = useField("text");
+  const [author, resetAuthor] = useField("text");
+  const [info, resetInfo] = useField("text");
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
@@ -25,10 +21,16 @@ const CreateNew = (props) => {
     props.notificationHandler(`a new anecdote ${newAnecdote.content} created!`);
   };
 
+  const handleReset = () => {
+    resetContent();
+    resetAuthor();
+    resetInfo();
+  };
+
   return (
     <div>
       <h2>create a new anecdote</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} onReset={handleReset}>
         <div>
           content
           <input {...content} />
@@ -41,7 +43,8 @@ const CreateNew = (props) => {
           url for more info
           <input {...info} />
         </div>
-        <button>create</button>
+        <button type="submit">create</button>
+        <input type="reset" value="reset" />
       </form>
     </div>
   );
