@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { deleteBlog, increaseLike } from "../reducers/blogReducer.js";
+import { setBlogs } from "../reducers/blogReducer.js";
 
 const Blog = ({ blog, loggedInUser, likeFunction, deleteFunction }) => {
 	const [visible, setVisible] = useState(false);
@@ -40,17 +42,39 @@ const Blog = ({ blog, loggedInUser, likeFunction, deleteFunction }) => {
 };
 
 const Blogs = ({ user }) => {
+	const dispatch = useDispatch();
 	const blogs = useSelector((state) => state.blogs);
-	console.log(blogs);
+	// console.log(blogs);
+
+	// Handlers for sorting blogs by likes
+	const sortByLikeAscending = () => {
+		const sortedBlogs = [...blogs].sort((a, b) => a.likes - b.likes);
+		dispatch(setBlogs(sortedBlogs));
+	};
+
+	const sortByLikeDescending = () => {
+		const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes);
+		dispatch(setBlogs(sortedBlogs));
+	};
+
 	return (
 		<>
+			<div>
+				<button onClick={sortByLikeDescending}>
+					sort by like(descending order)
+				</button>
+				&nbsp;
+				<button onClick={sortByLikeAscending}>
+					sort by like(ascending order)
+				</button>
+			</div>
 			{blogs.map((blog) => (
 				<Blog
 					key={blog.id}
 					blog={blog}
 					loggedInUser={user}
-					likeFunction={() => increaseLike(blog.id)}
-					deleteFunction={() => deleteBlog(blog.id)}
+					likeFunction={() => dispatch(increaseLike(blog.id))}
+					deleteFunction={() => dispatch(deleteBlog(blog.id))}
 				/>
 			))}
 		</>

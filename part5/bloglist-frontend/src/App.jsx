@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setNotification } from "./reducers/notificationReducer.js";
 import { initializeBlogs } from "./reducers/blogReducer.js";
+// import { setBlogs } from "./reducers/blogReducer.js";
 import Blogs from "./components/Blogs.jsx";
 import Login from "./components/Login.jsx";
 import NewBlog from "./components/NewBlog.jsx";
@@ -88,80 +89,80 @@ const App = () => {
 	// };
 
 	// Handler related to increase a like by 1
-	const increaseLike = async (id) => {
-		const blogToUpdate = blogs.find((blog) => blog.id === id);
-		const updatedBlog = { ...blogToUpdate, likes: blogToUpdate.likes + 1 };
+	// const increaseLike = async (id) => {
+	// 	const blogToUpdate = blogs.find((blog) => blog.id === id);
+	// 	const updatedBlog = { ...blogToUpdate, likes: blogToUpdate.likes + 1 };
 
-		try {
-			const returnedBlog = await blogService.update(id, updatedBlog);
-			// This is for retaining the user info in detail, since the server returns only the userId
-			returnedBlog.user = { ...blogToUpdate.user };
-			setBlogs(blogs.map((blog) => (blog.id === id ? returnedBlog : blog)));
-		} catch (error) {
-			console.error(error.response.status);
-			console.error(error.response.data);
-			if (error.response.status === 404) {
-				dispatch(
-					setNotification(
-						`The blog ${blogToUpdate.title} has already been removed.`
-					)
-				);
-				setBlogs(blogs.filter((blog) => blog.id !== id));
-			} else {
-				dispatch(
-					setNotification(
-						`Cannot be updated from the server: ${error.response.data.error}`
-					)
-				);
-			}
-		}
-	};
+	// 	try {
+	// 		const returnedBlog = await blogService.update(id, updatedBlog);
+	// 		// This is for retaining the user info in detail, since the server returns only the userId
+	// 		returnedBlog.user = { ...blogToUpdate.user };
+	// 		setBlogs(blogs.map((blog) => (blog.id === id ? returnedBlog : blog)));
+	// 	} catch (error) {
+	// 		console.error(error.response.status);
+	// 		console.error(error.response.data);
+	// 		if (error.response.status === 404) {
+	// 			dispatch(
+	// 				setNotification(
+	// 					`The blog ${blogToUpdate.title} has already been removed.`
+	// 				)
+	// 			);
+	// 			setBlogs(blogs.filter((blog) => blog.id !== id));
+	// 		} else {
+	// 			dispatch(
+	// 				setNotification(
+	// 					`Cannot be updated from the server: ${error.response.data.error}`
+	// 				)
+	// 			);
+	// 		}
+	// 	}
+	// };
 
 	// Handlers for sorting blogs by likes
-	const sortByLikeAscending = () => {
-		const sortedBlogs = [...blogs].sort((a, b) => a.likes - b.likes);
-		setBlogs(sortedBlogs);
-	};
+	// const sortByLikeAscending = () => {
+	// 	const sortedBlogs = [...blogs].sort((a, b) => a.likes - b.likes);
+	// 	setBlogs(sortedBlogs);
+	// };
 
-	const sortByLikeDescending = () => {
-		const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes);
-		setBlogs(sortedBlogs);
-	};
+	// const sortByLikeDescending = () => {
+	// 	const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes);
+	// 	setBlogs(sortedBlogs);
+	// };
 
 	// Handler to delete a blog
-	const deleteBlog = async (id) => {
-		const blogToDelete = blogs.find((blog) => blog.id === id);
-		if (!blogToDelete) return;
+	// const deleteBlog = async (id) => {
+	// 	const blogToDelete = blogs.find((blog) => blog.id === id);
+	// 	if (!blogToDelete) return;
 
-		try {
-			if (
-				window.confirm(
-					`Removing blog ${blogToDelete.title} by ${blogToDelete.author}`
-				)
-			) {
-				await blogService.deleteBlog(id);
-				dispatch(
-					setNotification(`Deleted note ${blogToDelete.content} successfully!`)
-				);
-				setBlogs(blogs.filter((blog) => blog.id !== id));
-			}
-		} catch (error) {
-			if (error.response.status === 404) {
-				dispatch(
-					setNotification(
-						`The blog ${blogToDelete.content} has already been removed.`
-					)
-				);
-				setBlogs(blogs.filter((blog) => blog.id !== id));
-			} else {
-				dispatch(
-					setNotification(
-						`Cannot be deleted from the server: ${error.response.data.error}`
-					)
-				);
-			}
-		}
-	};
+	// 	try {
+	// 		if (
+	// 			window.confirm(
+	// 				`Removing blog ${blogToDelete.title} by ${blogToDelete.author}`
+	// 			)
+	// 		) {
+	// 			await blogService.deleteBlog(id);
+	// 			dispatch(
+	// 				setNotification(`Deleted note ${blogToDelete.content} successfully!`)
+	// 			);
+	// 			setBlogs(blogs.filter((blog) => blog.id !== id));
+	// 		}
+	// 	} catch (error) {
+	// 		if (error.response.status === 404) {
+	// 			dispatch(
+	// 				setNotification(
+	// 					`The blog ${blogToDelete.content} has already been removed.`
+	// 				)
+	// 			);
+	// 			setBlogs(blogs.filter((blog) => blog.id !== id));
+	// 		} else {
+	// 			dispatch(
+	// 				setNotification(
+	// 					`Cannot be deleted from the server: ${error.response.data.error}`
+	// 				)
+	// 			);
+	// 		}
+	// 	}
+	// };
 
 	// render components
 	return (
@@ -177,15 +178,6 @@ const App = () => {
 						<NewBlog user={user} ref={newBlogRef} />
 					</Togglable>
 					<h2>blogs</h2>
-					<div>
-						<button onClick={sortByLikeDescending}>
-							sort by like(descending order)
-						</button>
-						&nbsp;
-						<button onClick={sortByLikeAscending}>
-							sort by like(ascending order)
-						</button>
-					</div>
 					<Blogs user={user} />
 				</>
 			)}

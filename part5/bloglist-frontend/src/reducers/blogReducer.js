@@ -12,6 +12,9 @@ const blogSlice = createSlice({
 		setBlogs(state, action) {
 			return action.payload;
 		},
+		// excludeBlog(state, action) {
+		// 	return state.filter((blog) => blog.id !== action.payload.id);
+		// },
 	},
 });
 
@@ -44,6 +47,81 @@ export const createBlog = (newBlogObject) => {
 					`Blog cannot be added to the server: ${err.response.data.error}`
 				)
 			);
+		}
+	};
+};
+
+export const deleteBlog = (id) => {
+	return async (dispatch, getState) => {
+		const currentState = getState().blogs; // we can access the state by using getState
+		// console.log(currentState);
+		const blogToDelete = currentState.find((blog) => blog.id === id);
+		if (!blogToDelete) return;
+
+		try {
+			if (
+				window.confirm(
+					`Removing blog ${blogToDelete.title} by ${blogToDelete.author}`
+				)
+			) {
+				await blogService.deleteBlog(id);
+				dispatch(
+					setNotification(`Deleted note ${blogToDelete.content} successfully!`)
+				);
+				dispatch(setBlogs(currentState.filter((blog) => blog.id !== id)));
+			}
+		} catch (error) {
+			if (error.response.status === 404) {
+				dispatch(
+					setNotification(
+						`The blog ${blogToDelete.content} has already been removed.`
+					)
+				);
+				dispatch(setBlogs(currentState.filter((blog) => blog.id !== id)));
+			} else {
+				dispatch(
+					setNotification(
+						`Cannot be deleted from the server: ${error.response.data.error}`
+					)
+				);
+			}
+		}
+	};
+};
+
+export const increaseLike = (id) => {
+	return async (dispatch, getState) => {
+		const currentState = getState().blogs;
+		const blogToUpdate = currentState.find((blog) => blog.id === id);
+		if (!blogToUpdate) return;
+		const updatedBlog = { ...blogToUpdate, likes: blogToUpdate.likes + 1 };
+
+		try {
+			const returnedBlog = await blogService.update(id, updatedBlog);
+			// This is for retaining the user info in detail, since the server returns only the userId
+			// returnedBlog.user = { ...blogToUpdate.user };
+			dispatch(
+				setBlogs(
+					currentState.map((blog) => (blog.id === id ? returnedBlog : blog))
+				)
+			);
+		} catch (error) {
+			console.error(error.response.status);
+			console.error(error.response.data);
+			if (error.response.status === 404) {
+				dispatch(
+					setNotification(
+						`The blog ${blogToUpdate.title} has already been removed.`
+					)
+				);
+				dispatch(setBlogs(blogs.filter((blog) => blog.id !== id)));
+			} else {
+				dispatch(
+					setNotification(
+						`Cannot be updated from the server: ${error.response.data.error}`
+					)
+				);
+			}
 		}
 	};
 };
