@@ -9,6 +9,9 @@ export default [
 	{ ignores: ["dist"] },
 	{
 		files: ["**/*.{js,jsx}"],
+		env: {
+			"jest/globals": true,
+		},
 		languageOptions: {
 			ecmaVersion: 2020,
 			globals: {

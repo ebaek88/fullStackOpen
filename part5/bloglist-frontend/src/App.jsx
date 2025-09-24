@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from "react";
+import { useDispatch } from "react-redux";
+import { setNotification } from "./reducers/notificationReducer.js";
 import Blog from "./components/Blog.jsx";
 import Login from "./components/Login.jsx";
 import NewBlog from "./components/NewBlog.jsx";
@@ -9,9 +11,10 @@ import Togglable from "./components/Togglable.jsx";
 
 // The error object structure is specific to Axios
 const App = () => {
+	const dispatch = useDispatch();
 	const [blogs, setBlogs] = useState([]);
 	const [user, setUser] = useState(null);
-	const [message, setMessage] = useState(null);
+	// const [message, setMessage] = useState(null);
 
 	// For useEffect, callbacks need to be synchronous in order to prevent race condition.
 	// In order to use async functions as callbacks, wrap them around synch ones.
@@ -23,8 +26,10 @@ const App = () => {
 			} catch (error) {
 				console.error(error.response.status);
 				console.error(error.response.data);
-				showNotification(
-					`Blogs cannot be fetched from the server: ${error.response.data.error}`
+				dispatch(
+					setNotification(
+						`Blogs cannot be fetched from the server: ${error.response.data.error}`
+					)
 				);
 			}
 		};
@@ -44,14 +49,6 @@ const App = () => {
 	// Reference to the Togglable component that contains the NewBlog component.
 	const newBlogRef = useRef();
 
-	// Helper function to render Notification component
-	const showNotification = (msg, timeout = 3000) => {
-		setMessage(msg);
-		setTimeout(() => {
-			setMessage(null);
-		}, timeout);
-	};
-
 	// Handlers related to login and logout
 	const handleLogin = async (loginUser) => {
 		try {
@@ -62,18 +59,20 @@ const App = () => {
 			blogService.setToken(user.token);
 			setUser(user);
 
-			showNotification(`Welcome ${user.username}!`);
+			dispatch(setNotification(`Welcome ${user.username}!`));
 		} catch (err) {
 			console.error(err.response.status);
 			console.error(err.response.data);
-			showNotification(`wrong credentials: ${err.response.data.error}`);
+			dispatch(
+				setNotification(`wrong credentials: ${err.response.data.error}`)
+			);
 		}
 	};
 
 	const handleLogout = () => {
 		window.localStorage.clear();
 		setUser(null);
-		showNotification("Logged out successfully!");
+		dispatch(setNotification("Logged out successfully!"));
 	};
 
 	// Handler related to adding a new blog
@@ -84,14 +83,18 @@ const App = () => {
 			// This is for retaining the user info in detail, since the server returns only the userId
 			returnedBlog.user = { ...user };
 			setBlogs(blogs.concat(returnedBlog));
-			showNotification(
-				`A new blog ${returnedBlog.title} by ${returnedBlog.author} added successfully!`
+			dispatch(
+				setNotification(
+					`A new blog ${returnedBlog.title} by ${returnedBlog.author} added successfully!`
+				)
 			);
 		} catch (err) {
 			console.error(err.response.status);
 			console.error(err.response.data);
-			showNotification(
-				`Blog cannot be added to the server: ${err.response.data.error}`
+			dispatch(
+				setNotification(
+					`Blog cannot be added to the server: ${err.response.data.error}`
+				)
 			);
 		}
 	};
@@ -110,13 +113,17 @@ const App = () => {
 			console.error(error.response.status);
 			console.error(error.response.data);
 			if (error.response.status === 404) {
-				showNotification(
-					`The blog ${blogToUpdate.title} has already been removed.`
+				dispatch(
+					setNotification(
+						`The blog ${blogToUpdate.title} has already been removed.`
+					)
 				);
 				setBlogs(blogs.filter((blog) => blog.id !== id));
 			} else {
-				showNotification(
-					`Cannot be updated from the server: ${error.response.data.error}`
+				dispatch(
+					setNotification(
+						`Cannot be updated from the server: ${error.response.data.error}`
+					)
 				);
 			}
 		}
@@ -145,18 +152,24 @@ const App = () => {
 				)
 			) {
 				await blogService.deleteBlog(id);
-				showNotification(`Deleted note ${blogToDelete.content} successfully!`);
+				dispatch(
+					setNotification(`Deleted note ${blogToDelete.content} successfully!`)
+				);
 				setBlogs(blogs.filter((blog) => blog.id !== id));
 			}
 		} catch (error) {
 			if (error.response.status === 404) {
-				showNotification(
-					`The blog ${blogToDelete.content} has already been removed.`
+				dispatch(
+					setNotification(
+						`The blog ${blogToDelete.content} has already been removed.`
+					)
 				);
 				setBlogs(blogs.filter((blog) => blog.id !== id));
 			} else {
-				showNotification(
-					`Cannot be deleted from the server: ${error.response.data.error}`
+				dispatch(
+					setNotification(
+						`Cannot be deleted from the server: ${error.response.data.error}`
+					)
 				);
 			}
 		}
@@ -165,7 +178,7 @@ const App = () => {
 	// render components
 	return (
 		<div>
-			<Notification message={message} />
+			<Notification />
 			{!user && <Login tryLogin={handleLogin} />}
 			{user && (
 				<>
