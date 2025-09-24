@@ -1,36 +1,38 @@
 {
-  "name": "bloglist-backend",
-  "version": "0.0.1",
-  "description": "",
-  "homepage": "https://github.com/ebaek88/fullStackOpen#readme",
-  "bugs": {
-    "url": "https://github.com/ebaek88/fullStackOpen/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ebaek88/fullStackOpen.git"
-  },
-  "license": "MIT",
-  "author": "Euihyun Baek",
-  "type": "commonjs",
-  "main": "index.js",
-  "scripts": {
-    "start": "cross-env NODE_ENV=production node index.js",
-    "dev": "cross-env NODE_ENV=development node --watch index.js",
-    "test": "cross-env NODE_ENV=test node --test",
-    "start:test": "cross-env NODE_ENV=test node --watch index.js"
-  },
-  "dependencies": {
-    "bcrypt": "^6.0.0",
-    "cross-env": "^10.0.0",
-    "dotenv": "^17.2.1",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "lodash": "^4.17.21",
-    "mongoose": "^8.17.1",
-    "morgan": "^1.10.1"
-  },
-  "devDependencies": {
-    "supertest": "^7.1.4"
-  }
+	"name": "bloglist-backend",
+	"version": "0.0.1",
+	"description": "",
+	"homepage": "https://github.com/ebaek88/fullStackOpen#readme",
+	"bugs": {
+		"url": "https://github.com/ebaek88/fullStackOpen/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ebaek88/fullStackOpen.git"
+	},
+	"license": "MIT",
+	"author": "Euihyun Baek",
+	"type": "commonjs",
+	"main": "index.js",
+	"scripts": {
+		"start": "cross-env NODE_ENV=production node index.js",
+		"dev": "cross-env NODE_ENV=development node --watch index.js",
+		"test": "cross-env NODE_ENV=test node --test",
+		"start:test": "cross-env NODE_ENV=test node --watch index.js",
+		"format": "prettier --write --cache ."
+	},
+	"dependencies": {
+		"bcrypt": "^6.0.0",
+		"cross-env": "^10.0.0",
+		"dotenv": "^17.2.1",
+		"express": "^5.1.0",
+		"jsonwebtoken": "^9.0.2",
+		"lodash": "^4.17.21",
+		"mongoose": "^8.17.1",
+		"morgan": "^1.10.1"
+	},
+	"devDependencies": {
+		"prettier": "^3.6.2",
+		"supertest": "^7.1.4"
+	}
 }
