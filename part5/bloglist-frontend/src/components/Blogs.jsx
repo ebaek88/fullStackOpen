@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 
 const Blog = ({ blog, loggedInUser, likeFunction, deleteFunction }) => {
 	const [visible, setVisible] = useState(false);
@@ -38,4 +39,22 @@ const Blog = ({ blog, loggedInUser, likeFunction, deleteFunction }) => {
 	);
 };
 
-export default Blog;
+const Blogs = ({ user }) => {
+	const blogs = useSelector((state) => state.blogs);
+	console.log(blogs);
+	return (
+		<>
+			{blogs.map((blog) => (
+				<Blog
+					key={blog.id}
+					blog={blog}
+					loggedInUser={user}
+					likeFunction={() => increaseLike(blog.id)}
+					deleteFunction={() => deleteBlog(blog.id)}
+				/>
+			))}
+		</>
+	);
+};
+
+export default Blogs;

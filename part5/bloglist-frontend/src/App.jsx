@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { setNotification } from "./reducers/notificationReducer.js";
-import Blog from "./components/Blog.jsx";
+import { initializeBlogs } from "./reducers/blogReducer.js";
+import Blogs from "./components/Blogs.jsx";
 import Login from "./components/Login.jsx";
 import NewBlog from "./components/NewBlog.jsx";
 import blogService from "./services/blogs.js";
@@ -12,29 +13,15 @@ import Togglable from "./components/Togglable.jsx";
 // The error object structure is specific to Axios
 const App = () => {
 	const dispatch = useDispatch();
-	const [blogs, setBlogs] = useState([]);
+	// const [blogs, setBlogs] = useState([]);
+	const blogs = useSelector((state) => state.blogs);
 	const [user, setUser] = useState(null);
 	// const [message, setMessage] = useState(null);
 
 	// For useEffect, callbacks need to be synchronous in order to prevent race condition.
 	// In order to use async functions as callbacks, wrap them around synch ones.
 	useEffect(() => {
-		const fetchBlogs = async () => {
-			try {
-				const initialBlogs = await blogService.getAll();
-				setBlogs(initialBlogs);
-			} catch (error) {
-				console.error(error.response.status);
-				console.error(error.response.data);
-				dispatch(
-					setNotification(
-						`Blogs cannot be fetched from the server: ${error.response.data.error}`
-					)
-				);
-			}
-		};
-
-		fetchBlogs();
+		dispatch(initializeBlogs());
 	}, []);
 
 	useEffect(() => {
@@ -76,28 +63,29 @@ const App = () => {
 	};
 
 	// Handler related to adding a new blog
-	const addBlog = async (blogObject) => {
-		newBlogRef.current.toggleVisibility();
-		try {
-			const returnedBlog = await blogService.create(blogObject);
-			// This is for retaining the user info in detail, since the server returns only the userId
-			returnedBlog.user = { ...user };
-			setBlogs(blogs.concat(returnedBlog));
-			dispatch(
-				setNotification(
-					`A new blog ${returnedBlog.title} by ${returnedBlog.author} added successfully!`
-				)
-			);
-		} catch (err) {
-			console.error(err.response.status);
-			console.error(err.response.data);
-			dispatch(
-				setNotification(
-					`Blog cannot be added to the server: ${err.response.data.error}`
-				)
-			);
-		}
-	};
+	// const addBlog = async (blogObject) => {
+	// 	newBlogRef.current.toggleVisibility();
+	// 	try {
+	// 		const returnedBlog = await blogService.create(blogObject);
+	// 		// This is for retaining the user info in detail, since the server returns only the userId
+	// 		returnedBlog.user = { ...user };
+	// 		setBlogs(blogs.concat(returnedBlog));
+	// 		dispatch(
+	// 			setNotification(
+	// 				`A new blog ${returnedBlog.title} by ${returnedBlog.author} added successfully!`
+	// 			)
+	// 		);
+	// 		dispatch(createBlog(blogObject));
+	// 	} catch (err) {
+	// 		console.error(err.response.status);
+	// 		console.error(err.response.data);
+	// 		dispatch(
+	// 			setNotification(
+	// 				`Blog cannot be added to the server: ${err.response.data.error}`
+	// 			)
+	// 		);
+	// 	}
+	// };
 
 	// Handler related to increase a like by 1
 	const increaseLike = async (id) => {
@@ -186,7 +174,7 @@ const App = () => {
 						{user.name} logged in <button onClick={handleLogout}>logout</button>
 					</p>
 					<Togglable buttonLabel={"create new blog"} ref={newBlogRef}>
-						<NewBlog createBlog={addBlog} />
+						<NewBlog user={user} ref={newBlogRef} />
 					</Togglable>
 					<h2>blogs</h2>
 					<div>
@@ -198,15 +186,7 @@ const App = () => {
 							sort by like(ascending order)
 						</button>
 					</div>
-					{blogs.map((blog) => (
-						<Blog
-							key={blog.id}
-							blog={blog}
-							loggedInUser={user}
-							likeFunction={() => increaseLike(blog.id)}
-							deleteFunction={() => deleteBlog(blog.id)}
-						/>
-					))}
+					<Blogs user={user} />
 				</>
 			)}
 		</div>

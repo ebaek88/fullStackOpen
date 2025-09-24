@@ -1,22 +1,30 @@
-import { useState } from "react";
+// import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { createBlog } from "../reducers/blogReducer.js";
 
-const NewBlog = ({ createBlog }) => {
-	const [title, setTitle] = useState("");
-	const [author, setAuthor] = useState("");
-	const [url, setUrl] = useState("");
+const NewBlog = ({ user, ref }) => {
+	// const [title, setTitle] = useState("");
+	// const [author, setAuthor] = useState("");
+	// const [url, setUrl] = useState("");
+
+	const dispatch = useDispatch();
 
 	const addBlog = (evt) => {
 		evt.preventDefault();
+		const title = evt.target.title.value;
+		const author = evt.target.author.value;
+		const url = evt.target.url.value;
+		evt.target.title.value = "";
+		evt.target.author.value = "";
+		evt.target.url.value = "";
 
-		createBlog({
-			title,
-			author,
-			url,
-		});
+		ref.current.toggleVisibility();
+		const newBlog = { title, author, url };
+		dispatch(createBlog(newBlog));
 
-		setTitle("");
-		setAuthor("");
-		setUrl("");
+		// setTitle("");
+		// setAuthor("");
+		// setUrl("");
 	};
 
 	return (
@@ -28,8 +36,9 @@ const NewBlog = ({ createBlog }) => {
 						title:
 						<input
 							type="text"
-							value={title}
-							onChange={(evt) => setTitle(evt.target.value)}
+							name="title"
+							// value={title}
+							// onChange={(evt) => setTitle(evt.target.value)}
 						/>
 					</label>
 				</div>
@@ -38,8 +47,9 @@ const NewBlog = ({ createBlog }) => {
 						author:
 						<input
 							type="text"
-							value={author}
-							onChange={(evt) => setAuthor(evt.target.value)}
+							name="author"
+							// value={author}
+							// onChange={(evt) => setAuthor(evt.target.value)}
 						/>
 					</label>
 				</div>
@@ -48,8 +58,9 @@ const NewBlog = ({ createBlog }) => {
 						url:
 						<input
 							type="text"
-							value={url}
-							onChange={(evt) => setUrl(evt.target.value)}
+							name="url"
+							// value={url}
+							// onChange={(evt) => setUrl(evt.target.value)}
 						/>
 					</label>
 				</div>
