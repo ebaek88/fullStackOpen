@@ -12,9 +12,6 @@ const blogSlice = createSlice({
 		setBlogs(state, action) {
 			return action.payload;
 		},
-		// excludeBlog(state, action) {
-		// 	return state.filter((blog) => blog.id !== action.payload.id);
-		// },
 	},
 });
 
@@ -29,10 +26,11 @@ export const initializeBlogs = () => {
 };
 
 export const createBlog = (newBlogObject) => {
-	return async (dispatch) => {
+	return async (dispatch, getState) => {
 		try {
 			const returnedBlog = await blogService.create(newBlogObject);
 			// we need user information so that we can attach the user info to the returned blog
+			returnedBlog.user = { ...getState().user }; // we can access the state by using getState
 			dispatch(appendBlog(returnedBlog));
 			dispatch(
 				setNotification(
@@ -54,7 +52,6 @@ export const createBlog = (newBlogObject) => {
 export const deleteBlog = (id) => {
 	return async (dispatch, getState) => {
 		const currentState = getState().blogs; // we can access the state by using getState
-		// console.log(currentState);
 		const blogToDelete = currentState.find((blog) => blog.id === id);
 		if (!blogToDelete) return;
 
@@ -99,7 +96,7 @@ export const increaseLike = (id) => {
 		try {
 			const returnedBlog = await blogService.update(id, updatedBlog);
 			// This is for retaining the user info in detail, since the server returns only the userId
-			// returnedBlog.user = { ...blogToUpdate.user };
+			returnedBlog.user = { ...getState().user };
 			dispatch(
 				setBlogs(
 					currentState.map((blog) => (blog.id === id ? returnedBlog : blog))

@@ -1,41 +1,34 @@
-import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { handleLogin } from "../reducers/userReducer.js";
 
-const Login = ({ tryLogin }) => {
-	const [username, setUsername] = useState("");
-	const [password, setPassword] = useState("");
+const Login = () => {
+	const dispatch = useDispatch();
 
-	const handleLogin = (evt) => {
+	const tryLogin = (evt) => {
 		evt.preventDefault();
+		const username = evt.target.username.value;
+		const password = evt.target.password.value;
+		evt.target.username.value = "";
+		evt.target.password.value = "";
 
 		const loginUser = { username, password };
-		tryLogin(loginUser);
-
-		setUsername("");
-		setPassword("");
+		dispatch(handleLogin(loginUser));
 	};
 
 	return (
 		<div>
 			<h2>log in to application</h2>
-			<form onSubmit={handleLogin}>
+			<form onSubmit={tryLogin}>
 				<div>
 					<label>
 						username &nbsp;
-						<input
-							type="text"
-							value={username}
-							onChange={(evt) => setUsername(evt.target.value)}
-						/>
+						<input type="text" name="username" />
 					</label>
 				</div>
 				<div>
 					<label>
 						password &nbsp;
-						<input
-							type="password"
-							value={password}
-							onChange={(evt) => setPassword(evt.target.value)}
-						/>
+						<input type="password" name="password" />
 					</label>
 				</div>
 				<button type="submit">login</button>

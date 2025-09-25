@@ -8,7 +8,7 @@ const setToken = (newToken) => {
 };
 
 // For error handling, you don't need to handle errors here.
-// The errors will be thrown to App.jsx and it will handle them.
+// The errors will be thrown to the caller and it will handle them.
 const getAll = () => {
 	const request = axios.get(baseUrl);
 	return request.then((response) => response.data);
