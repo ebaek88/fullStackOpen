@@ -1,5 +1,7 @@
-import notificationReducer, { setNotification } from "./notificationReducer.js";
-import { createNotification } from "./notificationReducer.js";
+import notificationReducer, {
+	setNotification,
+} from "./notificationReducerRedux.js";
+import { createNotification } from "./notificationReducerRedux.js";
 import deepFreeze from "deep-freeze";
 
 jest.useFakeTimers(); // we need to use this to simulate a timer in Jest

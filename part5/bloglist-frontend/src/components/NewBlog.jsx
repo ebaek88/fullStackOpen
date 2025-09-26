@@ -1,15 +1,12 @@
-// import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { createBlog } from "../reducers/blogReducer.js";
+import { useSetNotification } from "../contexts/NotificationContext.jsx";
 
 const NewBlog = ({ user, ref }) => {
-	// const [title, setTitle] = useState("");
-	// const [author, setAuthor] = useState("");
-	// const [url, setUrl] = useState("");
-
 	const dispatch = useDispatch();
+	const setNotification = useSetNotification();
 
-	const addBlog = (evt) => {
+	const addBlog = async (evt) => {
 		evt.preventDefault();
 		const title = evt.target.title.value;
 		const author = evt.target.author.value;
@@ -20,11 +17,21 @@ const NewBlog = ({ user, ref }) => {
 
 		ref.current.toggleVisibility();
 		const newBlog = { title, author, url };
-		dispatch(createBlog(newBlog));
 
-		// setTitle("");
-		// setAuthor("");
-		// setUrl("");
+		try {
+			await dispatch(createBlog(newBlog));
+			setNotification({
+				type: "CREATE",
+				payload: { title, author },
+			});
+		} catch (err) {
+			console.error(err.response.status);
+			console.error(err.response.data);
+			setNotification({
+				type: "ERROR",
+				payload: `Blog cannot be added to the server: ${err.response.data.error}`,
+			});
+		}
 	};
 
 	return (
@@ -34,34 +41,19 @@ const NewBlog = ({ user, ref }) => {
 				<div>
 					<label>
 						title:
-						<input
-							type="text"
-							name="title"
-							// value={title}
-							// onChange={(evt) => setTitle(evt.target.value)}
-						/>
+						<input type="text" name="title" />
 					</label>
 				</div>
 				<div>
 					<label>
 						author:
-						<input
-							type="text"
-							name="author"
-							// value={author}
-							// onChange={(evt) => setAuthor(evt.target.value)}
-						/>
+						<input type="text" name="author" />
 					</label>
 				</div>
 				<div>
 					<label>
 						url:
-						<input
-							type="text"
-							name="url"
-							// value={url}
-							// onChange={(evt) => setUrl(evt.target.value)}
-						/>
+						<input type="text" name="url" />
 					</label>
 				</div>
 				<button type="submit">create</button>

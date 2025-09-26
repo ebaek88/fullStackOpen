@@ -1,18 +1,18 @@
 import { useSelector } from "react-redux";
 
-const Notification = () => {
+const Notification = ({ msg }) => {
 	const notification = useSelector((state) => state.notification);
 	const successPrompts = ["Deleted", "Updated", "Welcome", "successfully"];
 
-	if (!notification) return null;
+	if (!msg) return null;
 
-	if (successPrompts.some((prompt) => notification.includes(prompt))) {
-		return <div className="success">{notification}</div>;
+	if (successPrompts.some((prompt) => msg.includes(prompt))) {
+		return <div className="success">{msg}</div>;
 	}
 
 	return (
 		<div className="modal">
-			<div className="error">{notification}</div>
+			<div className="error">{msg}</div>
 		</div>
 	);
 };

@@ -1,10 +1,12 @@
 import { useDispatch } from "react-redux";
 import { handleLogin } from "../reducers/userReducer.js";
+import { useSetNotification } from "../contexts/NotificationContext.jsx";
 
 const Login = () => {
 	const dispatch = useDispatch();
+	const setNotification = useSetNotification();
 
-	const tryLogin = (evt) => {
+	const tryLogin = async (evt) => {
 		evt.preventDefault();
 		const username = evt.target.username.value;
 		const password = evt.target.password.value;
@@ -12,7 +14,20 @@ const Login = () => {
 		evt.target.password.value = "";
 
 		const loginUser = { username, password };
-		dispatch(handleLogin(loginUser));
+		try {
+			await dispatch(handleLogin(loginUser));
+			setNotification({
+				type: "LOGIN",
+				payload: username,
+			});
+		} catch (err) {
+			console.error(err.response.status);
+			console.error(err.response.data);
+			setNotification({
+				type: "ERROR",
+				payload: `wrong credentials: ${err.response.data.error}`,
+			});
+		}
 	};
 
 	return (

@@ -2,7 +2,10 @@ import { useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { initializeBlogs } from "./reducers/blogReducer.js";
 import { setUser } from "./reducers/userReducer.js";
-import { setNotification } from "./reducers/notificationReducer.js";
+import {
+	useNotificationValue,
+	useSetNotification,
+} from "./contexts/NotificationContext.jsx";
 import Blogs from "./components/Blogs.jsx";
 import Login from "./components/Login.jsx";
 import NewBlog from "./components/NewBlog.jsx";
@@ -14,6 +17,9 @@ import Togglable from "./components/Togglable.jsx";
 const App = () => {
 	const dispatch = useDispatch();
 	const user = useSelector((state) => state.user);
+
+	const notificationValue = useNotificationValue();
+	const setNotification = useSetNotification();
 
 	// For useEffect, callbacks need to be synchronous in order to prevent race condition.
 	// In order to use async functions as callbacks, wrap them around synch ones.
@@ -37,13 +43,13 @@ const App = () => {
 	const handleLogout = () => {
 		window.localStorage.clear();
 		dispatch(setUser(null));
-		dispatch(setNotification("Logged out successfully!"));
+		setNotification({ type: "LOGOUT" });
 	};
 
 	// render components
 	return (
 		<div>
-			<Notification />
+			<Notification msg={notificationValue} />
 			{!user && <Login />}
 			{user && (
 				<>

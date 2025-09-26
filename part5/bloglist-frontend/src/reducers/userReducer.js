@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import blogService from "../services/blogs.js";
 import loginService from "../services/login.js";
-import { setNotification } from "./notificationReducer.js";
+// import { setNotification } from "./notificationReducerRedux.js";
 
 const userSlice = createSlice({
 	name: "user",
@@ -24,13 +24,15 @@ export const handleLogin = (loginUser) => {
 			window.localStorage.setItem("loggedBloglistUser", JSON.stringify(user));
 			blogService.setToken(user.token);
 			dispatch(setUser(user));
-			dispatch(setNotification(`Welcome ${user.username}!`));
+			// dispatch(setNotification(`Welcome ${user.username}!`));
 		} catch (err) {
-			console.error(err.response.status);
-			console.error(err.response.data);
-			dispatch(
-				setNotification(`wrong credentials: ${err.response.data.error}`)
-			);
+			// console.error(err.response.status);
+			// console.error(err.response.data);
+			// console.error(err);
+			throw err;
+			// dispatch(
+			// 	setNotification(`wrong credentials: ${err.response.data.error}`)
+			// );
 		}
 	};
 };
