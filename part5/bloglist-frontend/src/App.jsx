@@ -23,9 +23,9 @@ const App = () => {
 
 	// For useEffect, callbacks need to be synchronous in order to prevent race condition.
 	// In order to use async functions as callbacks, wrap them around synch ones.
-	useEffect(() => {
-		dispatch(initializeBlogs());
-	}, []);
+	// useEffect(() => {
+	// 	dispatch(initializeBlogs());
+	// }, []);
 
 	useEffect(() => {
 		const loggedUserJSON = window.localStorage.getItem("loggedBloglistUser");

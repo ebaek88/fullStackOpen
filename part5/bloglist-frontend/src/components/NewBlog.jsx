@@ -1,10 +1,24 @@
-import { useDispatch } from "react-redux";
-import { createBlog } from "../reducers/blogReducer.js";
+// import { useDispatch } from "react-redux";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import blogService from "../services/blogs.js";
+// import { createBlog } from "../reducers/blogReducer.js";
 import { useSetNotification } from "../contexts/NotificationContext.jsx";
 
 const NewBlog = ({ user, ref }) => {
-	const dispatch = useDispatch();
+	// const dispatch = useDispatch();
 	const setNotification = useSetNotification();
+	const queryClient = useQueryClient();
+	const newBlogMutation = useMutation({
+		mutationFn: blogService.create,
+		onSuccess: (newBlog) => {
+			const blogs = queryClient.getQueryData(["blogs"]);
+			queryClient.setQueryData(["blogs"], blogs.concat(newBlog));
+			setNotification({
+				type: "CREATE",
+				payload: { title: newBlog.title, author: newBlog.author },
+			});
+		},
+	});
 
 	const addBlog = async (evt) => {
 		evt.preventDefault();
@@ -15,23 +29,10 @@ const NewBlog = ({ user, ref }) => {
 		evt.target.author.value = "";
 		evt.target.url.value = "";
 
-		ref.current.toggleVisibility();
 		const newBlog = { title, author, url };
+		newBlogMutation.mutate(newBlog);
 
-		try {
-			await dispatch(createBlog(newBlog));
-			setNotification({
-				type: "CREATE",
-				payload: { title, author },
-			});
-		} catch (err) {
-			console.error(err.response.status);
-			console.error(err.response.data);
-			setNotification({
-				type: "ERROR",
-				payload: `Blog cannot be added to the server: ${err.response.data.error}`,
-			});
-		}
+		ref.current.toggleVisibility();
 	};
 
 	return (

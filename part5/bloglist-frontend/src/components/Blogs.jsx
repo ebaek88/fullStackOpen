@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useQuery } from "@tanstack/react-query";
 import { deleteBlog, increaseLike } from "../reducers/blogReducer.js";
 import { setBlogs } from "../reducers/blogReducer.js";
+import blogService from "../services/blogs.js";
 import { useSetNotification } from "../contexts/NotificationContext.jsx";
 
 const Blog = ({ blog, loggedInUser, likeFunction, deleteFunction }) => {
@@ -43,9 +45,32 @@ const Blog = ({ blog, loggedInUser, likeFunction, deleteFunction }) => {
 };
 
 const Blogs = ({ user }) => {
-	const dispatch = useDispatch();
-	const blogs = useSelector((state) => state.blogs);
+	// const dispatch = useDispatch();
+	// const blogs = useSelector((state) => state.blogs);
 	// console.log(blogs);
+
+	const result = useQuery({
+		queryKey: ["blogs"],
+		queryFn: blogService.getAll,
+		retry: 1,
+	});
+	console.log(JSON.parse(JSON.stringify(result)));
+
+	if (result.isLoading) {
+		return <div>loading data...</div>;
+	}
+
+	if (result.isError) {
+		return (
+			<div>
+				anecdote service not available due to problems in server:{" "}
+				{result.error.message}
+			</div>
+		);
+	}
+
+	const blogs = result.data;
+
 	const setNotification = useSetNotification();
 
 	// Handlers for sorting blogs by likes
