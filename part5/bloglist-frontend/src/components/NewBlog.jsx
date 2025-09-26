@@ -18,6 +18,14 @@ const NewBlog = ({ user, ref }) => {
 				payload: { title: newBlog.title, author: newBlog.author },
 			});
 		},
+		onError: (err) => {
+			console.error(err.response.status);
+			console.error(err.response.data);
+			setNotification({
+				type: "ERROR",
+				payload: `Blog cannot be added to the server: ${err.response.data.error}`,
+			});
+		},
 	});
 
 	const addBlog = async (evt) => {

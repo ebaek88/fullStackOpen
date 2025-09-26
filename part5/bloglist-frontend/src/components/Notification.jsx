@@ -1,7 +1,7 @@
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 
 const Notification = ({ msg }) => {
-	const notification = useSelector((state) => state.notification);
+	// const notification = useSelector((state) => state.notification);
 	const successPrompts = ["Deleted", "Updated", "Welcome", "successfully"];
 
 	if (!msg) return null;

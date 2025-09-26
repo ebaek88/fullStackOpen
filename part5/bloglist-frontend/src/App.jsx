@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { initializeBlogs } from "./reducers/blogReducer.js";
+// import { useSelector, useDispatch } from "react-redux";
+// import { initializeBlogs } from "./reducers/blogReducer.js";
 import { setUser } from "./reducers/userReducer.js";
 import {
 	useNotificationValue,
@@ -15,8 +15,9 @@ import Togglable from "./components/Togglable.jsx";
 
 // The error object structure is specific to Axios
 const App = () => {
-	const dispatch = useDispatch();
-	const user = useSelector((state) => state.user);
+	// const dispatch = useDispatch();
+	// const user = useSelector((state) => state.user);
+	const user = {};
 
 	const notificationValue = useNotificationValue();
 	const setNotification = useSetNotification();
@@ -27,14 +28,14 @@ const App = () => {
 	// 	dispatch(initializeBlogs());
 	// }, []);
 
-	useEffect(() => {
-		const loggedUserJSON = window.localStorage.getItem("loggedBloglistUser");
-		if (loggedUserJSON) {
-			const user = JSON.parse(loggedUserJSON);
-			dispatch(setUser(user));
-			blogService.setToken(user.token);
-		}
-	}, []);
+	// useEffect(() => {
+	// 	const loggedUserJSON = window.localStorage.getItem("loggedBloglistUser");
+	// 	if (loggedUserJSON) {
+	// 		const user = JSON.parse(loggedUserJSON);
+	// 		dispatch(setUser(user));
+	// 		blogService.setToken(user.token);
+	// 	}
+	// }, []);
 
 	// Reference to the Togglable component that contains the NewBlog component.
 	const newBlogRef = useRef();
