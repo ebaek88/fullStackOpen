@@ -1,9 +1,10 @@
-import { useDispatch } from "react-redux";
-import { handleLogin } from "../reducers/userReducer.js";
+import { useUserDispatch } from "../contexts/UserContext.jsx";
+import blogService from "../services/blogs.js";
+import loginService from "../services/login.js";
 import { useSetNotification } from "../contexts/NotificationContext.jsx";
 
 const Login = () => {
-	const dispatch = useDispatch();
+	const dispatch = useUserDispatch();
 	const setNotification = useSetNotification();
 
 	const tryLogin = async (evt) => {
@@ -15,17 +16,26 @@ const Login = () => {
 
 		const loginUser = { username, password };
 		try {
-			await dispatch(handleLogin(loginUser));
+			const loginData = await loginService.login(loginUser);
+			window.localStorage.setItem(
+				"loggedBloglistUser",
+				JSON.stringify(loginData)
+			);
+			blogService.setToken(loginData.token);
+			dispatch({
+				type: "LOGIN",
+				payload: { ...loginData },
+			});
 			setNotification({
 				type: "LOGIN",
-				payload: username,
+				payload: loginData.username,
 			});
 		} catch (err) {
-			console.error(err.response.status);
-			console.error(err.response.data);
+			console.error(err.response?.status);
+			console.error(err.response?.data);
 			setNotification({
 				type: "ERROR",
-				payload: `wrong credentials: ${err.response.data.error}`,
+				payload: `wrong credentials: ${err.response?.data?.error}`,
 			});
 		}
 	};

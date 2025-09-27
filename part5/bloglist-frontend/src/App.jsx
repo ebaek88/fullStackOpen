@@ -1,41 +1,36 @@
-import { useEffect, useRef } from "react";
-// import { useSelector, useDispatch } from "react-redux";
-// import { initializeBlogs } from "./reducers/blogReducer.js";
-import { setUser } from "./reducers/userReducer.js";
+import { useEffect, useRef, useContext } from "react";
+import blogService from "./services/blogs.js";
 import {
 	useNotificationValue,
 	useSetNotification,
 } from "./contexts/NotificationContext.jsx";
+import UserContext from "./contexts/UserContext.jsx";
 import Blogs from "./components/Blogs.jsx";
 import Login from "./components/Login.jsx";
 import NewBlog from "./components/NewBlog.jsx";
-import blogService from "./services/blogs.js";
 import Notification from "./components/Notification.jsx";
 import Togglable from "./components/Togglable.jsx";
 
 // The error object structure is specific to Axios
 const App = () => {
-	// const dispatch = useDispatch();
-	// const user = useSelector((state) => state.user);
-	const user = {};
+	const [user, userDispatch] = useContext(UserContext);
 
 	const notificationValue = useNotificationValue();
 	const setNotification = useSetNotification();
 
 	// For useEffect, callbacks need to be synchronous in order to prevent race condition.
 	// In order to use async functions as callbacks, wrap them around synch ones.
-	// useEffect(() => {
-	// 	dispatch(initializeBlogs());
-	// }, []);
-
-	// useEffect(() => {
-	// 	const loggedUserJSON = window.localStorage.getItem("loggedBloglistUser");
-	// 	if (loggedUserJSON) {
-	// 		const user = JSON.parse(loggedUserJSON);
-	// 		dispatch(setUser(user));
-	// 		blogService.setToken(user.token);
-	// 	}
-	// }, []);
+	useEffect(() => {
+		const loggedUserJSON = window.localStorage.getItem("loggedBloglistUser");
+		if (loggedUserJSON) {
+			const user = JSON.parse(loggedUserJSON);
+			userDispatch({
+				type: "LOGIN",
+				payload: user,
+			});
+			blogService.setToken(user.token);
+		}
+	}, []);
 
 	// Reference to the Togglable component that contains the NewBlog component.
 	const newBlogRef = useRef();
@@ -43,7 +38,7 @@ const App = () => {
 	// Logout handler
 	const handleLogout = () => {
 		window.localStorage.clear();
-		dispatch(setUser(null));
+		userDispatch({ type: "LOGOUT" });
 		setNotification({ type: "LOGOUT" });
 	};
 

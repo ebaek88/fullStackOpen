@@ -1,18 +1,16 @@
-// import { useDispatch } from "react-redux";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import blogService from "../services/blogs.js";
-// import { createBlog } from "../reducers/blogReducer.js";
 import { useSetNotification } from "../contexts/NotificationContext.jsx";
 
 const NewBlog = ({ user, ref }) => {
-	// const dispatch = useDispatch();
 	const setNotification = useSetNotification();
 	const queryClient = useQueryClient();
 	const newBlogMutation = useMutation({
 		mutationFn: blogService.create,
 		onSuccess: (newBlog) => {
+			const newBlogWithUserInfo = { ...newBlog, user };
 			const blogs = queryClient.getQueryData(["blogs"]);
-			queryClient.setQueryData(["blogs"], blogs.concat(newBlog));
+			queryClient.setQueryData(["blogs"], blogs.concat(newBlogWithUserInfo));
 			setNotification({
 				type: "CREATE",
 				payload: { title: newBlog.title, author: newBlog.author },

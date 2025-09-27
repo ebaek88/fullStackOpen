@@ -1,8 +1,5 @@
 import { useState } from "react";
-// import { useSelector, useDispatch } from "react-redux";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-// import { deleteBlog, increaseLike } from "../reducers/blogReducer.js";
-import { setBlogs } from "../reducers/blogReducer.js";
 import blogService from "../services/blogs.js";
 import { useSetNotification } from "../contexts/NotificationContext.jsx";
 
@@ -42,10 +39,6 @@ const Blog = ({ blog, loggedInUser, likeFunction, deleteFunction }) => {
 };
 
 const Blogs = ({ user }) => {
-	// const dispatch = useDispatch();
-	// const blogs = useSelector((state) => state.blogs);
-	// console.log(blogs);
-
 	const setNotification = useSetNotification();
 
 	const result = useQuery({
@@ -58,12 +51,16 @@ const Blogs = ({ user }) => {
 	const queryClient = useQueryClient();
 
 	const likeBlogMutation = useMutation({
-		mutationFn: blogService.update,
-		onSuccess: (updatedBlog) => {
+		mutationFn: (blog) => blogService.update(blog.id, blog),
+		onSuccess: (updatedBlog, variables) => {
 			const blogs = queryClient.getQueryData(["blogs"]);
 			queryClient.setQueryData(
 				["blogs"],
-				blogs.map((blog) => (blog.id === updatedBlog.id ? updatedBlog : blog))
+				blogs.map((blog) =>
+					blog.id === updatedBlog.id
+						? { ...updatedBlog, user: variables.user }
+						: blog
+				)
 			);
 		},
 		onError: (error, variables) => {
@@ -74,7 +71,6 @@ const Blogs = ({ user }) => {
 					type: "ERROR",
 					payload: `The blog ${variables.title} has already been removed.`,
 				});
-				// dispatch(setBlogs(blogs.filter((blog) => blog.id !== id)));
 				queryClient.invalidateQueries({ queryKey: ["blogs"] });
 			} else {
 				setNotification({
@@ -85,25 +81,25 @@ const Blogs = ({ user }) => {
 		},
 	});
 	const deleteBlogMutation = useMutation({
-		mutationFn: blogService.deleteBlog,
-		onSuccess: (deletedBlog) => {
+		mutationFn: (blog) => blogService.deleteBlog(blog.id),
+		onSuccess: (_, variables) => {
 			setNotification({
 				type: "DELETE",
-				payload: deletedBlog.title,
+				payload: variables.title,
 			});
 			const blogs = queryClient.getQueryData(["blogs"]);
 			queryClient.setQueryData(
 				["blogs"],
-				blogs.filter((blog) => blog.id !== deletedBlog.id)
+				blogs.filter((blog) => blog.id !== variables.id)
 			);
 		},
-		onError: (error) => {
+		onError: (error, variables) => {
 			console.error(error.response?.status);
 			console.error(error.response?.data);
 			if (error.response?.status === 404) {
 				setNotification({
 					type: "ERROR",
-					payload: `The blog has already been removed.`,
+					payload: `The blog ${variables.title} has already been removed.`,
 				});
 				// const blogs = queryClient.getQueryData(["blogs"]);
 				// queryClient.setQueryData(
@@ -165,7 +161,13 @@ const Blogs = ({ user }) => {
 					likeFunction={() =>
 						likeBlogMutation.mutate({ ...blog, likes: blog.likes + 1 })
 					}
-					deleteFunction={() => deleteBlogMutation.mutate(blog.id)}
+					deleteFunction={() => {
+						if (
+							window.confirm(`Removing blog ${blog.title} by ${blog.author}`)
+						) {
+							deleteBlogMutation.mutate(blog);
+						}
+					}}
 				/>
 			))}
 		</>

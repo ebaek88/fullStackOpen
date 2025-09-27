@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import blogService from "../services/blogs.js";
-// import { setNotification } from "./notificationReducerRedux.js";
+import { setNotification } from "./notificationReducerRedux.js";
 
 const blogSlice = createSlice({
 	name: "blog",
@@ -32,20 +32,20 @@ export const createBlog = (newBlogObject) => {
 			// we need user information so that we can attach the user info to the returned blog
 			returnedBlog.user = { ...getState().user }; // we can access the state by using getState
 			dispatch(appendBlog(returnedBlog));
-			// dispatch(
-			// 	setNotification(
-			// 		`A new blog ${returnedBlog.title} by ${returnedBlog.author} added successfully!`
-			// 	)
-			// );
+			dispatch(
+				setNotification(
+					`A new blog ${returnedBlog.title} by ${returnedBlog.author} added successfully!`
+				)
+			);
 		} catch (err) {
-			// console.error(err.response.status);
-			// console.error(err.response.data);
-			// dispatch(
-			// 	setNotification(
-			// 		`Blog cannot be added to the server: ${err.response.data.error}`
-			// 	)
-			// );
-			throw err;
+			console.error(err.response.status);
+			console.error(err.response.data);
+			dispatch(
+				setNotification(
+					`Blog cannot be added to the server: ${err.response.data.error}`
+				)
+			);
+			// throw err;
 		}
 	};
 };
@@ -63,27 +63,27 @@ export const deleteBlog = (id) => {
 				)
 			) {
 				await blogService.deleteBlog(id);
-				// dispatch(
-				// 	setNotification(`Deleted note ${blogToDelete.content} successfully!`)
-				// );
+				dispatch(
+					setNotification(`Deleted note ${blogToDelete.content} successfully!`)
+				);
 				dispatch(setBlogs(currentState.filter((blog) => blog.id !== id)));
 			}
 		} catch (err) {
-			// if (error.response.status === 404) {
-			// 	dispatch(
-			// 		setNotification(
-			// 			`The blog ${blogToDelete.content} has already been removed.`
-			// 		)
-			// 	);
-			// 	dispatch(setBlogs(currentState.filter((blog) => blog.id !== id)));
-			// } else {
-			// 	dispatch(
-			// 		setNotification(
-			// 			`Cannot be deleted from the server: ${error.response.data.error}`
-			// 		)
-			// 	);
-			// }
-			throw err;
+			if (error.response.status === 404) {
+				dispatch(
+					setNotification(
+						`The blog ${blogToDelete.content} has already been removed.`
+					)
+				);
+				dispatch(setBlogs(currentState.filter((blog) => blog.id !== id)));
+			} else {
+				dispatch(
+					setNotification(
+						`Cannot be deleted from the server: ${error.response.data.error}`
+					)
+				);
+			}
+			// throw err;
 		}
 	};
 };
