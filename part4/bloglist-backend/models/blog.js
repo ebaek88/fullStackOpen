@@ -25,7 +25,7 @@ const blogSchema = new mongoose.Schema({
 // , so that the id field is in string and the version field is no longer needed in the app
 blogSchema.set("toJSON", {
 	transform: (document, returnedObject) => {
-		returnedObject.id = returnedObject._id.toString();
+		returnedObject.id = returnedObject._id?.toString();
 		delete returnedObject._id;
 		delete returnedObject.__v;
 	},

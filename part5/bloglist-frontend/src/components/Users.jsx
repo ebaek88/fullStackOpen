@@ -22,6 +22,23 @@ const Users = () => {
 	}
 
 	const blogs = result.data;
+	const blogCount = {};
+	for (const blog of blogs) {
+		if (!blogCount[blog.user.id]) {
+			blogCount[blog.user.id] = [blog.user.name, 0];
+		}
+		blogCount[blog.user.id][1] = blogCount[blog.user.id][1] + 1;
+	}
+	// const blogCountIterator = Object.entries(blogCount);
+	const blogCountRows = [];
+	for (const [id, [name, count]] of Object.entries(blogCount)) {
+		blogCountRows.push(
+			<tr key={id}>
+				<td>{name}</td>
+				<td>{count}</td>
+			</tr>
+		);
+	}
 
 	return (
 		<>
@@ -29,12 +46,11 @@ const Users = () => {
 			<table>
 				<thead>
 					<tr>
-						<th scope="col" colSpan={2}>
-							blogs created
-						</th>
+						<th scope="col"></th>
+						<th scope="col">blogs created</th>
 					</tr>
 				</thead>
-				<tbody></tbody>
+				<tbody>{blogCountRows}</tbody>
 			</table>
 		</>
 	);
