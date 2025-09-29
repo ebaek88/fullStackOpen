@@ -1,4 +1,5 @@
 import { useEffect, useRef, useContext } from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import blogService from "./services/blogs.js";
 import {
 	useNotificationValue,
@@ -10,6 +11,7 @@ import Login from "./components/Login.jsx";
 import NewBlog from "./components/NewBlog.jsx";
 import Notification from "./components/Notification.jsx";
 import Togglable from "./components/Togglable.jsx";
+import Users from "./components/Users.jsx";
 
 // The error object structure is specific to Axios
 const App = () => {
@@ -17,6 +19,8 @@ const App = () => {
 
 	const notificationValue = useNotificationValue();
 	const setNotification = useSetNotification();
+
+	const padding = { padding: 5 };
 
 	// For useEffect, callbacks need to be synchronous in order to prevent race condition.
 	// In order to use async functions as callbacks, wrap them around synch ones.
@@ -44,22 +48,28 @@ const App = () => {
 
 	// render components
 	return (
-		<div>
-			<Notification msg={notificationValue} />
-			{!user && <Login />}
-			{user && (
-				<>
-					<p>
-						{user.name} logged in <button onClick={handleLogout}>logout</button>
-					</p>
-					<Togglable buttonLabel={"create new blog"} ref={newBlogRef}>
-						<NewBlog user={user} ref={newBlogRef} />
-					</Togglable>
-					<h2>blogs</h2>
-					<Blogs user={user} />
-				</>
-			)}
-		</div>
+		<Router>
+			<div>
+				<Notification msg={notificationValue} />
+				{!user && <Login />}
+				{user && (
+					<>
+						<p>
+							{user.name} logged in{" "}
+							<button onClick={handleLogout}>logout</button>
+						</p>
+						<Togglable buttonLabel={"create new blog"} ref={newBlogRef}>
+							<NewBlog user={user} ref={newBlogRef} />
+						</Togglable>
+						<h2>blogs</h2>
+						<Blogs user={user} />
+					</>
+				)}
+			</div>
+			<Routes>
+				<Route path="/users" element={<Users />} />
+			</Routes>
+		</Router>
 	);
 };
 
