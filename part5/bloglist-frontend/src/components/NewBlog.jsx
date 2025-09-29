@@ -1,10 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import blogService from "../services/blogs.js";
 import { useSetNotification } from "../contexts/NotificationContext.jsx";
 
 const NewBlog = ({ user, ref }) => {
 	const setNotification = useSetNotification();
 	const queryClient = useQueryClient();
+	const navigate = useNavigate();
+	const errorRedirect = () => setTimeout(() => navigate("/"), 3000);
+
 	const newBlogMutation = useMutation({
 		mutationFn: blogService.create,
 		onSuccess: (newBlog) => {
@@ -23,6 +27,7 @@ const NewBlog = ({ user, ref }) => {
 				type: "ERROR",
 				payload: `Blog cannot be added to the server: ${err.response.data.error}`,
 			});
+			errorRedirect();
 		},
 	});
 

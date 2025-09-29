@@ -6,7 +6,6 @@ import {
 	useSetNotification,
 } from "./contexts/NotificationContext.jsx";
 import UserContext from "./contexts/UserContext.jsx";
-// import Home from "./components/Home.jsx";
 import Notification from "./components/Notification.jsx";
 import Login from "./components/Login.jsx";
 import Togglable from "./components/Togglable.jsx";
@@ -14,6 +13,7 @@ import NewBlog from "./components/NewBlog.jsx";
 import Blogs from "./components/Blogs.jsx";
 import Users from "./components/Users.jsx";
 import User from "./components/User.jsx";
+import Blog from "./components/Blog.jsx";
 
 // The error object structure is specific to Axios
 const App = () => {
@@ -58,16 +58,17 @@ const App = () => {
 					<p>
 						{user.name} logged in <button onClick={handleLogout}>logout</button>
 					</p>
-					<Togglable buttonLabel={"create new blog"} ref={newBlogRef}>
-						<NewBlog user={user} ref={newBlogRef} />
-					</Togglable>
 				</>
 			)}
 			<Routes>
+				<Route path="/blogs/:id" element={<Blog loggedInUser={user} />} />
 				<Route path="/users/:id" element={<User />} />
 				<Route path="/users" element={<Users />} />
 				<Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
-				<Route path="/" element={user ? <Blogs user={user} /> : <Login />} />
+				<Route
+					path="/"
+					element={user ? <Blogs user={user} ref={newBlogRef} /> : <Login />}
+				/>
 			</Routes>
 		</>
 	);
