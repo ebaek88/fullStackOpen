@@ -8,8 +8,7 @@ import {
 import UserContext from "./contexts/UserContext.jsx";
 import Notification from "./components/Notification.jsx";
 import Login from "./components/Login.jsx";
-import Togglable from "./components/Togglable.jsx";
-import NewBlog from "./components/NewBlog.jsx";
+import NavigationMenu from "./components/NavigationMenu.jsx";
 import Blogs from "./components/Blogs.jsx";
 import Users from "./components/Users.jsx";
 import User from "./components/User.jsx";
@@ -21,8 +20,6 @@ const App = () => {
 
 	const notificationValue = useNotificationValue();
 	const setNotification = useSetNotification();
-
-	const padding = { padding: 5 };
 
 	// For useEffect, callbacks need to be synchronous in order to prevent race condition.
 	// In order to use async functions as callbacks, wrap them around synch ones.
@@ -52,14 +49,8 @@ const App = () => {
 	return (
 		<>
 			<Notification msg={notificationValue} />
-			{user && (
-				<>
-					<h2>blogs</h2>
-					<p>
-						{user.name} logged in <button onClick={handleLogout}>logout</button>
-					</p>
-				</>
-			)}
+			<NavigationMenu user={user} handleLogout={handleLogout} />
+			<h2>blog app</h2>
 			<Routes>
 				<Route path="/blogs/:id" element={<Blog loggedInUser={user} />} />
 				<Route path="/users/:id" element={<User />} />
