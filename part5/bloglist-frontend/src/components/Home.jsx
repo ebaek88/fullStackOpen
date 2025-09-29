@@ -4,7 +4,7 @@ import Togglable from "./Togglable.jsx";
 import NewBlog from "./NewBlog.jsx";
 import Blogs from "./Blogs.jsx";
 
-const Home = ({ user, msg, ref, handleLogout }) => {
+const Home = ({ user, msg, ref }) => {
 	return (
 		<div>
 			<Notification msg={msg} />

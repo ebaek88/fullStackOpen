@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { useUserDispatch } from "../contexts/UserContext.jsx";
 import blogService from "../services/blogs.js";
 import loginService from "../services/login.js";
@@ -6,6 +7,7 @@ import { useSetNotification } from "../contexts/NotificationContext.jsx";
 const Login = () => {
 	const dispatch = useUserDispatch();
 	const setNotification = useSetNotification();
+	const navigate = useNavigate();
 
 	const tryLogin = async (evt) => {
 		evt.preventDefault();
@@ -30,6 +32,8 @@ const Login = () => {
 				type: "LOGIN",
 				payload: loginData.username,
 			});
+
+			navigate("/");
 		} catch (err) {
 			console.error(err.response?.status);
 			console.error(err.response?.data);

@@ -1,13 +1,19 @@
 import { useEffect, useRef, useContext } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, useMatch, Navigate } from "react-router-dom";
 import blogService from "./services/blogs.js";
 import {
 	useNotificationValue,
 	useSetNotification,
 } from "./contexts/NotificationContext.jsx";
 import UserContext from "./contexts/UserContext.jsx";
-import Home from "./components/Home.jsx";
+// import Home from "./components/Home.jsx";
+import Notification from "./components/Notification.jsx";
+import Login from "./components/Login.jsx";
+import Togglable from "./components/Togglable.jsx";
+import NewBlog from "./components/NewBlog.jsx";
+import Blogs from "./components/Blogs.jsx";
 import Users from "./components/Users.jsx";
+import User from "./components/User.jsx";
 
 // The error object structure is specific to Axios
 const App = () => {
@@ -44,25 +50,26 @@ const App = () => {
 
 	// render components
 	return (
-		<Router>
+		<>
+			<Notification msg={notificationValue} />
 			{user && (
 				<>
 					<h2>blogs</h2>
 					<p>
 						{user.name} logged in <button onClick={handleLogout}>logout</button>
 					</p>
+					<Togglable buttonLabel={"create new blog"} ref={newBlogRef}>
+						<NewBlog user={user} ref={newBlogRef} />
+					</Togglable>
 				</>
 			)}
 			<Routes>
+				<Route path="/users/:id" element={<User />} />
 				<Route path="/users" element={<Users />} />
-				<Route
-					path="/"
-					element={
-						<Home user={user} msg={notificationValue} ref={newBlogRef} />
-					}
-				/>
+				<Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
+				<Route path="/" element={user ? <Blogs user={user} /> : <Login />} />
 			</Routes>
-		</Router>
+		</>
 	);
 };
 

@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import blogService from "../services/blogs.js";
+import { Link } from "react-router-dom";
+import User from "./User.jsx";
 
 const Users = () => {
 	const result = useQuery({
@@ -34,7 +36,9 @@ const Users = () => {
 	for (const [id, [name, count]] of Object.entries(blogCount)) {
 		blogCountRows.push(
 			<tr key={id}>
-				<td>{name}</td>
+				<td>
+					<Link to={`/users/${id}`}>{name}</Link>
+				</td>
 				<td>{count}</td>
 			</tr>
 		);
