@@ -130,13 +130,11 @@ blogsRouter.put(
 				return response.status(404).end();
 			}
 
-			// console.log(blogToUpdate.user);
-
-			if (blogToUpdate.user.toString() !== user._id.toString()) {
-				return response.status(401).json({
-					error: "a note can be updated only by the user who created it",
-				});
-			}
+			// if (blogToUpdate.user.toString() !== user._id.toString()) {
+			// 	return response.status(401).json({
+			// 		error: "a note can be updated only by the user who created it",
+			// 	});
+			// }
 
 			// Update the blog
 			blogToUpdate.title = title;
