@@ -13,10 +13,11 @@ const initialBlogs = [
 		author: "Edsger W. Dijkstra",
 		url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
 		likes: 5,
+		comments: ["good"],
 	},
 ];
 
-const userId = "68a666af578993e657a57c51";
+const userId = "68db302484b18d8c3ba09ef0";
 
 // creating initial notes with user "root"
 const createInitialBlogs = async () => {
@@ -27,6 +28,7 @@ const createInitialBlogs = async () => {
 			url: blog.url,
 			likes: blog.likes,
 			user: userId,
+			comments: blog.comments || [],
 		});
 	});
 
@@ -40,8 +42,10 @@ const createInitialBlogs = async () => {
 };
 
 const initialUser = {
-	username: "test",
-	password: "bbcBbc998&",
+	// username: "test",
+	// password: "bbcBbc998&",
+	username: "root",
+	password: "Q1w2e3r4!",
 };
 
 const nonExistingId = async () => {

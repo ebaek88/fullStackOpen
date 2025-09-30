@@ -15,6 +15,10 @@ const blogSchema = new mongoose.Schema({
 		type: Number,
 		default: 0,
 	},
+	comments: {
+		type: [String],
+		// If the type is an array, the default value is automatically [].
+	},
 	user: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "User",

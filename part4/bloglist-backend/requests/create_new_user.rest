@@ -1,3 +1,4 @@
+### for prod and dev server
 POST http://localhost:3003/api/users
 Content-Type: application/json
 
@@ -14,5 +15,15 @@ Content-Type: application/json
 {
   "username": "admin",
   "name": "admin",
+  "password": "Q1w2e3r4!"
+}
+
+### for test server
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+  "username": "user",
+  "name": "user",
   "password": "Q1w2e3r4!"
 }

@@ -1,4 +1,5 @@
 const blogsRouter = require("express").Router();
+const { request, response } = require("express");
 const Blog = require("../models/blog.js");
 const middleware = require("../utils/middleware.js");
 
@@ -58,6 +59,29 @@ blogsRouter.post(
 	}
 );
 
+blogsRouter.post(
+	"/:id/comments",
+	middleware.tokenExtractor,
+	middleware.userExtractor,
+	async (request, response, next) => {
+		const { comment } = request.body;
+
+		try {
+			const blogToComment = await Blog.findById(request.params.id);
+			if (!blogToComment) {
+				return response.status(404).end();
+			}
+			blogToComment.comments.push(comment);
+			// blogToComment.validateSync();
+
+			const commentedBlog = await blogToComment.save();
+			response.json(commentedBlog);
+		} catch (error) {
+			next(error);
+		}
+	}
+);
+
 blogsRouter.delete(
 	"/:id",
 	middleware.tokenExtractor,
@@ -93,7 +117,7 @@ blogsRouter.put(
 	middleware.tokenExtractor,
 	middleware.userExtractor,
 	async (request, response, next) => {
-		const { title, author, url, likes } = request.body;
+		const { title, author, url, comments, likes } = request.body;
 
 		try {
 			// Retrieve information about the logged in user from the userExtractor middleware
@@ -106,6 +130,8 @@ blogsRouter.put(
 				return response.status(404).end();
 			}
 
+			// console.log(blogToUpdate.user);
+
 			if (blogToUpdate.user.toString() !== user._id.toString()) {
 				return response.status(401).json({
 					error: "a note can be updated only by the user who created it",
@@ -116,6 +142,7 @@ blogsRouter.put(
 			blogToUpdate.title = title;
 			blogToUpdate.author = author;
 			blogToUpdate.url = url;
+			blogToUpdate.comments = comments;
 			blogToUpdate.likes = likes || 0;
 
 			blogToUpdate.validateSync();
