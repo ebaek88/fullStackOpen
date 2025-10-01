@@ -1,14 +1,25 @@
 const blogsRouter = require("express").Router();
-const { request, response } = require("express");
 const Blog = require("../models/blog.js");
+const Comment = require("../models/comment.js");
+const User = require("../models/user.js");
 const middleware = require("../utils/middleware.js");
 
 blogsRouter.get("/", async (request, response, next) => {
 	try {
-		const blogs = await Blog.find({}).populate("user", {
-			username: 1,
-			name: 1,
-		});
+		const blogs = await Blog.find({})
+			.populate("user", {
+				username: 1,
+				name: 1,
+			})
+			.populate({
+				path: "comments",
+				select: { content: 1 },
+				// This populating the commenter is commented for now, in order to maintain the anonymity of the comments.
+				// populate: {
+				// 	path: "user",
+				// 	select: { username: 1, name: 1 },
+				// },
+			});
 		response.json(blogs);
 	} catch (error) {
 		next(error);
@@ -17,8 +28,23 @@ blogsRouter.get("/", async (request, response, next) => {
 
 blogsRouter.get("/:id", async (request, response, next) => {
 	try {
-		const blog = await Blog.findById(request.params.id);
-		blog ? response.json(blog) : response.status(404).end();
+		const blog = await Blog.findById(request.params.id)
+			.populate("user", {
+				username: 1,
+				name: 1,
+			})
+			.populate({
+				path: "comments",
+				select: { content: 1 },
+				// This populating the commenter is commented for now, in order to maintain the anonymity of the comments.
+				// populate: {
+				// 	path: "user",
+				// 	select: { username: 1, name: 1 },
+				// },
+			});
+		blog
+			? response.json(blog)
+			: response.status(404).json({ error: "blog not found" });
 	} catch (error) {
 		next(error);
 	}
@@ -46,7 +72,6 @@ blogsRouter.post(
 				likes: body.likes || 0,
 				user: user._id,
 			});
-			blog.validateSync();
 
 			const result = await blog.save();
 			user.blogs = user.blogs.concat(result._id);
@@ -64,18 +89,39 @@ blogsRouter.post(
 	middleware.tokenExtractor,
 	middleware.userExtractor,
 	async (request, response, next) => {
-		const { comment } = request.body;
+		const body = request.body;
+		// Retrieve information about the logged in user from the userExtractor middleware
+		const user = request.user;
+
+		if (!body.content) {
+			return response.status(400).json({ error: "content missing" });
+		}
 
 		try {
 			const blogToComment = await Blog.findById(request.params.id);
 			if (!blogToComment) {
 				return response.status(404).end();
 			}
-			blogToComment.comments.push(comment);
-			// blogToComment.validateSync();
 
-			const commentedBlog = await blogToComment.save();
-			response.json(commentedBlog);
+			const comment = new Comment({
+				content: body.content,
+				blog: blogToComment._id,
+				user: user._id,
+			});
+
+			const commentResult = await comment.save();
+			const updatedBlog = await Blog.findByIdAndUpdate(
+				blogToComment._id,
+				{ $push: { comments: commentResult._id } },
+				{ new: true, runValidators: true, context: "query" }
+			);
+			// updatedUser is for future functionalities
+			const updatedUser = await User.findByIdAndUpdate(
+				user._id,
+				{ $push: { comments: commentResult._id } },
+				{ new: true, runValidators: true, context: "query" }
+			);
+			response.json(updatedBlog);
 		} catch (error) {
 			next(error);
 		}
@@ -94,7 +140,7 @@ blogsRouter.delete(
 			// Check if the blog to be deleted has been created by the user logged in
 			const blogToDelete = await Blog.findById(request.params.id);
 			if (!blogToDelete) {
-				return response.status(404).end();
+				return response.status(404).json({ error: "blog not found" });
 			}
 
 			if (blogToDelete.user.toString() !== user._id.toString()) {
@@ -127,7 +173,7 @@ blogsRouter.put(
 			const blogToUpdate = await Blog.findById(request.params.id);
 
 			if (!blogToUpdate) {
-				return response.status(404).end();
+				return response.status(404).json({ error: "blog not found" });
 			}
 
 			// if (blogToUpdate.user.toString() !== user._id.toString()) {
@@ -143,12 +189,7 @@ blogsRouter.put(
 			blogToUpdate.comments = comments;
 			blogToUpdate.likes = likes || 0;
 
-			blogToUpdate.validateSync();
-
 			const updatedBlog = await blogToUpdate.save();
-			// After saving the updated note, we need to update the blogs list in User as well.
-			user.blogs = user.blogs.concat(updatedBlog._id);
-			await user.save();
 
 			response.json(updatedBlog);
 		} catch (error) {

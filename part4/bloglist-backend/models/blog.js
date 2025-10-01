@@ -1,29 +1,34 @@
 const mongoose = require("mongoose");
 
 // Setting up DB schema and object model from it
-const blogSchema = new mongoose.Schema({
-	title: {
-		type: String,
-		required: [true, "Title required!"],
+const blogSchema = new mongoose.Schema(
+	{
+		title: {
+			type: String,
+			required: [true, "Title required!"],
+		},
+		author: String,
+		url: {
+			type: String,
+			required: [true, "URL required!"],
+		},
+		likes: {
+			type: Number,
+			default: 0,
+		},
+		user: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "User",
+		},
+		comments: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "Comment",
+			},
+		],
 	},
-	author: String,
-	url: {
-		type: String,
-		required: [true, "URL required!"],
-	},
-	likes: {
-		type: Number,
-		default: 0,
-	},
-	comments: {
-		type: [String],
-		// If the type is an array, the default value is automatically [].
-	},
-	user: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: "User",
-	},
-});
+	{ timestamps: true }
+); // automatically creates createdAt and updatedAt. Both in Date type.
 
 // Formatting the document objects returned by Mongoose
 // , so that the id field is in string and the version field is no longer needed in the app

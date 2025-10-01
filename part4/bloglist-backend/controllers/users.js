@@ -38,12 +38,29 @@ userRouter.post("/", async (req, res, next) => {
 
 userRouter.get("/", async (req, res, next) => {
 	try {
-		const users = await User.find({}).populate("blogs", {
-			title: 1,
-			author: 1,
-			url: 1,
-			likes: 1,
-		});
+		const users = await User.find({})
+			.populate({
+				path: "blogs",
+				select: {
+					title: 1,
+					author: 1,
+					url: 1,
+					likes: 1,
+				},
+				populate: {
+					path: "comments",
+					select: { content: 1 },
+				},
+			})
+			.populate({
+				path: "comments",
+				select: { content: 1, blog: 1 },
+				// This populating the commenter is commented for now, in order to maintain the anonymity of the comments.
+				// populate: {
+				// 	path: "user",
+				// 	select: { username: 1, name: 1 },
+				// },
+			});
 		res.json(users);
 	} catch (err) {
 		next(err);
