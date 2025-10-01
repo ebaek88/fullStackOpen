@@ -13,11 +13,10 @@ const initialBlogs = [
 		author: "Edsger W. Dijkstra",
 		url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
 		likes: 5,
-		comments: ["good"],
 	},
 ];
 
-const userId = "68db302484b18d8c3ba09ef0";
+const userId = "68dda78ba96712f8794ac4b0";
 
 // creating initial notes with user "root"
 const createInitialBlogs = async () => {
@@ -28,7 +27,6 @@ const createInitialBlogs = async () => {
 			url: blog.url,
 			likes: blog.likes,
 			user: userId,
-			comments: blog.comments || [],
 		});
 	});
 

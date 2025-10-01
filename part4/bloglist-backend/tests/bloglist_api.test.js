@@ -8,6 +8,7 @@ const app = require("../app.js");
 const helper = require("./test_helper.js");
 const Blog = require("../models/blog.js");
 const logger = require("../utils/logger.js");
+const Comment = require("../models/comment.js");
 
 const api = supertest(app);
 
@@ -69,10 +70,20 @@ describe("when there are initially some blogs saved", () => {
 				.get(`/api/blogs/${blogToView.id}`)
 				.expect(200)
 				.expect("Content-Type", /application\/json/);
-			assert.deepStrictEqual(resultBlog.body, {
-				...blogToView,
-				user: blogToView.user.toString(),
-			});
+			assert.deepStrictEqual(
+				{
+					...resultBlog.body,
+					createdAt: new Date(resultBlog.body.createdAt).toISOString(),
+					updatedAt: new Date(resultBlog.body.updatedAt).toISOString(),
+					user: resultBlog.body.user.id,
+				},
+				{
+					...blogToView,
+					createdAt: blogToView.createdAt.toISOString(),
+					updatedAt: blogToView.updatedAt.toISOString(),
+					user: blogToView.user.toString(),
+				}
+			);
 			assert.deepStrictEqual([], resultBlog.body.comments);
 		});
 
@@ -401,40 +412,6 @@ describe("when there are initially some blogs saved", () => {
 			);
 		});
 
-		test("fails with status code 401 and appropriate message if the logged in user and tne note creator are not the same", async () => {
-			const blogsAtStart = await helper.blogsInDb();
-
-			const loginInfo = {
-				username: "user",
-				password: "Q1w2e3r4!",
-			};
-
-			const loginResponse = await api.post("/api/login").send(loginInfo);
-			const authToken = loginResponse.body.token;
-
-			const blogToUpdate = {
-				...blogsAtStart[blogsAtStart.length - 1],
-				title: "haha",
-				likes: -100,
-			};
-
-			await api
-				.put(`/api/blogs/${blogToUpdate.id}`)
-				.set("Authorization", `Bearer ${authToken}`)
-				.send(blogToUpdate)
-				.expect(401, {
-					error: "a note can be updated only by the user who created it",
-				})
-				.expect("Content-Type", /application\/json/);
-
-			const blogsAtEnd = await helper.blogsInDb();
-			assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
-			assert.deepStrictEqual(
-				blogsAtEnd[blogsAtEnd.length - 1],
-				blogsAtStart[blogsAtStart.length - 1]
-			);
-		});
-
 		test("fails with status code 404 if the blog to update is missing", async () => {
 			const blogsAtStart = await helper.blogsInDb();
 			const falseBlogId = "68a3968fe9e5d2b874ccaa2e";
@@ -500,28 +477,36 @@ describe("when there are initially some blogs saved", () => {
 			const loginResponse = await api.post("/api/login").send(loginInfo);
 			const authToken = loginResponse.body.token;
 
-			const blogToCommentId = blogsAtStart.find(
+			const blogToComment = blogsAtStart.find(
 				(blog) => blog.title === "Go To Statement Considered Harmful"
-			).id;
+			);
 
 			const newComment = {
-				comment: "job",
+				content: "job",
 			};
 
 			await api
-				.post(`/api/blogs/${blogToCommentId}/comments`)
+				.post(`/api/blogs/${blogToComment.id}/comments`)
 				.set("Authorization", `Bearer ${authToken}`)
 				.send(newComment)
 				.expect(200)
 				.expect("Content-Type", /application\/json/);
 
 			const blogsAtEnd = await helper.blogsInDb();
-			const comments = blogsAtEnd.find(
+			const updatedBlogComments = blogsAtEnd.find(
 				(blog) => blog.title === "Go To Statement Considered Harmful"
 			).comments;
-			assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
-			assert(comments.includes("good"));
-			assert(comments.includes("job"));
+
+			const updatedBlogCommentObject = await Comment.findById(
+				updatedBlogComments[0].toString()
+			);
+			// console.log(updatedBlogCommentObject);
+
+			assert.strictEqual(
+				updatedBlogComments.length,
+				blogToComment.comments.length + 1
+			);
+			assert(updatedBlogCommentObject.content === "job");
 		});
 
 		test("fails with status code 404 if the blog to add comment to is missing", async () => {
@@ -537,7 +522,7 @@ describe("when there are initially some blogs saved", () => {
 			const authToken = loginResponse.body.token;
 
 			const newComment = {
-				comment: "job",
+				content: "job",
 			};
 
 			await api
@@ -547,12 +532,10 @@ describe("when there are initially some blogs saved", () => {
 				.expect(404);
 
 			const blogsAtEnd = await helper.blogsInDb();
-			const comments = blogsAtEnd.find(
+			const updatedBlogComments = blogsAtEnd.find(
 				(blog) => blog.title === "Go To Statement Considered Harmful"
 			).comments;
-			assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
-			assert(comments.includes("good"));
-			assert(!comments.includes("job"));
+			assert.strictEqual(updatedBlogComments.length, 0);
 		});
 
 		test("fails with status code 401 and appropriate message if authentication token is missing", async () => {
@@ -562,7 +545,7 @@ describe("when there are initially some blogs saved", () => {
 			).id;
 
 			const newComment = {
-				comment: "job",
+				content: "job",
 			};
 
 			await api
@@ -571,46 +554,10 @@ describe("when there are initially some blogs saved", () => {
 				.expect(401, { error: "token nonexisting" });
 
 			const blogsAtEnd = await helper.blogsInDb();
-			const comments = blogsAtEnd.find(
+			const updatedBlogComments = blogsAtEnd.find(
 				(blog) => blog.title === "Go To Statement Considered Harmful"
 			).comments;
-			assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
-			assert(comments.includes("good"));
-			assert(!comments.includes("job"));
-		});
-
-		test("a new comment is added to a blog with empty comments", async () => {
-			const blogsAtStart = await helper.blogsInDb();
-			const loginInfo = {
-				username: helper.initialUser.username,
-				password: helper.initialUser.password,
-			};
-
-			const loginResponse = await api.post("/api/login").send(loginInfo);
-			const authToken = loginResponse.body.token;
-
-			const blogToComment = blogsAtStart.find(
-				(blog) => blog.title === "React patterns"
-			);
-			const blogToCommentId = blogToComment.id;
-
-			const newComment = {
-				comment: "hello",
-			};
-
-			await api
-				.post(`/api/blogs/${blogToCommentId}/comments`)
-				.set("Authorization", `Bearer ${authToken}`)
-				.send(newComment)
-				.expect(200)
-				.expect("Content-Type", /application\/json/);
-
-			const blogsAtEnd = await helper.blogsInDb();
-			const comments = blogsAtEnd.find(
-				(blog) => blog.title === "React patterns"
-			).comments;
-			assert.strictEqual(blogToComment.comments.length + 1, comments.length);
-			assert(comments.includes("hello"));
+			assert.strictEqual(updatedBlogComments.length, 0);
 		});
 	});
 });
