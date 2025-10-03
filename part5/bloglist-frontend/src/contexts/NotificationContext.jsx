@@ -1,9 +1,12 @@
-import { createContext, useContext, useReducer } from "react";
+import { createContext, useContext, useReducer, useRef } from "react";
 
 const notificationReducer = (state, action) => {
 	switch (action.type) {
 		case "CREATE": {
 			return `A new blog ${action.payload.title} by ${action.payload.author} added successfully!`;
+		}
+		case "COMMENT": {
+			return `A new comment ${action.payload.comment} has been added to the blog ${action.payload.title} successfully!`;
 		}
 		case "DELETE": {
 			return `Deleted note ${action.payload} successfully!`;
@@ -27,6 +30,7 @@ const notificationReducer = (state, action) => {
 };
 
 const NotificationContext = createContext(null);
+// const NotificationContext = createContext(["", () => {}, () => {}]);
 
 export const NotificationContextProvider = (props) => {
 	const [notification, notificationDispatch] = useReducer(
@@ -34,12 +38,12 @@ export const NotificationContextProvider = (props) => {
 		""
 	);
 
-	let notificationTimeoutId;
+	const notificationTimeoutId = useRef(null);
 
 	const setNotification = (action, timeInSec = 3) => {
-		clearTimeout(notificationTimeoutId);
+		clearTimeout(notificationTimeoutId.current);
 		notificationDispatch(action);
-		notificationTimeoutId = setTimeout(() => {
+		notificationTimeoutId.current = setTimeout(() => {
 			notificationDispatch({ type: "CLEAR" });
 		}, timeInSec * 1000);
 	};

@@ -98,7 +98,20 @@ blogsRouter.post(
 		}
 
 		try {
-			const blogToComment = await Blog.findById(request.params.id);
+			const blogToComment = await Blog.findById(request.params.id)
+				.populate("user", {
+					username: 1,
+					name: 1,
+				})
+				.populate({
+					path: "comments",
+					select: { content: 1 },
+					// This populating the commenter is commented for now, in order to maintain the anonymity of the comments.
+					// populate: {
+					// 	path: "user",
+					// 	select: { username: 1, name: 1 },
+					// },
+				});
 			if (!blogToComment) {
 				return response.status(404).end();
 			}
@@ -114,7 +127,20 @@ blogsRouter.post(
 				blogToComment._id,
 				{ $push: { comments: commentResult._id } },
 				{ new: true, runValidators: true, context: "query" }
-			);
+			)
+				.populate("user", {
+					username: 1,
+					name: 1,
+				})
+				.populate({
+					path: "comments",
+					select: { content: 1 },
+					// This populating the commenter is commented for now, in order to maintain the anonymity of the comments.
+					// populate: {
+					// 	path: "user",
+					// 	select: { username: 1, name: 1 },
+					// },
+				});
 			// updatedUser is for future functionalities
 			const updatedUser = await User.findByIdAndUpdate(
 				user._id,
@@ -158,6 +184,7 @@ blogsRouter.delete(
 	}
 );
 
+// for increasing like by 1
 blogsRouter.put(
 	"/:id",
 	middleware.tokenExtractor,
@@ -170,7 +197,20 @@ blogsRouter.put(
 			const user = request.user;
 
 			// Check if the blog to be updated has been created by the user logged in
-			const blogToUpdate = await Blog.findById(request.params.id);
+			const blogToUpdate = await Blog.findById(request.params.id)
+				.populate("user", {
+					username: 1,
+					name: 1,
+				})
+				.populate({
+					path: "comments",
+					select: { content: 1 },
+					// This populating the commenter is commented for now, in order to maintain the anonymity of the comments.
+					// populate: {
+					// 	path: "user",
+					// 	select: { username: 1, name: 1 },
+					// },
+				});
 
 			if (!blogToUpdate) {
 				return response.status(404).json({ error: "blog not found" });
@@ -183,15 +223,18 @@ blogsRouter.put(
 			// }
 
 			// Update the blog
-			blogToUpdate.title = title;
-			blogToUpdate.author = author;
-			blogToUpdate.url = url;
-			blogToUpdate.comments = comments;
-			blogToUpdate.likes = likes || 0;
+			blogToUpdate.title = title ?? blogToUpdate.title;
+			blogToUpdate.author = author ?? blogToUpdate.author;
+			blogToUpdate.url = url ?? blogToUpdate.url;
+			blogToUpdate.likes = likes || blogToUpdate.likes;
+			// save the blog
+			const savedBlog = await blogToUpdate.save();
+			// need to populate the updated blog again in order to return to FE
+			const populatedBlog = await Blog.findById(savedBlog._id)
+				.populate("user", { username: 1, name: 1 })
+				.populate({ path: "comments", select: { content: 1 } });
 
-			const updatedBlog = await blogToUpdate.save();
-
-			response.json(updatedBlog);
+			response.json(populatedBlog);
 		} catch (error) {
 			next(error);
 		}
