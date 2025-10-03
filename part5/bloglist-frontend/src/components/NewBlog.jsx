@@ -48,27 +48,49 @@ const NewBlog = ({ user, ref }) => {
 
 	return (
 		<div>
-			<h2>create new</h2>
+			<h2 className="text-xl font-semibold">create new</h2>
 			<form onSubmit={addBlog}>
-				<div>
-					<label>
+				<div className="flex items-center mb-1.5">
+					<label className="w-20 hover:cursor-pointer" htmlFor="title">
 						title:
-						<input type="text" name="title" />
 					</label>
+					<input
+						id="title"
+						type="text"
+						name="title"
+						className="border-2 rounded-lg ml-2 pl-1 pr-1"
+					/>
 				</div>
-				<div>
-					<label>
+				<div className="flex items-center mb-1.5">
+					<label className="w-20 hover:cursor-pointer" htmlFor="author">
 						author:
-						<input type="text" name="author" />
 					</label>
+					<input
+						id="author"
+						type="text"
+						name="author"
+						className="border-2 rounded-lg ml-2 pl-1 pr-1"
+					/>
 				</div>
-				<div>
-					<label>
+				<div className="flex items-center mb-1.5">
+					<label className="w-20 hover:cursor-pointer" htmlFor="url">
 						url:
-						<input type="text" name="url" />
 					</label>
+					<input
+						id="url"
+						type="text"
+						name="url"
+						className="border-2 rounded-lg ml-2 pl-1 pr-1"
+					/>
 				</div>
-				<button type="submit">create</button>
+				<div className="flex justify-end">
+					<button
+						type="submit"
+						className="bg-gray-300 p-1 rounded-lg hover:text-white duration-400 cursor-pointer"
+					>
+						create
+					</button>
+				</div>
 			</form>
 		</div>
 	);

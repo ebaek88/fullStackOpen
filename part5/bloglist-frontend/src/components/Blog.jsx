@@ -188,32 +188,82 @@ const Blog = ({ loggedInUser }) => {
 
 	return (
 		<div>
-			<h2>{blog.title}</h2>
-			<div>author: {blog.author}</div>
-			<div>
-				<a href={blog.url} target="_blank" rel="noreferrer">
-					{blog.url}
-				</a>
-				<div className="blog-likes">
-					{blog.likes} likes <button onClick={likeFunction}>like</button>
-				</div>
-				<div>added by {blog.user.name || "unknown user"}</div>
-				{loggedInUser && loggedInUser.id === blog.user?.id && (
-					<div>
-						<button onClick={deleteFunction}>remove</button>
-					</div>
-				)}
-			</div>
-			<div>
-				<h3>comments</h3>
+			<h2 className="text-xl font-semibold">{blog.title}</h2>
+			<table>
+				<tbody>
+					<tr className="odd:bg-gray-300">
+						<td>author</td>
+						<td className="pl-2.5">{blog.author}</td>
+					</tr>
+					<tr className="odd:bg-gray-300">
+						<td>url</td>
+						<td className="pl-2.5">
+							<a
+								href={blog.url}
+								target="_blank"
+								rel="noreferrer"
+								className="hover:text-sky-600 duration-400"
+							>
+								{blog.url}
+							</a>
+						</td>
+					</tr>
+					<tr className="odd:bg-gray-300">
+						<td>
+							<span className="font-semibold">{blog.likes}</span> likes
+						</td>
+						<td className="pl-2.5">
+							<button
+								onClick={likeFunction}
+								className="bg-gray-400 my-1 px-2.5 rounded-lg hover:text-gray-100 duration-400 cursor-pointer"
+							>
+								like
+							</button>
+						</td>
+					</tr>
+					<tr className="odd:bg-gray-300">
+						<td>added by</td>
+						<td className="pl-2.5">{blog.user.name || "unknown user"}</td>
+					</tr>
+					<tr className="odd:bg-gray-300">
+						<td></td>
+						<td className="pl-2.5">
+							{loggedInUser && loggedInUser.id === blog.user?.id && (
+								<button
+									onClick={deleteFunction}
+									className="bg-gray-400 my-1 px-2.5 rounded-lg hover:text-gray-100 duration-400 cursor-pointer"
+								>
+									remove
+								</button>
+							)}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div className="mt-2.5">
+				<h3 className="text-lg font-semibold">💬 comments</h3>
 				<form onSubmit={addCommentFunction}>
-					<input type="text" name="comment" />{" "}
-					<button type="submit">add comment</button>
+					<input
+						type="text"
+						name="comment"
+						className="border-2 rounded-lg mb-2 px-1"
+					/>{" "}
+					<button
+						type="submit"
+						className="bg-gray-300 p-1 rounded-lg hover:text-gray-100 duration-400 cursor-pointer"
+					>
+						add comment
+					</button>
 				</form>
 				{comments.length > 0 ? (
 					<ul>
 						{comments.map((comment) => (
-							<li key={comment.id}>{comment.content}</li>
+							<li
+								key={comment.id}
+								className="odd:bg-gray-300 odd:hover:text-gray-100 duration-400 rounded-lg px-1"
+							>
+								{comment.content}
+							</li>
 						))}
 					</ul>
 				) : (

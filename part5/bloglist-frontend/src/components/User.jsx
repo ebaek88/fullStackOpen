@@ -28,10 +28,13 @@ const User = () => {
 
 	return (
 		<div>
-			<h2>{userInfo.name}</h2>
-			<h3>added blogs</h3>
+			<h2 className="text-xl font-semibold mb-1.5">{userInfo.name}</h2>
+			<h3 className="text-md mb-3">✒️ added blogs</h3>
 			{userBlogs.map((blog) => (
-				<li key={blog.id} style={{ listStyle: "inside" }}>
+				<li
+					key={blog.id}
+					className="odd:bg-gray-300 odd:hover:text-gray-100 duration-400"
+				>
 					{blog.title}
 				</li>
 			))}

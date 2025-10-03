@@ -46,21 +46,34 @@ const Login = () => {
 
 	return (
 		<div>
-			<h2>log in to application</h2>
+			<h2 className="mt-2 mb-2">log in to application</h2>
 			<form onSubmit={tryLogin}>
 				<div>
 					<label>
 						username &nbsp;
-						<input type="text" name="username" />
+						<input
+							type="text"
+							name="username"
+							className="border-2 rounded-lg mb-2 px-1"
+						/>
 					</label>
 				</div>
 				<div>
 					<label>
 						password &nbsp;
-						<input type="password" name="password" />
+						<input
+							type="password"
+							name="password"
+							className="border-2 rounded-lg ml-0.75 mb-2 px-1"
+						/>
 					</label>
 				</div>
-				<button type="submit">login</button>
+				<button
+					type="submit"
+					className="bg-gray-300 px-2.5 py-1 rounded-lg hover:text-gray-100 duration-400 cursor-pointer"
+				>
+					login
+				</button>
 			</form>
 		</div>
 	);

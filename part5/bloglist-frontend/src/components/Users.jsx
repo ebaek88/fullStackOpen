@@ -34,23 +34,28 @@ const Users = () => {
 	const blogCountRows = [];
 	for (const [id, [name, count]] of Object.entries(blogCount)) {
 		blogCountRows.push(
-			<tr key={id}>
+			<tr
+				key={id}
+				className="odd:bg-gray-300 odd:hover:text-gray-100 duration-400"
+			>
 				<td>
 					<Link to={`/users/${id}`}>{name}</Link>
 				</td>
-				<td>{count}</td>
+				<td className="pl-2.5">{count}</td>
 			</tr>
 		);
 	}
 
 	return (
 		<>
-			<h2>Users</h2>
+			<h2 className="text-xl font-semibold">Users</h2>
 			<table>
 				<thead>
 					<tr>
 						<th scope="col"></th>
-						<th scope="col">blogs created</th>
+						<th scope="col" className="pl-2.5">
+							blogs created
+						</th>
 					</tr>
 				</thead>
 				<tbody>{blogCountRows}</tbody>

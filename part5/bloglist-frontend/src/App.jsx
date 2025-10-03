@@ -47,21 +47,26 @@ const App = () => {
 
 	// render components
 	return (
-		<>
+		<div>
 			<Notification msg={notificationValue} />
 			<NavigationMenu user={user} handleLogout={handleLogout} />
-			<h2>blog app</h2>
-			<Routes>
-				<Route path="/blogs/:id" element={<Blog loggedInUser={user} />} />
-				<Route path="/users/:id" element={<User />} />
-				<Route path="/users" element={<Users />} />
-				<Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
-				<Route
-					path="/"
-					element={user ? <Blogs user={user} ref={newBlogRef} /> : <Login />}
-				/>
-			</Routes>
-		</>
+			<h2 className="px-2 text-3xl font-semibold mt-2.5 mb-2.5">blog app</h2>
+			<div className="px-2">
+				<Routes>
+					<Route path="/blogs/:id" element={<Blog loggedInUser={user} />} />
+					<Route path="/users/:id" element={<User />} />
+					<Route path="/users" element={<Users />} />
+					<Route
+						path="/login"
+						element={user ? <Navigate to="/" /> : <Login />}
+					/>
+					<Route
+						path="/"
+						element={user ? <Blogs user={user} ref={newBlogRef} /> : <Login />}
+					/>
+				</Routes>
+			</div>
+		</div>
 	);
 };
 
