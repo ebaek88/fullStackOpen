@@ -19,7 +19,9 @@
 		"dev": "cross-env NODE_ENV=development node --watch index.js",
 		"test": "cross-env NODE_ENV=test node --test",
 		"start:test": "cross-env NODE_ENV=test node --watch index.js",
-		"format": "prettier --write --cache ."
+		"format": "prettier --write --cache .",
+		"build:ui": "rm -rf dist && cd ../../part5/bloglist-frontend && npm run build && cp -r dist ../../part4/bloglist-backend",
+		"deploy:full": "npm run build:ui && git add . && git commit -m deploytheentireapp && git push"
 	},
 	"dependencies": {
 		"bcrypt": "^6.0.0",
