@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "ts-node": "ts-node",
-    "calculateBmi": "npm run ts-node -- bmiCalculator.ts"
+    "calculateBmi": "npm run ts-node -- bmiCalculator.ts",
+    "calculateExercises": "npm run ts-node -- exerciseCalculator.ts"
   },
   "repository": {
     "type": "git",
