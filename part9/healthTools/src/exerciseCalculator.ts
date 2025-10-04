@@ -1,3 +1,5 @@
+import { parseArgumentsExerciseCalculator } from "./validateInput.ts";
+
 interface Ratings {
   differenceMax: number;
   rating: number;
@@ -86,8 +88,19 @@ const calculateExercises = (dailyHours: number[], target: number): Result => {
   };
 };
 
+try {
+  const { target, dailyHours } = parseArgumentsExerciseCalculator(process.argv);
+  console.log(calculateExercises(dailyHours, target));
+} catch (error: unknown) {
+  let errorMessage = "Something bad happened.";
+  if (error instanceof Error) {
+    errorMessage += " Error: " + error.message;
+  }
+  console.log(errorMessage);
+}
+
 // console.log(calculateExercises([0, 0, 0, 4.5, 0, 0, 1], 2)); //'you need to exercise more to reach your target'
 // console.log(calculateExercises([0, 0, 1, 4.5, 0, 3, 1], 2)); //'not too bad but could be be better'
 // console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2)); //'you are really doing well. keep going!'
 // console.log(calculateExercises([3, 3, 3, 4.5, 1, 1.5, 1], 2)); //'not too bad but could be be better'
-console.log(calculateExercises([3, 3, 3, 4.5, 1.5, 1.5, 1], 2)); //'you are exercising too much.'
+// console.log(calculateExercises([3, 3, 3, 4.5, 1.5, 1.5, 1], 2)); //'you are exercising too much.'

@@ -1,3 +1,5 @@
+import { parseArgumentsBmi } from "./validateInput.ts";
+
 interface BmiRange {
   max: number;
   label: string;
@@ -22,4 +24,15 @@ const calculateBmi = (height: number, weight: number): string => {
   return range?.label ?? "Obese (Class III)";
 };
 
-console.log(calculateBmi(180, 74));
+try {
+  const { height, weight } = parseArgumentsBmi(process.argv);
+  console.log(calculateBmi(height, weight));
+} catch (error: unknown) {
+  let errorMessage = "Something bad happened.";
+  if (error instanceof Error) {
+    errorMessage += " Error: " + error.message;
+  }
+  console.log(errorMessage);
+}
+
+// console.log(calculateBmi(180, 74));
