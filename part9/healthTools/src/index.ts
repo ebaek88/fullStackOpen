@@ -1,5 +1,6 @@
 // import express from "express";
-import express = require("express");
+import express = require("express"); // using this "hybrid" syntax bc "import" is needed to make sure VSCode knows the types.
+// this is because @types/express uses ESModule...?
 const calculateBmi = require("./bmiCalculator.ts");
 
 const app = express();
