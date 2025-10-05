@@ -1,4 +1,5 @@
-import { parseArgumentsBmi } from "./validateInput.ts";
+// import { parseArgumentsBmi } from "./validateInput.ts";
+const { parseArgumentsBmi } = require("./validateInput.ts");
 
 interface BmiRange {
   max: number;
@@ -25,8 +26,10 @@ const calculateBmi = (height: number, weight: number): string => {
 };
 
 try {
-  const { height, weight } = parseArgumentsBmi(process.argv);
-  console.log(calculateBmi(height, weight));
+  if (require.main === module) {
+    const { height, weight } = parseArgumentsBmi(process.argv);
+    console.log(calculateBmi(height, weight));
+  }
 } catch (error: unknown) {
   let errorMessage = "Something bad happened.";
   if (error instanceof Error) {
@@ -35,4 +38,4 @@ try {
   console.log(errorMessage);
 }
 
-// console.log(calculateBmi(180, 74));
+module.exports = calculateBmi;

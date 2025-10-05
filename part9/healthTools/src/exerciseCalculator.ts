@@ -1,10 +1,11 @@
-import { parseArgumentsExerciseCalculator } from "./validateInput.ts";
+// import { parseArgumentsExerciseCalculator } from "./validateInput.ts";
+const { parseArgumentsExerciseCalculator } = require("./validateInput.ts");
 
-interface Ratings {
-  differenceMax: number;
-  rating: number;
-  explanation: string;
-}
+// interface Ratings {
+//   differenceMax: number;
+//   rating: number;
+//   explanation: string;
+// }
 
 interface Result {
   periodLength: number;
@@ -16,28 +17,28 @@ interface Result {
   average: number;
 }
 
-const exerciseRanges: Ratings[] = [
-  {
-    differenceMax: -1.0,
-    rating: 1,
-    explanation: "you need to exercise more to reach your target",
-  },
-  {
-    differenceMax: -0.25,
-    rating: 2,
-    explanation: "not too bad but could be be better",
-  },
-  {
-    differenceMax: 0.25,
-    rating: 3,
-    explanation: "you are really doing well. keep going!",
-  },
-  {
-    differenceMax: 0.5,
-    rating: 2,
-    explanation: "not too bad but could be be better",
-  },
-];
+// const exerciseRanges: Ratings[] = [
+//   {
+//     differenceMax: -1.0,
+//     rating: 1,
+//     explanation: "you need to exercise more to reach your target",
+//   },
+//   {
+//     differenceMax: -0.25,
+//     rating: 2,
+//     explanation: "not too bad but could be be better",
+//   },
+//   {
+//     differenceMax: 0.25,
+//     rating: 3,
+//     explanation: "you are really doing well. keep going!",
+//   },
+//   {
+//     differenceMax: 0.5,
+//     rating: 2,
+//     explanation: "not too bad but could be be better",
+//   },
+// ];
 
 const calculateExercises = (dailyHours: number[], target: number): Result => {
   const periodLength = dailyHours.length;
@@ -89,8 +90,12 @@ const calculateExercises = (dailyHours: number[], target: number): Result => {
 };
 
 try {
-  const { target, dailyHours } = parseArgumentsExerciseCalculator(process.argv);
-  console.log(calculateExercises(dailyHours, target));
+  if (require.main === module) {
+    const { target, dailyHours } = parseArgumentsExerciseCalculator(
+      process.argv
+    );
+    console.log(calculateExercises(dailyHours, target));
+  }
 } catch (error: unknown) {
   let errorMessage = "Something bad happened.";
   if (error instanceof Error) {

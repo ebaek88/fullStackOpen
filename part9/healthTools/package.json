@@ -6,10 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "ts-node": "ts-node",
-    "calculateBmi": "npm run ts-node -- ./src/bmiCalculator.ts",
-    "calculateExercises": "npm run ts-node -- ./src/exerciseCalculator.ts",
-    "start": "tsx ./src/index.ts",
-    "dev": "tsx watch ./src/index.ts",
+    "tsx": "tsx",
+    "calculateBmi": "npm run tsx -- ./src/bmiCalculator.ts",
+    "calculateExercises": "npm run tsx -- ./src/exerciseCalculator.ts",
+    "start": "ts-node ./src/index.ts",
+    "dev": "ts-node-dev ./src/index.ts",
     "clean": "rm -rf dist",
     "build": "npm run clean && tsc"
   },
@@ -31,7 +32,6 @@
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   },
-  "type": "module",
   "dependencies": {
     "express": "^5.1.0"
   }

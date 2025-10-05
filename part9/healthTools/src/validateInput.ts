@@ -29,7 +29,7 @@ const parseArgumentsExerciseCalculator = (
   if (args.length < 4) throw new Error("Not enough arguments");
   const [, , target, ...rest] = args;
   const targetInNumber = Number(target);
-  console.log(targetInNumber);
+  // console.log(targetInNumber);
   if (isNaN(targetInNumber)) throw new Error("The target is not a number!");
   if (rest.length === 0)
     throw new Error("Not enough input for daily hours recorded!");
@@ -47,5 +47,6 @@ const parseArgumentsExerciseCalculator = (
 // need to use "export type" when exporting a type and when "verbatimModuleSyntax" at tsconfig is on
 // "export type" tells TypeScript that you're only exporting the TYPE, not a value that exists at runtime.
 // This is what "verbatimModuleSyntax" enforces.
-export type { bmiInputs };
-export { parseArgumentsBmi, parseArgumentsExerciseCalculator };
+// export type { bmiInputs };
+// export { parseArgumentsBmi, parseArgumentsExerciseCalculator };
+module.exports = { parseArgumentsBmi, parseArgumentsExerciseCalculator };
