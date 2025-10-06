@@ -1,5 +1,8 @@
-// import { parseArgumentsBmi } from "./validateInput.ts";
-const { parseArgumentsBmi } = require("./validateInput.ts");
+import { parseArgumentsBmi } from "./validateInput.js";
+// const { parseArgumentsBmi } = require("./validateInput.ts");
+// this is equivalent to require.main in CommonJS
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
 
 interface BmiRange {
   max: number;
@@ -16,7 +19,7 @@ const bmiRanges: BmiRange[] = [
   { max: 40, label: "Obese (Class II)" },
 ];
 
-const calculateBmi = (height: number, weight: number): string => {
+export const calculateBmi = (height: number, weight: number): string => {
   const heightInMeters = height / 100;
   const bmi = weight / (heightInMeters * heightInMeters);
 
@@ -26,7 +29,8 @@ const calculateBmi = (height: number, weight: number): string => {
 };
 
 try {
-  if (require.main === module) {
+  // this conditional is ESM equivalent to require.main === module in CommonJS
+  if (process.argv[1] === __filename) {
     const { height, weight } = parseArgumentsBmi(process.argv);
     console.log(calculateBmi(height, weight));
   }
@@ -37,5 +41,3 @@ try {
   }
   console.log(errorMessage);
 }
-
-module.exports = calculateBmi;

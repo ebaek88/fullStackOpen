@@ -9,10 +9,11 @@
     "tsx": "tsx",
     "calculateBmi": "npm run tsx -- ./src/bmiCalculator.ts",
     "calculateExercises": "npm run tsx -- ./src/exerciseCalculator.ts",
-    "start": "ts-node ./src/index.ts",
-    "dev": "ts-node-dev ./src/index.ts",
+    "start": "tsx ./src/index.ts",
+    "dev": "tsx watch ./src/index.ts",
     "clean": "rm -rf dist",
-    "build": "npm run clean && tsc"
+    "build": "npm run clean && tsc",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -25,14 +26,20 @@
   },
   "homepage": "https://github.com/ebaek88/fullStackOpen#readme",
   "devDependencies": {
+    "@eslint/js": "^9.37.0",
+    "@stylistic/eslint-plugin": "^5.4.0",
+    "@types/eslint__js": "^8.42.3",
     "@types/express": "^5.0.3",
     "@types/node": "^24.6.2",
+    "eslint": "^9.37.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "tsx": "^4.20.6",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.0"
   },
   "dependencies": {
     "express": "^5.1.0"
-  }
+  },
+  "type": "module"
 }

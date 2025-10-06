@@ -1,7 +1,8 @@
-// import express from "express";
-import express = require("express"); // using this "hybrid" syntax bc "import" is needed to make sure VSCode knows the types.
+import express from "express";
+// import express = require("express"); // using this "hybrid" syntax bc "import" is needed to make sure VSCode knows the types.
 // this is because @types/express uses ESModule...?
-const calculateBmi = require("./bmiCalculator.ts");
+// const calculateBmi = require("./bmiCalculator.ts");
+import { calculateBmi } from "./bmiCalculator.js"; // in ESM, import files should be in .js. tsx automatically converts .ts to .js.
 
 const app = express();
 
@@ -15,7 +16,7 @@ app.get("/bmi", (req, res) => {
     return res.status(400).json({ error: "malformatted parameters" });
   }
 
-  const result = calculateBmi(height, weight);
+  const result = calculateBmi(Number(height), Number(weight));
 
   return res.json({
     height,

@@ -8,7 +8,7 @@
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
-    // "target": "esnext",
+    "target": "esnext",
     // "types": [],
     // For nodejs:
     // "lib": ["esnext"],
@@ -52,6 +52,7 @@
     "strictPropertyInitialization": true,
     "strictBindCallApply": true,
     "alwaysStrict": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "moduleResolution": "nodenext"
   }
 }

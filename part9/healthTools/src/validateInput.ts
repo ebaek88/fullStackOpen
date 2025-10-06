@@ -47,6 +47,5 @@ const parseArgumentsExerciseCalculator = (
 // need to use "export type" when exporting a type and when "verbatimModuleSyntax" at tsconfig is on
 // "export type" tells TypeScript that you're only exporting the TYPE, not a value that exists at runtime.
 // This is what "verbatimModuleSyntax" enforces.
-// export type { bmiInputs };
-// export { parseArgumentsBmi, parseArgumentsExerciseCalculator };
-module.exports = { parseArgumentsBmi, parseArgumentsExerciseCalculator };
+export type { bmiInputs };
+export { parseArgumentsBmi, parseArgumentsExerciseCalculator };
