@@ -23,6 +23,14 @@ export default defineConfig([
     rules: {
       "@stylistic/semi": "error",
       "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-unsafe-member-access": "error",
+      "@typescript-eslint/no-unsafe-assignment": "error",
+      "@typescript-eslint/array-type": [
+        "error",
+        {
+          default: "array-simple",
+        },
+      ],
     },
   },
 ]);

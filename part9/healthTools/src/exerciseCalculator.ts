@@ -1,5 +1,7 @@
-// import { parseArgumentsExerciseCalculator } from "./validateInput.ts";
-const { parseArgumentsExerciseCalculator } = require("./validateInput.ts");
+import { parseArgumentsExerciseCalculator } from "./validateInput.ts";
+// const { parseArgumentsExerciseCalculator } = require("./validateInput.ts");
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
 
 // interface Ratings {
 //   differenceMax: number;
@@ -40,11 +42,16 @@ interface Result {
 //   },
 // ];
 
-const calculateExercises = (dailyHours: number[], target: number): Result => {
-  const periodLength = dailyHours.length;
-  const trainingDays = dailyHours.filter((dailyHour) => dailyHour > 0).length;
+export const calculateExercises = (
+  daily_exercises: number[],
+  target: number
+): Result => {
+  const periodLength = daily_exercises.length;
+  const trainingDays = daily_exercises.filter(
+    (dailyHour) => dailyHour > 0
+  ).length;
   const average =
-    dailyHours.reduce((acc, curr) => acc + curr, 0) / periodLength;
+    daily_exercises.reduce((acc, curr) => acc + curr, 0) / periodLength;
   const difference = average - target;
   const success = difference >= 0;
   // const exerciseRating = exerciseRanges.find(
@@ -90,11 +97,12 @@ const calculateExercises = (dailyHours: number[], target: number): Result => {
 };
 
 try {
-  if (require.main === module) {
-    const { target, dailyHours } = parseArgumentsExerciseCalculator(
+  // this conditional is ESM equivalent to require.main === module in CommonJS
+  if (process.argv[1] === __filename) {
+    const { target, daily_exercises } = parseArgumentsExerciseCalculator(
       process.argv
     );
-    console.log(calculateExercises(dailyHours, target));
+    console.log(calculateExercises(daily_exercises, target));
   }
 } catch (error: unknown) {
   let errorMessage = "Something bad happened.";

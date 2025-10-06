@@ -1,0 +1,52 @@
+###
+POST http://localhost:3003/calculate
+Content-Type: application/json
+
+{
+  "daily_exercises": [1, 0, 2, 0, 3, 0, 2.5],
+  "target": 2.5
+}
+
+### error: "parameters missing"
+POST http://localhost:3003/calculate
+Content-Type: application/json
+
+{
+  "daily_exercises": [1, 0, 2, 0, 3, 0, 2.5]
+}
+
+### error: "parameters missing"
+POST http://localhost:3003/calculate
+Content-Type: application/json
+
+{
+  "target": 3
+}
+
+### error: "parameters missing"
+POST http://localhost:3003/calculate
+Content-Type: application/json
+
+{
+  "daily_exercises": [],
+  "target": 2.5
+}
+
+### error: "malformatted parameters"
+POST http://localhost:3003/calculate
+Content-Type: application/json
+
+{
+  "daily_exercises": [1, 0, 2, 0, "hello", 0, 2.5],
+  "target": 2.5
+}
+
+
+### error: "malformatted parameters"
+POST http://localhost:3003/calculate
+Content-Type: application/json
+
+{
+  "daily_exercises": [1, 0, 2, 0, 3, 0, 2.5],
+  "target": "hello"
+}

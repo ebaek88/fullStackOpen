@@ -6,7 +6,7 @@ interface bmiInputs {
 
 interface exerciseCalculatorInputs {
   target: number;
-  dailyHours: number[];
+  daily_exercises: number[];
 }
 
 const parseArgumentsBmi = (args: string[]): bmiInputs => {
@@ -33,11 +33,11 @@ const parseArgumentsExerciseCalculator = (
   if (isNaN(targetInNumber)) throw new Error("The target is not a number!");
   if (rest.length === 0)
     throw new Error("Not enough input for daily hours recorded!");
-  const dailyHours = rest.map((val) => Number(val));
-  if (dailyHours.every((val) => !isNaN(Number(val)))) {
+  const daily_exercises = rest.map((val) => Number(val));
+  if (daily_exercises.every((val) => !isNaN(Number(val)))) {
     return {
       target: targetInNumber,
-      dailyHours,
+      daily_exercises,
     };
   } else {
     throw new Error("Some input in daily hours is not a number!");
