@@ -10,7 +10,7 @@ app.use(
   })
 );
 
-const PORT = 3001;
+const PORT = 3003;
 
 app.get("/api/ping", (_req, res) => {
   console.log("someone pinged here");
