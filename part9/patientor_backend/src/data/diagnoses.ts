@@ -1,6 +1,6 @@
 import type { Diagnosis } from "../types.js";
 
-const data: Diagnosis[] = [
+const data: Array<Diagnosis> = [
   {
     code: "M24.2",
     name: "Disorder of ligament",

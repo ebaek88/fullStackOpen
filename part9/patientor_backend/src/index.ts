@@ -3,6 +3,7 @@
 import express from "express";
 import cors from "cors";
 import diagnosesRouter from "./routes/diagnosesRouter.js";
+import patientsRouter from "./routes/patientsRouter.js";
 
 const app = express();
 app.use(express.json());
@@ -17,6 +18,7 @@ app.use(
 );
 
 app.use("/api/diagnoses", diagnosesRouter);
+app.use("/api/patients", patientsRouter);
 
 app.get("/api/ping", (_req, res) => {
   console.log("someone pinged here");
