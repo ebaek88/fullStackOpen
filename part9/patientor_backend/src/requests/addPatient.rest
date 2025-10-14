@@ -1,0 +1,23 @@
+### correct format
+POST http://localhost:3003/api/patients/
+Content-Type: application/json
+
+{
+  "name": "Dooly",
+  "dateOfBirth": "1987-01-01",
+  "ssn": "123456-7890",
+  "gender": "male",
+  "occupation": "Dinosaur"
+}
+
+### incorrect format - error
+POST http://localhost:3003/api/patients/
+Content-Type: application/json
+
+{
+  "name": "Gildong Go",
+  "dateOfBirth": "1964-03-32",
+  "ssn": "123456-7890",
+  "gender": "male",
+  "occupation": "Salaryman"
+}
