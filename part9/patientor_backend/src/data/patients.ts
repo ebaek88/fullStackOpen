@@ -1,5 +1,6 @@
 import type { Patient } from "../types.js";
-import toNewPatient from "../utils.js";
+import { NewPatientSchema } from "../utils.js";
+import * as z from "zod";
 
 const data = [
   {
@@ -45,8 +46,8 @@ const data = [
 ];
 
 const patientEntries: Array<Patient> = data.map((obj) => {
-  const object = toNewPatient(obj) as Patient;
-  object.id = obj.id;
+  const object = NewPatientSchema.parse(obj) as Patient;
+  object.id = z.uuid({ version: "v1" }).parse(obj.id);
   return object;
 });
 

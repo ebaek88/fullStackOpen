@@ -1,90 +1,50 @@
-import { type NewPatient, Gender } from "./types.js";
+import type { Request, Response, NextFunction } from "express";
+import * as z from "zod";
+import { Gender } from "./types.js";
 
-// name, ssn, dateOfBirth, gender, occupation
-const isString = (text: unknown): text is string => {
-  return typeof text === "string" || text instanceof String;
-};
+// schema for a new patient
+const ssnRegex = /(\d{6})-(\d{2,3}[A-Z0-9])/; // regex for validating SSN format
 
-const isDate = (date: string): boolean => {
-  return Boolean(Date.parse(date));
-};
+export const NewPatientSchema = z.object({
+  name: z.string(),
+  ssn: z.string().regex(ssnRegex),
+  dateOfBirth: z.iso.date().refine((val) => Date.parse(val) <= Date.now(), {
+    error: "the date cannot be later than the current date",
+  }),
+  gender: z.enum(Gender),
+  occupation: z.string(),
+});
 
-const isGender = (param: string): param is Gender => {
-  return Object.values(Gender)
-    .map((value) => value.toString())
-    .includes(param);
-};
-
-const parseName = (name: unknown): string => {
-  if (!name || !isString(name)) {
-    throw new Error("Incorrect or missing name");
+// middleware
+// schema parser for a new patient
+export const newPatientParser = (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+) => {
+  try {
+    NewPatientSchema.parse(req.body);
+    next();
+  } catch (error: unknown) {
+    next(error);
   }
-  return name;
 };
 
-const parseSsn = (ssn: unknown): string => {
-  const ssnRegex = /(\d{6})-(\d{2,3}[A-Z0-9])/; // regex for validating SSN format
-
-  if (!ssn || !isString(ssn) || !ssnRegex.test(ssn)) {
-    throw new Error("Incorrect or missing ssn");
-  }
-
-  return ssn;
+// handler for unknown endpoint
+export const unknownEndpoint = (_req: Request, res: Response) => {
+  res.status(404).send({ error: "unknown endpoint" });
 };
 
-const parseOccupation = (occupation: unknown): string => {
-  if (!occupation || !isString(occupation)) {
-    throw new Error("Incorrect or missing occupation");
+// error handler
+export const errorMiddleware = (
+  error: unknown,
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (error instanceof z.ZodError) {
+    res.status(400).send({ error: error.issues });
+  } else {
+    next(error);
   }
-
-  return occupation;
 };
-
-const parseDateOfBirth = (dateOfBirth: unknown): string => {
-  if (
-    !dateOfBirth ||
-    !isString(dateOfBirth) ||
-    !isDate(dateOfBirth) ||
-    Date.parse(dateOfBirth) > Date.now()
-  ) {
-    throw new Error("Incorrect or missing date");
-  }
-
-  return dateOfBirth;
-};
-
-const parseGender = (gender: unknown): Gender => {
-  if (!gender || !isString(gender) || !isGender(gender)) {
-    throw new Error("Incorrect or missing gender: " + gender);
-  }
-
-  return gender;
-};
-
-const toNewPatient = (object: unknown): NewPatient => {
-  if (!object || typeof object !== "object") {
-    throw new Error("Incorrect or missing data");
-  }
-
-  if (
-    "name" in object &&
-    "ssn" in object &&
-    "dateOfBirth" in object &&
-    "gender" in object &&
-    "occupation" in object
-  ) {
-    const newPatient: NewPatient = {
-      name: parseName(object.name),
-      ssn: parseSsn(object.ssn),
-      dateOfBirth: parseDateOfBirth(object.dateOfBirth),
-      gender: parseGender(object.gender),
-      occupation: parseOccupation(object.occupation),
-    };
-
-    return newPatient;
-  }
-
-  throw new Error("Incorrect data: some fields are missing");
-};
-
-export default toNewPatient;

@@ -4,6 +4,7 @@ import express from "express";
 import cors from "cors";
 import diagnosesRouter from "./routes/diagnosesRouter.js";
 import patientsRouter from "./routes/patientsRouter.js";
+import { unknownEndpoint, errorMiddleware } from "./utils.js";
 
 const app = express();
 app.use(express.json());
@@ -24,6 +25,9 @@ app.get("/api/ping", (_req, res) => {
   console.log("someone pinged here");
   res.send("pong");
 });
+
+app.use(unknownEndpoint);
+app.use(errorMiddleware);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
