@@ -1,23 +1,16 @@
-interface CoursePart {
-  name: string;
-  exerciseCount: number;
-}
-
-interface ContentProps {
-  content: Array<CoursePart>;
-}
+import type { ContentProps } from "../types.ts";
+import Part from "./Part.tsx";
 
 const Content = (props: ContentProps) => {
   return (
     <>
       {props.content.map((part) => (
-        <p
+        <Part
           key={part.name
             .split("")
             .reduce((sum, char) => sum + char.charCodeAt(0), "")}
-        >
-          {part.name} {part.exerciseCount}
-        </p>
+          part={part}
+        />
       ))}
     </>
   );
