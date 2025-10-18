@@ -1,3 +1,4 @@
+import type React from "react";
 import type { NewDiaryEntry } from "../types.ts";
 import { Weather, Visibility } from "../types.ts";
 

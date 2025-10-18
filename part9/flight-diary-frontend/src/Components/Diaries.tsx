@@ -1,7 +1,12 @@
-import type { NonSensitiveDiaryEntry } from "../types.ts";
+import type { NonSensitiveDiaryEntry, DiaryEntry } from "../types.ts";
 import Diary from "./Diary.tsx";
 
-const Diaries = ({ entries }: { entries: Array<NonSensitiveDiaryEntry> }) => {
+interface DiariesProps {
+  entries: Array<NonSensitiveDiaryEntry> | Array<DiaryEntry>;
+  // showDiariesWithComments: boolean;
+}
+
+const Diaries = ({ entries }: DiariesProps) => {
   return (
     <div>
       <h2>Diary entries</h2>

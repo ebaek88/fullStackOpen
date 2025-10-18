@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import type {
-  // DiaryEntry,
+  DiaryEntry,
   NewDiaryEntry,
   NonSensitiveDiaryEntry,
 } from "./types.ts";
 import { Weather, Visibility } from "./types.ts";
 import {
   getAllNonsensitiveDiaries,
+  getAllDiaries,
   createNote,
 } from "./services/diaryServices.ts";
 import NewEntry from "./Components/NewEntry.tsx";
@@ -25,27 +26,38 @@ const App = () => {
   };
 
   // states for the app
-  // const [diaryEntries, setDiaryEntries] = useState<Array<DiaryEntry> | null>(null);
+  const [diaryEntries, setDiaryEntries] = useState<
+    Array<DiaryEntry> | undefined
+  >([]);
   const [nonSensitiveDiaryEntries, setNonsensitiveDiaryEntries] = useState<
     Array<NonSensitiveDiaryEntry> | undefined
   >([]);
   const [newDiaryEntry, setNewDiaryEntry] =
     useState<NewDiaryEntry>(defaultNewDiaryEntry);
+  const [showDiariesWithComments, setShowDiariesWithComments] =
+    useState<boolean>(false);
+  const [needsRefresh, setNeedsRefresh] = useState<boolean>(true);
 
   useEffect(() => {
-    getAllNonsensitiveDiaries().then((data) =>
-      setNonsensitiveDiaryEntries(data)
-    );
-  }, []);
+    if (needsRefresh) {
+      getAllNonsensitiveDiaries().then((data) =>
+        setNonsensitiveDiaryEntries(data)
+      );
+      getAllDiaries().then((data) => setDiaryEntries(data));
+      setNeedsRefresh(false);
+    }
+  }, [needsRefresh]);
 
   // event handlers
   const diaryCreation = async (event: React.SyntheticEvent) => {
     event.preventDefault();
     if (newDiaryEntry) {
       const createdDiary = await createNote(newDiaryEntry);
+      setDiaryEntries(diaryEntries?.concat(createdDiary));
       setNonsensitiveDiaryEntries(
         nonSensitiveDiaryEntries?.concat(createdDiary)
       );
+      setNeedsRefresh(true);
     }
     setNewDiaryEntry(defaultNewDiaryEntry);
   };
@@ -85,6 +97,15 @@ const App = () => {
     }
   };
 
+  const toggleShowDiariesWithComments = () => {
+    setShowDiariesWithComments(!showDiariesWithComments);
+  };
+
+  if (needsRefresh) {
+    console.log("diaries with comments:", diaryEntries);
+    console.log("diaries without comments:", nonSensitiveDiaryEntries);
+  }
+
   return (
     <>
       <NewEntry
@@ -95,8 +116,16 @@ const App = () => {
         handleCommentChange={handleCommentChange}
         newDiaryEntry={newDiaryEntry}
       />
-      {nonSensitiveDiaryEntries && (
+      <button onClick={toggleShowDiariesWithComments}>
+        {showDiariesWithComments
+          ? "show diaries without comments"
+          : "show diaries with comments"}
+      </button>
+      {!showDiariesWithComments && nonSensitiveDiaryEntries && (
         <Diaries entries={nonSensitiveDiaryEntries} />
+      )}
+      {showDiariesWithComments && diaryEntries && (
+        <Diaries entries={diaryEntries} />
       )}
     </>
   );
