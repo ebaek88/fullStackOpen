@@ -88,9 +88,11 @@ const App = () => {
       event.preventDefault();
       if (newDiaryEntry) {
         const createdDiary = await createNote(newDiaryEntry);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { comment, ...nonSensitiveNewDiaryEntry } = createdDiary;
         setDiaryEntries(diaryEntries?.concat(createdDiary));
         setNonsensitiveDiaryEntries(
-          nonSensitiveDiaryEntries?.concat(createdDiary)
+          nonSensitiveDiaryEntries?.concat(nonSensitiveNewDiaryEntry)
         );
         showNotification(`Successfully added diary ${createdDiary.date}`);
         setNeedsRefresh(true);
@@ -123,22 +125,20 @@ const App = () => {
     }
   };
 
-  const handleWeatherChange = (event: React.FormEvent<HTMLSelectElement>) => {
+  const handleWeatherChange = (value: Weather) => {
     if (newDiaryEntry) {
       setNewDiaryEntry({
         ...newDiaryEntry,
-        weather: event.currentTarget.value as Weather,
+        weather: value,
       });
     }
   };
 
-  const handleVisibilityChange = (
-    event: React.FormEvent<HTMLSelectElement>
-  ) => {
+  const handleVisibilityChange = (value: Visibility) => {
     if (newDiaryEntry) {
       setNewDiaryEntry({
         ...newDiaryEntry,
-        visibility: event.currentTarget.value as Visibility,
+        visibility: value,
       });
     }
   };
