@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import axios from "axios";
 import type {
   DiaryEntry,
   NewDiaryEntry,
@@ -12,6 +13,7 @@ import {
 } from "./services/diaryServices.ts";
 import NewEntry from "./Components/NewEntry.tsx";
 import Diaries from "./Components/Diaries.tsx";
+import Notification from "./Components/Notification.tsx";
 
 const App = () => {
   // constants
@@ -24,6 +26,7 @@ const App = () => {
     visibility: Visibility.Good,
     comment: "",
   };
+  const timeoutId = useRef<number | undefined>(-1);
 
   // states for the app
   const [diaryEntries, setDiaryEntries] = useState<
@@ -37,28 +40,71 @@ const App = () => {
   const [showDiariesWithComments, setShowDiariesWithComments] =
     useState<boolean>(false);
   const [needsRefresh, setNeedsRefresh] = useState<boolean>(true);
+  const [notification, setNotification] = useState<string>("");
 
   useEffect(() => {
     if (needsRefresh) {
-      getAllNonsensitiveDiaries().then((data) =>
-        setNonsensitiveDiaryEntries(data)
-      );
-      getAllDiaries().then((data) => setDiaryEntries(data));
-      setNeedsRefresh(false);
+      getAllNonsensitiveDiaries()
+        .then((data) => setNonsensitiveDiaryEntries(data))
+        .catch((error: unknown) => {
+          if (axios.isAxiosError(error)) {
+            console.log(error?.status);
+            console.log(error?.message);
+            showNotification(error?.message);
+          } else {
+            showNotification("unknown error occurred");
+          }
+        })
+        .finally(() => setNeedsRefresh(false));
+      getAllDiaries()
+        .then((data) => setDiaryEntries(data))
+        .catch((error: unknown) => {
+          if (axios.isAxiosError(error)) {
+            console.log(error?.status);
+            console.log(error?.message);
+            showNotification(error?.message);
+          } else {
+            showNotification("unknown error occurred");
+          }
+        })
+        .finally(() => setNeedsRefresh(false));
+      // setNeedsRefresh(false);
     }
   }, [needsRefresh]);
 
   // event handlers
-  const diaryCreation = async (event: React.SyntheticEvent) => {
-    event.preventDefault();
-    if (newDiaryEntry) {
-      const createdDiary = await createNote(newDiaryEntry);
-      setDiaryEntries(diaryEntries?.concat(createdDiary));
-      setNonsensitiveDiaryEntries(
-        nonSensitiveDiaryEntries?.concat(createdDiary)
-      );
-      setNeedsRefresh(true);
+  const showNotification = (msg: string, duration = 3000) => {
+    setNotification(msg);
+    if (timeoutId.current) {
+      clearTimeout(timeoutId.current);
     }
+    timeoutId.current = setTimeout(() => {
+      setNotification("");
+    }, duration);
+  };
+
+  const diaryCreation = async (event: React.SyntheticEvent) => {
+    try {
+      event.preventDefault();
+      if (newDiaryEntry) {
+        const createdDiary = await createNote(newDiaryEntry);
+        setDiaryEntries(diaryEntries?.concat(createdDiary));
+        setNonsensitiveDiaryEntries(
+          nonSensitiveDiaryEntries?.concat(createdDiary)
+        );
+        showNotification(`Successfully added diary ${createdDiary.date}`);
+        setNeedsRefresh(true);
+      }
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.log(error?.status);
+        console.log(error?.message);
+        showNotification(error?.message);
+      } else {
+        showNotification("unknown error occurred");
+      }
+    }
+
     setNewDiaryEntry(defaultNewDiaryEntry);
   };
 
@@ -108,6 +154,7 @@ const App = () => {
 
   return (
     <>
+      <Notification message={notification} />
       <NewEntry
         handleSubmit={diaryCreation}
         handleDateChange={handleDateChange}
