@@ -9,13 +9,20 @@ const getFullPatients = (): Array<Patient> => {
 };
 
 const getPatientsWithoutSsn = (): Array<PatientWithoutSsn> => {
-  return patients.map(({ id, name, dateOfBirth, gender, occupation }) => ({
-    id,
-    name,
-    dateOfBirth,
-    gender,
-    occupation,
-  }));
+  return patients.map(
+    ({ id, name, dateOfBirth, gender, occupation, entries }) => ({
+      id,
+      name,
+      dateOfBirth,
+      gender,
+      occupation,
+      entries, // temporary. have not implemented interface Entry yet
+    })
+  );
+};
+
+const getIndividualPatient = (id: string) => {
+  return patients.find((patient) => patient.id === id);
 };
 
 const addPatient = (entry: NewPatient): Patient => {
@@ -28,4 +35,9 @@ const addPatient = (entry: NewPatient): Patient => {
   return newPatient;
 };
 
-export default { getFullPatients, getPatientsWithoutSsn, addPatient };
+export default {
+  getFullPatients,
+  getPatientsWithoutSsn,
+  getIndividualPatient,
+  addPatient,
+};

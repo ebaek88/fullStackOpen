@@ -13,6 +13,7 @@ export const NewPatientSchema = z.object({
   }),
   gender: z.enum(Gender),
   occupation: z.string(),
+  entries: z.array(z.object({})), // this is temporary, haven't defined interface Entry yet
 });
 
 // middleware

@@ -17,6 +17,26 @@ router.get(
   }
 );
 
+router.get(
+  "/:id",
+  (
+    req: Request<{ id: string }>,
+    res: Response<Patient | { error: string }>,
+    next: NextFunction
+  ) => {
+    try {
+      const queriedPatient = patientService.getIndividualPatient(req.params.id);
+      if (!queriedPatient) {
+        res.status(404).send({ error: "patient not found" });
+      } else {
+        res.send(queriedPatient);
+      }
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+);
+
 router.post(
   "/",
   newPatientParser,

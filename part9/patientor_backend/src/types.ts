@@ -1,6 +1,9 @@
 import * as z from "zod";
 import { NewPatientSchema } from "./utils.js";
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface Entry {} // temporary. have not implemented fully yet.
+
 export interface Diagnosis {
   code: string;
   name: string;
@@ -16,9 +19,12 @@ export interface Patient {
   ssn: string;
   gender: Gender;
   occupation: string;
+  entries: Array<Entry>;
 }
 
 export type PatientWithoutSsn = Omit<Patient, "ssn">;
+
+export type NonSensitivePatient = Omit<Patient, "ssn" | "entries">;
 
 // export type NewPatient = Omit<Patient, "id">;
 
