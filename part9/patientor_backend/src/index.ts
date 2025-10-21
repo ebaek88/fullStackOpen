@@ -2,6 +2,7 @@
 // import cors = require("cors");
 import express from "express";
 import cors from "cors";
+import morgan from "morgan";
 import diagnosesRouter from "./routes/diagnosesRouter.js";
 import patientsRouter from "./routes/patientsRouter.js";
 import { unknownEndpoint, errorMiddleware } from "./utils.js";
@@ -16,6 +17,17 @@ app.use(
     origin: "http://localhost:5173", // react address
     credentials: true, // to include cookies or credentials
   })
+);
+
+morgan.token("body", (req, _res) => {
+  if ("body" in req && req.body) {
+    return JSON.stringify(req.body);
+  }
+  return "-";
+});
+
+app.use(
+  morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
 
 app.use("/api/diagnoses", diagnosesRouter);
