@@ -1,6 +1,10 @@
 import express from "express";
 import type { Request, Response, NextFunction } from "express";
-import type { NewPatient, Patient, PatientWithoutSsn } from "../types.js";
+import type {
+  NewPatient,
+  Patient,
+  PatientWithoutSsn,
+} from "../types/patient.js";
 import patientService from "../services/patientService.js";
 import { newPatientParser } from "../utils.js";
 

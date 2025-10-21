@@ -1,6 +1,10 @@
 import { v1 as uuid } from "uuid";
 import patientData from "../data/patients.js";
-import type { Patient, PatientWithoutSsn, NewPatient } from "../types.js";
+import type {
+  Patient,
+  PatientWithoutSsn,
+  NewPatient,
+} from "../types/patient.js";
 
 const patients: Array<Patient> = patientData;
 
@@ -16,7 +20,7 @@ const getPatientsWithoutSsn = (): Array<PatientWithoutSsn> => {
       dateOfBirth,
       gender,
       occupation,
-      entries, // temporary. have not implemented interface Entry yet
+      entries,
     })
   );
 };

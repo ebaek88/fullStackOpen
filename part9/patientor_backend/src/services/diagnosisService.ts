@@ -1,5 +1,5 @@
 import diagnosisData from "../data/diagnoses.js";
-import type { Diagnosis, DiagnosisWithoutLatin } from "../types.js";
+import type { Diagnosis, DiagnosisWithoutLatin } from "../types/diagnosis.js";
 
 const diagnoses: Array<Diagnosis> = diagnosisData;
 

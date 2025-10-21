@@ -1,38 +1,38 @@
-import * as z from "zod";
-import { NewPatientSchema } from "./utils.js";
+// export interface BaseEntry {
+//   id: string;
+//   description: string;
+//   date: string;
+//   specialist: string;
+//   diagnosisCodes?: Array<Diagnosis["code"]>;
+// }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface Entry {} // temporary. have not implemented fully yet.
+// export interface HealthCheckEntry extends BaseEntry {
+//   type: "HealthCheck";
+//   healthCheckRating: HealthCheckRating;
+// }
 
-export interface Diagnosis {
-  code: string;
-  name: string;
-  latin?: string;
-}
+// export interface SickLeave {
+//   startDate: string;
+//   endDate: string;
+// }
 
-export type DiagnosisWithoutLatin = Omit<Diagnosis, "latin">;
+// export interface OccupationalHealthcareEntry extends BaseEntry {
+//   type: "OccupationalHealthcare";
+//   employerName: string;
+//   sickLeave?: SickLeave;
+// }
 
-export interface Patient {
-  id: string;
-  name: string;
-  dateOfBirth: string;
-  ssn: string;
-  gender: Gender;
-  occupation: string;
-  entries: Array<Entry>;
-}
+// export interface Discharge {
+//   date: string;
+//   criteria: string;
+// }
 
-export type PatientWithoutSsn = Omit<Patient, "ssn">;
+// export interface HospitalEntry extends BaseEntry {
+//   type: "Hospital";
+//   discharge?: Discharge;
+// }
 
-export type NonSensitivePatient = Omit<Patient, "ssn" | "entries">;
-
-// export type NewPatient = Omit<Patient, "id">;
-
-export enum Gender {
-  Male = "male",
-  Female = "female",
-  Other = "other",
-  Undisclosed = "undisclosed",
-}
-
-export type NewPatient = z.infer<typeof NewPatientSchema>;
+// export type Entry =
+//   | HealthCheckEntry
+//   | OccupationalHealthcareEntry
+//   | HospitalEntry;
