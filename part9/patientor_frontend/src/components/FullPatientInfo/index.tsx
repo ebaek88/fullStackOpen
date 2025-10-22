@@ -9,15 +9,20 @@ import {
   TableRow,
   TableCell,
 } from "@mui/material";
+
 import { useState, useEffect } from "react";
 import patientService from "../../services/patients.js";
+
 import type { Patient } from "../../types/patient.js";
+import type { DiagnosisWithoutLatin } from "../../types/diagnosis.js";
 
 interface Props {
   patientId: string | null | undefined;
+  showNotification: (msg: string, duration?: number) => void;
+  diagnoses: Array<DiagnosisWithoutLatin>;
 }
 
-const FullPatientInfo = ({ patientId }: Props) => {
+const FullPatientInfo = ({ patientId, showNotification, diagnoses }: Props) => {
   if (!patientId) {
     return (
       <div>
@@ -27,7 +32,7 @@ const FullPatientInfo = ({ patientId }: Props) => {
   }
 
   const [patient, setPatient] = useState<Patient | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  // const [errorMessage, setErrorMessage] = useState<string>("");
 
   useEffect(() => {
     const fetchIndividualPatient = async (id: string) => {
@@ -37,7 +42,7 @@ const FullPatientInfo = ({ patientId }: Props) => {
       } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
           console.log(error.message);
-          setErrorMessage(error.message);
+          showNotification(error.message);
         }
       }
     };
@@ -51,10 +56,14 @@ const FullPatientInfo = ({ patientId }: Props) => {
         <div>
           The full information for the corresponding patient is not available:
         </div>
-        <div>{errorMessage}</div>
       </>
     );
   }
+
+  const diagnosesDescriptions: { [code: string]: string } = {};
+  diagnoses.forEach((obj) => {
+    diagnosesDescriptions[obj.code] = obj.name;
+  });
 
   return (
     <div>
@@ -118,9 +127,10 @@ const FullPatientInfo = ({ patientId }: Props) => {
                       </TableCell>
                     </TableRow>
                   )}
-                  {entry.diagnosisCodes?.map((diagnosis) => (
-                    <TableRow key={diagnosis}>
-                      <TableCell>{diagnosis}</TableCell>
+                  {entry.diagnosisCodes?.map((code) => (
+                    <TableRow key={code}>
+                      <TableCell>{code}</TableCell>
+                      <TableCell>{diagnosesDescriptions[code]}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
