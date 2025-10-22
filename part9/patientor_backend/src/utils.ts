@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import * as z from "zod";
 import { NewPatientSchema } from "./schemas/patientSchema.js";
+import { EntryWithoutIdSchema } from "./schemas/entrySchema.js";
 
 // middleware
 // schema parser for a new patient
@@ -11,6 +12,20 @@ export const newPatientParser = (
 ) => {
   try {
     NewPatientSchema.parse(req.body);
+    next();
+  } catch (error: unknown) {
+    next(error);
+  }
+};
+
+// schema parser for a new entry
+export const newEntryParser = (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+) => {
+  try {
+    EntryWithoutIdSchema.parse(req.body);
     next();
   } catch (error: unknown) {
     next(error);

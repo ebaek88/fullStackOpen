@@ -5,8 +5,9 @@ import type {
   Patient,
   PatientWithoutSsn,
 } from "../types/patient.js";
+import type { Entry, EntryWithoutId } from "../types/entry.js";
 import patientService from "../services/patientService.js";
-import { newPatientParser } from "../utils.js";
+import { newPatientParser, newEntryParser } from "../utils.js";
 
 const router = express.Router();
 
@@ -60,6 +61,26 @@ router.post(
     try {
       const addedPatient = patientService.addPatient(req.body);
       res.json(addedPatient);
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+);
+
+router.post(
+  "/:id/entries",
+  newEntryParser,
+  (
+    req: Request<{ id: string }, unknown, EntryWithoutId>,
+    res: Response<Entry | { error: string }>,
+    next: NextFunction
+  ) => {
+    try {
+      const addedEntry = patientService.addEntry(req.params.id, req.body);
+      if (!addedEntry) {
+        res.status(400).json({ error: "patient to add entry not found" });
+      }
+      res.json(addedEntry);
     } catch (error: unknown) {
       next(error);
     }

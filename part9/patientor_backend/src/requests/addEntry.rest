@@ -1,0 +1,75 @@
+### incorrect format - error (wrong diagnosis code)
+POST http://localhost:3003/api/patients/d27736ec-f723-11e9-8f0b-362b9e155667/entries
+Content-Type: application/json
+
+{
+  "date": "2025-10-22",
+  "specialist": "MD Smith",
+  "type": "OccupationalHealthcare",
+  "description": "hello",
+  "employerName": "Google",
+  "diagnosisCodes": ["abc"]
+}
+
+### incorrect format - error (wrong date)
+POST http://localhost:3003/api/patients/d27736ec-f723-11e9-8f0b-362b9e155667/entries
+Content-Type: application/json
+
+{
+  "date": "2025-10-24",
+  "specialist": "MD Smith",
+  "type": "OccupationalHealthcare",
+  "description": "hello",
+  "employerName": "Google",
+  "diagnosisCodes": ["abc"]
+}
+
+### incorrect format - error (missing property)
+POST http://localhost:3003/api/patients/d27736ec-f723-11e9-8f0b-362b9e155667/entries
+Content-Type: application/json
+
+{
+  "date": "2025-09-24",
+  "specialist": "MD Smith",
+  "type": "HealthCheck",
+  "description": "hello",
+  "diagnosisCodes": ["J03.0"]
+}
+
+### incorrect format - error (incorrect patient id)
+POST http://localhost:3003/api/patients/d27736ec-f723-11e9-8f0b-362b9e155669/entries
+Content-Type: application/json
+
+{
+  "date": "2025-10-22",
+  "specialist": "MD Smith",
+  "type": "OccupationalHealthcare",
+  "description": "hello",
+  "employerName": "Google",
+  "diagnosisCodes": ["J06.9"]
+}
+
+### correct format
+POST http://localhost:3003/api/patients/d27736ec-f723-11e9-8f0b-362b9e155667/entries
+Content-Type: application/json
+
+{
+  "date": "2025-10-22",
+  "specialist": "MD Smith",
+  "type": "OccupationalHealthcare",
+  "description": "hello",
+  "employerName": "Google",
+  "diagnosisCodes": ["J06.9"]
+}
+
+### correct format
+POST http://localhost:3003/api/patients/d27736ec-f723-11e9-8f0b-362b9e155667/entries
+Content-Type: application/json
+
+{
+  "date": "2025-09-24",
+  "specialist": "MD Dooly",
+  "type": "HealthCheck",
+  "description": "hello",
+  "healthCheckRating": 3
+}

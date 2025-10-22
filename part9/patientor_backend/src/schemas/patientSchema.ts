@@ -9,7 +9,7 @@ export const PatientSchema = z.object({
   id: z.uuid({ version: "v1" }),
   name: z.string(),
   dateOfBirth: z.iso.date().refine((val) => Date.parse(val) <= Date.now(), {
-    error: "the date cannot be later than the current date",
+    message: "the date cannot be later than the current date",
   }),
   ssn: z.string().regex(ssnRegex),
   entries: z.array(EntrySchema),
