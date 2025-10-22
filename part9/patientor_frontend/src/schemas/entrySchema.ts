@@ -12,12 +12,12 @@ const BaseEntrySchema = z.object({
   diagnosisCodes: z.array(z.string()).optional(),
 });
 
-const HealthCheckEntrySchema = BaseEntrySchema.extend({
+export const HealthCheckEntrySchema = BaseEntrySchema.extend({
   type: z.literal("HealthCheck"),
   healthCheckRating: z.enum(HealthCheckRating),
 });
 
-const OccupationalHealthcareEntrySchema = BaseEntrySchema.extend({
+export const OccupationalHealthcareEntrySchema = BaseEntrySchema.extend({
   type: z.literal("OccupationalHealthcare"),
   employerName: z.string(),
   sickLeave: z
@@ -32,7 +32,7 @@ const OccupationalHealthcareEntrySchema = BaseEntrySchema.extend({
     .optional(),
 });
 
-const HospitalEntrySchema = BaseEntrySchema.extend({
+export const HospitalEntrySchema = BaseEntrySchema.extend({
   type: z.literal("Hospital"),
   discharge: z
     .object({

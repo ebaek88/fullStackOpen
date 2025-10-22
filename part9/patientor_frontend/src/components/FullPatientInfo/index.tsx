@@ -16,6 +16,8 @@ import patientService from "../../services/patients.js";
 import type { Patient } from "../../types/patient.js";
 import type { DiagnosisWithoutLatin } from "../../types/diagnosis.js";
 
+import EntryDetails from "../EntryDetails/index.tsx";
+
 interface Props {
   patientId: string | null | undefined;
   showNotification: (msg: string, duration?: number) => void;
@@ -32,7 +34,7 @@ const FullPatientInfo = ({ patientId, showNotification, diagnoses }: Props) => {
   }
 
   const [patient, setPatient] = useState<Patient | null>(null);
-  // const [errorMessage, setErrorMessage] = useState<string>("");
+  const [showEntries, setShowEntries] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchIndividualPatient = async (id: string) => {
@@ -101,45 +103,22 @@ const FullPatientInfo = ({ patientId, showNotification, diagnoses }: Props) => {
           </TableBody>
         </Table>
       </TableContainer>
-      <h3>entries</h3>
-      {patient.entries.map((entry) => (
-        <div key={entry.id}>
-          <div>
-            <TableContainer>
-              <Table>
-                <TableBody>
-                  <TableRow>
-                    <TableCell>
-                      <strong>Date</strong>
-                    </TableCell>
-                    <TableCell>{entry.date}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <strong>Description</strong>
-                    </TableCell>
-                    <TableCell>{entry.description}</TableCell>
-                  </TableRow>
-                  {entry.diagnosisCodes && (
-                    <TableRow>
-                      <TableCell colSpan={2}>
-                        <strong>Diagnosis Codes</strong>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                  {entry.diagnosisCodes?.map((code) => (
-                    <TableRow key={code}>
-                      <TableCell>{code}</TableCell>
-                      <TableCell>{diagnosesDescriptions[code]}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </div>
-          <br />
+      {patient.entries && patient.entries.length > 0 && (
+        <div style={{ margin: "10px" }}>
+          <strong>entries</strong>{" "}
+          <button onClick={() => setShowEntries(!showEntries)}>
+            {showEntries ? "hide " : "show "}entries
+          </button>
         </div>
-      ))}
+      )}
+      {showEntries &&
+        patient.entries.map((entry) => (
+          <EntryDetails
+            key={entry.id}
+            entry={entry}
+            diagnosesDescriptions={diagnosesDescriptions}
+          />
+        ))}
     </div>
   );
 };
