@@ -29,3 +29,5 @@ export const PatientSchema = z.object({
 // });
 
 export const NewPatientSchema = PatientSchema.omit({ id: true });
+
+export const PatientWithoutSsnSchema = PatientSchema.omit({ ssn: true });

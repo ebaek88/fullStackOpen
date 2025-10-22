@@ -12,7 +12,7 @@ import {
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-import { PatientFormValues, Patient } from "../../types";
+import type { PatientFormValues, Patient } from "../../types/patient.js";
 import AddPatientModal from "../AddPatientModal";
 
 import HealthRatingBar from "../HealthRatingBar";

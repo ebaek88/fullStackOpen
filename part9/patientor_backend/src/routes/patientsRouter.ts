@@ -10,8 +10,16 @@ import { newPatientParser } from "../utils.js";
 
 const router = express.Router();
 
+router.get("/", (_req, res: Response<Array<Patient>>, next: NextFunction) => {
+  try {
+    res.send(patientService.getFullPatients());
+  } catch (error: unknown) {
+    next(error);
+  }
+});
+
 router.get(
-  "/",
+  "/without-ssn",
   (_req, res: Response<Array<PatientWithoutSsn>>, next: NextFunction) => {
     try {
       res.send(patientService.getPatientsWithoutSsn());

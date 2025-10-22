@@ -2,9 +2,16 @@ import axios from "axios";
 import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
+import {
+  TableContainer,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+} from "@mui/material";
 import { useState, useEffect } from "react";
 import patientService from "../../services/patients.js";
-import type { Patient } from "../../types.js";
+import type { Patient } from "../../types/patient.js";
 
 interface Props {
   patientId: string | null | undefined;
@@ -51,7 +58,7 @@ const FullPatientInfo = ({ patientId }: Props) => {
 
   return (
     <div>
-      <h3>
+      <h2>
         {patient.name}{" "}
         {patient.gender === "male" ? (
           <MaleIcon />
@@ -60,31 +67,69 @@ const FullPatientInfo = ({ patientId }: Props) => {
         ) : (
           <QuestionMarkIcon />
         )}
-      </h3>
-      <table>
-        <tbody>
-          <tr>
-            <td>Date Of Birth</td>
-            <td>{patient.dateOfBirth}</td>
-          </tr>
-          <tr>
-            <td>Social Security Number</td>
-            <td>{patient.ssn}</td>
-          </tr>
-          <tr>
-            <td>Occupation</td>
-            <td>{patient.occupation}</td>
-          </tr>
-          <tr>
-            <td>Entries</td>
-            {!patient.entries || patient.entries.length === 0 ? (
-              <td>soon to be updated</td>
-            ) : (
-              <td>-</td>
-            )}
-          </tr>
-        </tbody>
-      </table>
+      </h2>
+      <TableContainer>
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell>
+                <strong>Date Of Birth</strong>
+              </TableCell>
+              <TableCell>{patient.dateOfBirth}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Social Security Number</strong>
+              </TableCell>
+              <TableCell>{patient.ssn}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <strong>Occupation</strong>
+              </TableCell>
+              <TableCell>{patient.occupation}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <h3>entries</h3>
+      {patient.entries.map((entry) => (
+        <div key={entry.id}>
+          <div>
+            <TableContainer>
+              <Table>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>
+                      <strong>Date</strong>
+                    </TableCell>
+                    <TableCell>{entry.date}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      <strong>Description</strong>
+                    </TableCell>
+                    <TableCell>{entry.description}</TableCell>
+                  </TableRow>
+                  {entry.diagnosisCodes && (
+                    <TableRow>
+                      <TableCell colSpan={2}>
+                        <strong>Diagnosis Codes</strong>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {entry.diagnosisCodes?.map((diagnosis) => (
+                    <TableRow key={diagnosis}>
+                      <TableCell>{diagnosis}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </div>
+          <br />
+        </div>
+      ))}
     </div>
   );
 };
