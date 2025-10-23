@@ -45,7 +45,11 @@ export const errorMiddleware = (
   next: NextFunction
 ) => {
   if (error instanceof z.ZodError) {
-    res.status(400).send({ error: error.issues });
+    const messages = error.issues.map((issue) => issue.message);
+    res.status(400).json({
+      message: messages.join("; "),
+      error: error.issues,
+    });
   } else {
     next(error);
   }

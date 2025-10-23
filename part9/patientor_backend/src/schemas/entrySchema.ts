@@ -2,7 +2,7 @@ import * as z from "zod";
 import { HealthCheckRating } from "../types/enums.js";
 import data from "../data/diagnoses.js";
 
-const codes = data.map((diagnosis) => diagnosis.code);
+const codes = new Set(data.map((diagnosis) => diagnosis.code));
 
 // schema for entry types
 const BaseEntrySchema = z.object({
@@ -18,7 +18,7 @@ const BaseEntrySchema = z.object({
     .refine(
       (arr) => {
         if (arr.length === 0) return true;
-        return arr.every((code) => codes.includes(code));
+        return arr.every((code) => codes.has(code)); // because codes is a Set rather than an array, this reduces from O(N^2) to O(N)
       },
       { message: "nonexistent diagnosis code" }
     )

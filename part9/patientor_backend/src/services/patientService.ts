@@ -1,14 +1,9 @@
 import * as z from "zod";
 import { v1 as uuid } from "uuid";
 import patientData from "../data/patients.js";
-import type {
-  Patient,
-  PatientWithoutSsn,
-  NewPatient,
-} from "../types/patient.js";
-import type { EntryWithoutId } from "../types/entry.js";
-
-// import { NewPatientSchema } from "../schemas/patientSchema.js";
+import type { Patient, PatientWithoutSsn } from "../types/patient.js";
+import { NewPatientSchema } from "../schemas/patientSchema.js";
+import { EntryWithoutIdSchema } from "../schemas/entrySchema.js";
 
 const patients: Array<Patient> = patientData;
 
@@ -33,24 +28,24 @@ const getIndividualPatient = (id: string) => {
   return patients.find((patient) => patient.id === id);
 };
 
-const addPatient = (entry: NewPatient): Patient => {
-  // const parsedEntry = NewPatientSchema.parse(entry);
+const addPatient = (entry: unknown): Patient => {
+  const parsedEntry = NewPatientSchema.parse(entry);
   const newPatient = {
     id: z.uuid({ version: "v1" }).parse(uuid()),
-    ...entry,
+    ...parsedEntry,
   };
 
   patients.push(newPatient);
   return newPatient;
 };
 
-const addEntry = (id: string, entry: EntryWithoutId) => {
+const addEntry = (id: string, entry: unknown) => {
   const patientToAdd = patients.find((patient) => patient.id === id);
   if (!patientToAdd) return;
-
+  const parsedEntry = EntryWithoutIdSchema.parse(entry);
   const newEntry = {
     id: z.uuid({ version: "v1" }).parse(uuid()),
-    ...entry,
+    ...parsedEntry,
   };
 
   patientToAdd.entries.push(newEntry);

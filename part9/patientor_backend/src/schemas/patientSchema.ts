@@ -17,15 +17,7 @@ export const PatientSchema = z.object({
   occupation: z.string(),
 });
 
-// export const NewPatientSchema = z.object({
-//   name: z.string(),
-//   dateOfBirth: z.iso.date().refine((val) => Date.parse(val) <= Date.now(), {
-//     error: "the date cannot be later than the current date",
-//   }),
-//   ssn: z.string().regex(ssnRegex),
-//   entries: z.array(EntrySchema),
-//   gender: z.enum(Gender),
-//   occupation: z.string(),
-// });
-
-export const NewPatientSchema = PatientSchema.omit({ id: true });
+// also made entries optional for NewPatientSchema, since a new patient is added first and then his/her entries.
+export const NewPatientSchema = PatientSchema.omit({ id: true }).extend({
+  entries: z.array(EntrySchema).optional().default([]),
+});
