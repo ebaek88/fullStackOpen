@@ -37,6 +37,7 @@ const FullPatientInfo = ({ patientId, showNotification, diagnoses }: Props) => {
 
   const [patient, setPatient] = useState<Patient | null>(null);
   const [showEntries, setShowEntries] = useState<boolean>(false);
+  const [showForm, setShowForm] = useState<boolean>(false);
   const [formError, setFormError] = useState<string>("");
 
   const formErrorTimeoutId = useRef<number | null>(null);
@@ -142,15 +143,24 @@ const FullPatientInfo = ({ patientId, showNotification, diagnoses }: Props) => {
           </TableBody>
         </Table>
       </TableContainer>
-      <AddEntryForm
-        onSubmit={submitNewEntry}
-        error={formError}
-        setError={showFormError}
-        diagnosisCodesArray={diagnosisCodesArray}
-      />
+      <div style={{ marginTop: "10px" }}>
+        <strong>Add a new entry</strong>
+        <button onClick={() => setShowForm(!showForm)}>
+          {showForm ? "hide " : "show "}new entry form
+        </button>
+        {showForm && (
+          <AddEntryForm
+            onSubmit={submitNewEntry}
+            error={formError}
+            setError={showFormError}
+            diagnosisCodesArray={diagnosisCodesArray}
+            setShowForm={setShowForm}
+          />
+        )}
+      </div>
       {patient.entries && patient.entries.length > 0 && (
         <div style={{ margin: "10px" }}>
-          <strong>entries</strong>{" "}
+          <strong>Entries</strong>{" "}
           <button onClick={() => setShowEntries(!showEntries)}>
             {showEntries ? "hide " : "show "}entries
           </button>

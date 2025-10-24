@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import type { EntryWithoutId } from "../../types/entry.js";
 import { HealthCheckRating } from "../../types/enums.js";
 import {
@@ -15,6 +15,7 @@ import {
   Checkbox,
   ListItemText,
   Input,
+  Button,
 } from "@mui/material";
 
 interface Props {
@@ -22,6 +23,7 @@ interface Props {
   error: string;
   setError: (msg: string, duration?: number) => void;
   diagnosisCodesArray: string[];
+  setShowForm: Dispatch<SetStateAction<boolean>>;
 }
 
 enum EntryType {
@@ -50,6 +52,7 @@ const AddEntryForm = ({
   error,
   setError,
   diagnosisCodesArray,
+  setShowForm,
 }: Props) => {
   // states for data
   const [type, setType] = useState<
@@ -63,11 +66,9 @@ const AddEntryForm = ({
     HealthCheckRating.Healthy
   );
   const [employerName, setEmployerName] = useState<string>("");
-  const [sickLeaveStartDate, setSickLeaveStartDate] =
-    useState<string>(defaultDateString);
-  const [sickLeaveEndDate, setSickLeaveEndDate] =
-    useState<string>(defaultDateString);
-  const [dischargeDate, setDischargeDate] = useState<string>(defaultDateString);
+  const [sickLeaveStartDate, setSickLeaveStartDate] = useState<string>("");
+  const [sickLeaveEndDate, setSickLeaveEndDate] = useState<string>("");
+  const [dischargeDate, setDischargeDate] = useState<string>("");
   const [dischargeCriteria, setDischargeCriteria] = useState<string>("");
   // states for UI
   const [showHealthCheck, setShowHealthCheck] = useState<boolean>(false);
@@ -107,6 +108,7 @@ const AddEntryForm = ({
             criteria: dischargeCriteria,
           };
         }
+        resetForm();
         onSubmit(entryToAdd);
         break;
       case "HealthCheck":
@@ -118,6 +120,7 @@ const AddEntryForm = ({
           diagnosisCodes,
           healthCheckRating,
         };
+        resetForm();
         onSubmit(entryToAdd);
         break;
       case "OccupationalHealthcare":
@@ -135,14 +138,14 @@ const AddEntryForm = ({
             endDate: sickLeaveEndDate,
           };
         }
+        resetForm();
         onSubmit(entryToAdd);
         break;
       default:
         assertNever(type);
         break;
     }
-
-    resetForm();
+    // resetForm();
   };
 
   // for styling
@@ -253,8 +256,8 @@ const AddEntryForm = ({
             onChange={(evt) =>
               setDiagnosisCodes(
                 typeof evt?.target?.value === "string"
-                  ? evt.target.value.split(",")
-                  : evt.target.value
+                  ? evt?.target?.value.split(",")
+                  : evt?.target?.value
               )
             }
             renderValue={(selected) => selected.join(",")}
@@ -273,25 +276,6 @@ const AddEntryForm = ({
         </div>
         {showHealthCheck && (
           <div>
-            {/* <label>
-              Healthcheck rating:{" "}
-              <select
-                value={healthCheckRating}
-                onChange={(evt) =>
-                  setHealthCheckRating(
-                    Number(evt.target.value) as HealthCheckRating
-                  )
-                }
-              >
-                {Object.values(HealthCheckRating)
-                  .filter((value) => typeof value === "number")
-                  .map((value) => (
-                    <option key={value} value={value}>
-                      {HealthCheckRating[value]}
-                    </option>
-                  ))}
-              </select>
-            </label> */}
             <div>
               <InputLabel id="healthcheck-rating">
                 Healthcheck rating
@@ -331,23 +315,27 @@ const AddEntryForm = ({
               />
             </div>
             <div>
-              <label htmlFor="sick-leave-start">Sick leave start: </label>
-              <input
+              <label htmlFor="sick-leave-start">Sick leave start </label>
+              <Input
                 type="date"
                 id="sick-leave-start"
                 onChange={(evt) => setSickLeaveStartDate(evt.target.value)}
-                min={date}
-                max={`${new Date().toISOString().slice(0, 10)}`}
+                inputProps={{
+                  min: date,
+                  max: `${new Date().toISOString().slice(0, 10)}`,
+                }}
               />
             </div>
             <div>
-              <label htmlFor="sick-leave-end">Sick leave end: </label>
-              <input
+              <label htmlFor="sick-leave-end">Sick leave end </label>
+              <Input
                 type="date"
                 id="sick-leave-end"
                 onChange={(evt) => setSickLeaveEndDate(evt.target.value)}
-                min={sickLeaveStartDate}
-                max={`${new Date().toISOString().slice(0, 10)}`}
+                inputProps={{
+                  min: sickLeaveStartDate,
+                  max: `${new Date().toISOString().slice(0, 10)}`,
+                }}
               />
             </div>
           </div>
@@ -355,13 +343,15 @@ const AddEntryForm = ({
         {showHospital && (
           <div>
             <div>
-              <label htmlFor="discharge-date">Discharge date: </label>
-              <input
+              <label htmlFor="discharge-date">Discharge date </label>
+              <Input
                 type="date"
                 id="discharge-date"
                 onChange={(evt) => setDischargeDate(evt.target.value)}
-                min={date}
-                max={`${new Date().toISOString().slice(0, 10)}`}
+                inputProps={{
+                  min: date,
+                  max: `${new Date().toISOString().slice(0, 10)}`,
+                }}
               />
             </div>
             <div>
@@ -375,10 +365,22 @@ const AddEntryForm = ({
             </div>
           </div>
         )}
-        <button type="reset" onClick={() => resetForm()}>
-          RESET
-        </button>{" "}
-        <button type="submit">ADD</button>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <Button
+            variant="contained"
+            color="error"
+            type="reset"
+            onClick={() => {
+              resetForm();
+              setShowForm(false);
+            }}
+          >
+            CANCEL
+          </Button>{" "}
+          <Button variant="contained" type="submit">
+            ADD
+          </Button>
+        </div>
       </form>
     </div>
   );
