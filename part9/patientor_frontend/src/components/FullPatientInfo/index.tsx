@@ -41,6 +41,17 @@ const FullPatientInfo = ({ patientId, showNotification, diagnoses }: Props) => {
 
   const formErrorTimeoutId = useRef<number | null>(null);
 
+  const showFormError = (msg: string, duration = 3000) => {
+    setFormError(msg);
+    if (formErrorTimeoutId.current) {
+      clearTimeout(formErrorTimeoutId.current);
+    }
+    formErrorTimeoutId.current = window.setTimeout(
+      () => setFormError(""),
+      duration
+    );
+  };
+
   const submitNewEntry = async (formValues: EntryWithoutId) => {
     try {
       const entry = await patientService.createEntry(patientId, formValues);
@@ -54,10 +65,10 @@ const FullPatientInfo = ({ patientId, showNotification, diagnoses }: Props) => {
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         console.error(error?.response?.data?.message);
-        setFormError(error?.response?.data?.message);
+        showFormError(error?.response?.data?.message);
       } else {
         console.error(error);
-        setFormError("Unknown error");
+        showFormError("Unknown error");
       }
     }
   };
@@ -77,17 +88,6 @@ const FullPatientInfo = ({ patientId, showNotification, diagnoses }: Props) => {
 
     fetchIndividualPatient(patientId);
   }, []);
-
-  const showFormError = (msg: string, duration = 3000) => {
-    setFormError(msg);
-    if (formErrorTimeoutId.current) {
-      clearTimeout(formErrorTimeoutId.current);
-    }
-    formErrorTimeoutId.current = window.setTimeout(
-      () => setFormError(""),
-      duration
-    );
-  };
 
   if (!patient) {
     return (

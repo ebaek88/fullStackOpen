@@ -4,7 +4,6 @@ import { HealthCheckRating } from "../../types/enums.js";
 import {
   Alert,
   TextField,
-  Input,
   InputLabel,
   Select,
   MenuItem,
@@ -13,6 +12,9 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  Checkbox,
+  ListItemText,
+  Input,
 } from "@mui/material";
 
 interface Props {
@@ -55,15 +57,17 @@ const AddEntryForm = ({
   >(EntryType.Hospital);
   const [description, setDescription] = useState<string>("");
   const [specialist, setSpecialist] = useState<string>("");
-  const [date, setDate] = useState<string>("");
+  const [date, setDate] = useState<string>(defaultDateString);
   const [diagnosisCodes, setDiagnosisCodes] = useState<string[]>([]);
   const [healthCheckRating, setHealthCheckRating] = useState<HealthCheckRating>(
     HealthCheckRating.Healthy
   );
   const [employerName, setEmployerName] = useState<string>("");
-  const [sickLeaveStartDate, setSickLeaveStartDate] = useState<string>("");
-  const [sickLeaveEndDate, setSickLeaveEndDate] = useState<string>("");
-  const [dischargeDate, setDischargeDate] = useState<string>("");
+  const [sickLeaveStartDate, setSickLeaveStartDate] =
+    useState<string>(defaultDateString);
+  const [sickLeaveEndDate, setSickLeaveEndDate] =
+    useState<string>(defaultDateString);
+  const [dischargeDate, setDischargeDate] = useState<string>(defaultDateString);
   const [dischargeCriteria, setDischargeCriteria] = useState<string>("");
   // states for UI
   const [showHealthCheck, setShowHealthCheck] = useState<boolean>(false);
@@ -74,14 +78,14 @@ const AddEntryForm = ({
   // helper function
   const resetForm = () => {
     setDescription("");
-    setDate("");
+    setDate(defaultDateString);
     setDiagnosisCodes([]);
     setSpecialist("");
     setEmployerName("");
-    setDischargeDate("");
+    setDischargeDate(defaultDateString);
     setDischargeCriteria("");
-    setSickLeaveStartDate("");
-    setSickLeaveEndDate("");
+    setSickLeaveStartDate(defaultDateString);
+    setSickLeaveEndDate(defaultDateString);
   };
 
   // event handler
@@ -211,11 +215,11 @@ const AddEntryForm = ({
         </FormControl>
         <div>
           <label htmlFor="date">Date </label>
-          <input
+          <Input
             type="date"
             id="date"
             onChange={(evt) => setDate(evt.target.value)}
-            max={`${new Date().toISOString().slice(0, 10)}`}
+            inputProps={{ max: `${new Date().toISOString().slice(0, 10)}` }}
           />
         </div>
         <div>
@@ -244,10 +248,16 @@ const AddEntryForm = ({
             labelId="diagnosis-codes"
             value={diagnosisCodes}
             label="Diagnosis codes"
+            multiple
             fullWidth
             onChange={(evt) =>
-              setDiagnosisCodes(diagnosisCodes.concat(evt.target.value))
+              setDiagnosisCodes(
+                typeof evt?.target?.value === "string"
+                  ? evt.target.value.split(",")
+                  : evt.target.value
+              )
             }
+            renderValue={(selected) => selected.join(",")}
             sx={{ marginY: "4px" }}
           >
             <MenuItem value="">
@@ -255,7 +265,8 @@ const AddEntryForm = ({
             </MenuItem>
             {diagnosisCodesArray.map((code) => (
               <MenuItem key={code} value={code}>
-                {code}
+                <Checkbox checked={diagnosisCodes.includes(code)} />
+                <ListItemText primary={code} />
               </MenuItem>
             ))}
           </Select>
