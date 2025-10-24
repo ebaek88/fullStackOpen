@@ -4,10 +4,12 @@ import type {
   PatientFormValues,
   PatientWithoutSsn,
 } from "../types/patient.js";
+import type { Entry, EntryWithoutId } from "../types/entry.js";
 import {
   PatientSchema,
   PatientWithoutSsnSchema,
 } from "../schemas/patientSchema.js";
+import { EntrySchema } from "../schemas/entrySchema.js";
 import { apiBaseUrl } from "../constants";
 
 const getAll = async () => {
@@ -27,16 +29,23 @@ const getIndividualFull = async (id: string) => {
   return PatientSchema.parse(data);
 };
 
-// for PatientFormValues, it is not validated with Zod schema yet
 const create = async (object: PatientFormValues) => {
   const { data } = await axios.post<Patient>(`${apiBaseUrl}/patients`, object);
+  return PatientSchema.parse(data);
+};
 
-  return data;
+const createEntry = async (id: string, object: EntryWithoutId) => {
+  const { data } = await axios.post<Entry>(
+    `${apiBaseUrl}/patients/${id}/entries`,
+    object
+  );
+  return EntrySchema.parse(data);
 };
 
 export default {
   getAll,
   getAllWithoutSsn,
   create,
+  createEntry,
   getIndividualFull,
 };

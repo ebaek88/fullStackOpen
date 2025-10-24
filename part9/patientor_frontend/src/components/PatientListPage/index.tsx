@@ -42,10 +42,7 @@ const PatientListPage = ({ patients, setPatients }: Props) => {
       setModalOpen(false);
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
-        if (
-          e?.response?.data?.message &&
-          typeof e.response.data.message === "string"
-        ) {
+        if (typeof e?.response?.data?.message === "string") {
           const message = e?.response?.data?.message;
           console.error(message);
           setError(message);

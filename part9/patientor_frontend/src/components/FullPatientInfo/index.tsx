@@ -10,13 +10,15 @@ import {
   TableCell,
 } from "@mui/material";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import patientService from "../../services/patients.js";
 
 import type { Patient } from "../../types/patient.js";
 import type { DiagnosisWithoutLatin } from "../../types/diagnosis.js";
+import type { EntryWithoutId } from "../../types/entry.ts";
 
 import EntryDetails from "../EntryDetails/index.tsx";
+import AddEntryForm from "./AddEntryForm.tsx";
 
 interface Props {
   patientId: string | null | undefined;
@@ -35,6 +37,30 @@ const FullPatientInfo = ({ patientId, showNotification, diagnoses }: Props) => {
 
   const [patient, setPatient] = useState<Patient | null>(null);
   const [showEntries, setShowEntries] = useState<boolean>(false);
+  const [formError, setFormError] = useState<string>("");
+
+  const formErrorTimeoutId = useRef<number | null>(null);
+
+  const submitNewEntry = async (formValues: EntryWithoutId) => {
+    try {
+      const entry = await patientService.createEntry(patientId, formValues);
+      if (entry !== undefined) {
+        if (!patient) return;
+        setPatient({
+          ...patient,
+          entries: (patient.entries ?? []).concat(entry),
+        });
+      }
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.error(error?.response?.data?.message);
+        setFormError(error?.response?.data?.message);
+      } else {
+        console.error(error);
+        setFormError("Unknown error");
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchIndividualPatient = async (id: string) => {
@@ -52,6 +78,17 @@ const FullPatientInfo = ({ patientId, showNotification, diagnoses }: Props) => {
     fetchIndividualPatient(patientId);
   }, []);
 
+  const showFormError = (msg: string, duration = 3000) => {
+    setFormError(msg);
+    if (formErrorTimeoutId.current) {
+      clearTimeout(formErrorTimeoutId.current);
+    }
+    formErrorTimeoutId.current = window.setTimeout(
+      () => setFormError(""),
+      duration
+    );
+  };
+
   if (!patient) {
     return (
       <>
@@ -63,9 +100,11 @@ const FullPatientInfo = ({ patientId, showNotification, diagnoses }: Props) => {
   }
 
   const diagnosesDescriptions: { [code: string]: string } = {};
-  diagnoses.forEach((obj) => {
+  const diagnosisCodesArray: string[] = [];
+  for (let obj of diagnoses) {
     diagnosesDescriptions[obj.code] = obj.name;
-  });
+    diagnosisCodesArray.push(obj.code);
+  }
 
   return (
     <div>
@@ -103,6 +142,12 @@ const FullPatientInfo = ({ patientId, showNotification, diagnoses }: Props) => {
           </TableBody>
         </Table>
       </TableContainer>
+      <AddEntryForm
+        onSubmit={submitNewEntry}
+        error={formError}
+        setError={showFormError}
+        diagnosisCodesArray={diagnosisCodesArray}
+      />
       {patient.entries && patient.entries.length > 0 && (
         <div style={{ margin: "10px" }}>
           <strong>entries</strong>{" "}
