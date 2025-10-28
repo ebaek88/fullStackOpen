@@ -1,0 +1,32 @@
+Script started on 2025-10-27 18:04:28-06:00 [TERM="xterm-256color" TTY="/dev/pts/4" COLUMNS="66" LINES="12"]
+[?2004h]0;euihyunbaek88@DESKTOP-BJFRF3V: ~/repos/fullStackOpen/part12-containers-applications/script-answers[01;32meuihyunbaek88@DESKTOP-BJFRF3V[00m:[01;34m~/repos/fullStackOpen/part12-containers-applications/script-answers[00m$ sudo docker container run hello-w orld
+[?2004l[sudo] password for euihyunbaek88: 
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+
+[?2004h]0;euihyunbaek88@DESKTOP-BJFRF3V: ~/repos/fullStackOpen/part12-containers-applications/script-answers[01;32meuihyunbaek88@DESKTOP-BJFRF3V[00m:[01;34m~/repos/fullStackOpen/part12-containers-applications/script-answers[00m$ sudo mkdir /usr/src/app
+[?2004lmkdir: cannot create directory ‘/usr/src/app’: File exists
+[?2004h]0;euihyunbaek88@DESKTOP-BJFRF3V: ~/repos/fullStackOpen/part12-containers-applications/script-answers[01;32meuihyunbaek88@DESKTOP-BJFRF3V[00m:[01;34m~/repos/fullStackOpen/part12-containers-applications/script-answers[00m$ sudo touch /usr/src/app/index.js
+[?2004l[?2004h]0;euihyunbaek88@DESKTOP-BJFRF3V: ~/repos/fullStackOpen/part12-containers-applications/script-answers[01;32meuihyunbaek88@DESKTOP-BJFRF3V[00m:[01;34m~/repos/fullStackOpen/part12-containers-applications/script-answers[00m$ exit
+[?2004lexit
+
+Script done on 2025-10-27 18:06:16-06:00 [COMMAND_EXIT_CODE="0"]
