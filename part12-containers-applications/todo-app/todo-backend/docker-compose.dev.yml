@@ -1,0 +1,13 @@
+services:
+  mongo:
+    image: mongo
+    ports:
+      - 3456:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: the_database
+    volumes:
+      # for WSL, absolute path must be used instead of relative path
+      - /home/euihyunbaek88/repos/fullStackOpen/part12-containers-applications/todo-app/todo-backend/mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+      - /home/euihyunbaek88/repos/fullStackOpen/part12-containers-applications/todo-app/todo-backend/mongo_data:/data/db
