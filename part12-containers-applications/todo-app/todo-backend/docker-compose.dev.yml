@@ -11,3 +11,7 @@ services:
       # for WSL, absolute path must be used instead of relative path
       - /home/euihyunbaek88/repos/fullStackOpen/part12-containers-applications/todo-app/todo-backend/mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
       - /home/euihyunbaek88/repos/fullStackOpen/part12-containers-applications/todo-app/todo-backend/mongo_data:/data/db
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
