@@ -1,11 +1,0 @@
-Script started on 2025-10-27 19:53:18-06:00 [TERM="xterm-256color" TTY="/dev/pts/6" COLUMNS="66" LINES="12"]
-[?2004h]0;euihyunbaek88@DESKTOP-BJFRF3V: ~/repos/fullStackOpen/part12-containers-applications/script-answers[01;32meuihyunbaek88@DESKTOP-BJFRF3V[00m:[01;34m~/repos/fullStackOpen/part12-containers-applications/script-answers[00m$ sudo docker container run -it u[Kubu ntu bash
-[?2004l[sudo] password for euihyunbaek88: 
-[?2004h]0;root@f5c3c34efaba: /root@f5c3c34efaba:/# qor   mkdir /usr/src/app
-[?2004l[?2004h]0;root@f5c3c34efaba: /root@f5c3c34efaba:/# touch /usr/r src/app/index.js
-[?2004l[?2004h]0;root@f5c3c34efaba: /root@f5c3c34efaba:/# [Kexit
-[?2004lexit
-[?2004h]0;euihyunbaek88@DESKTOP-BJFRF3V: ~/repos/fullStackOpen/part12-containers-applications/script-answers[01;32meuihyunbaek88@DESKTOP-BJFRF3V[00m:[01;34m~/repos/fullStackOpen/part12-containers-applications/script-answers[00m$ exit
-[?2004lexit
-
-Script done on 2025-10-27 19:54:41-06:00 [COMMAND_EXIT_CODE="0"]
