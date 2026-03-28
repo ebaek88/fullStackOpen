@@ -1,0 +1,9 @@
+.dockerignore
+.gitignore
+node_modules
+Dockerfile
+dev.Dockerfile
+mongo_data
+redis_data
+.git
+npm-debug.log
