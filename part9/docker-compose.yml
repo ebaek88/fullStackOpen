@@ -1,0 +1,28 @@
+services:
+  app:
+    image: patientor-front
+    build:
+      context: ./patientor_frontend/ # The context will pick this directory as the "build context"
+      dockerfile: Dockerfile # In Compose, dockerfile paths are resolved from build.context, not from this compose file
+      args:
+        # Vite reads this when the frontend image is built, so this must be a build arg in production.
+        VITE_BACKEND_URL: http://localhost:8080/api
+    container_name: patientor-front
+
+  api:
+    image: patientor-backend
+    build:
+      context: ./patientor_backend/
+      dockerfile: Dockerfile
+    container_name: patientor-api
+
+  nginx:
+    image: nginx:1.29
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - 8080:80
+    container_name: patientor-reverse-proxy
+    depends_on:
+      - app
+      - api

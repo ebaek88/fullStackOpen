@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 
 COPY . .
 
-ENV VITE_BACKEND_URL=http://localhost:3000
+ENV VITE_BACKEND_URL=http://localhost:3003
 
 RUN npm install
 

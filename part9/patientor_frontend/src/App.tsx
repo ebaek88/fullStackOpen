@@ -45,6 +45,9 @@ const App = () => {
         if (axios.isAxiosError(error)) {
           console.log(error.message);
           showNotification(error.message);
+        } else if (error instanceof Error) {
+          console.log(error.message);
+          showNotification(error.message);
         }
       }
     };
@@ -55,6 +58,9 @@ const App = () => {
         setDiagnoses(diagnoses);
       } catch (error) {
         if (axios.isAxiosError(error)) {
+          console.log(error.message);
+          showNotification(error.message);
+        } else if (error instanceof Error) {
           console.log(error.message);
           showNotification(error.message);
         }
