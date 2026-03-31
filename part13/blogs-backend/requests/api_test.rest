@@ -37,9 +37,25 @@ Content-Type: application/json
 DELETE http://localhost:3001/api/blogs/4
 
 ###
-PUT http://localhost:3001/api/blogs/5
+PUT http://localhost:3001/api/blogs/6
 Content-Type: application/json
 
 {
-  "likes": 888
+  "likes": 123
+}
+
+### throws error
+PUT http://localhost:3001/api/blogs/6
+Content-Type: application/json
+
+{
+  "likes": "hello"
+}
+
+### throws error
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+
+{
+  "author": "author4"
 }

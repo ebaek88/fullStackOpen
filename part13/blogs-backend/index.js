@@ -1,5 +1,6 @@
 // index.js for configuring and launching the app.
 const express = require("express");
+const logger = require("./util/logger.js");
 const app = express();
 
 const { PORT } = require("./util/config.js");
@@ -14,7 +15,7 @@ app.use("/api/blogs", blogsRouter);
 const start = async () => {
   await connectToDatabase();
   app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    logger.info(`Server running on port ${PORT}`);
   });
 };
 
