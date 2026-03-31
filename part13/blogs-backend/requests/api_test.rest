@@ -24,4 +24,14 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:3001/api/blogs/3
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+
+{
+  "author": "author2",
+  "url": "https://daum.net",
+  "title": "blog2"
+}
+
+###
+DELETE http://localhost:3001/api/blogs/4

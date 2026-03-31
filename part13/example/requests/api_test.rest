@@ -14,7 +14,25 @@ POST http://localhost:3001/api/notes
 Content-Type: application/json
 
 {
+  "content": "oops",
+  "important": "true"
+}
+
+###
+POST http://localhost:3001/api/notes
+Content-Type: application/json
+
+{
   "content": "MongoDB is webscale",
+  "important": "false"
+}
+
+###
+POST http://localhost:3001/api/notes
+Content-Type: application/json
+
+{
+  "content": "I am hungry",
   "important": "false"
 }
 
@@ -25,9 +43,12 @@ GET http://localhost:3001/api/notes/1
 GET http://localhost:3001/api/notes/777
 
 ###
-PUT http://localhost:3001/api/notes/2
+PUT http://localhost:3001/api/notes/3
 Content-Type: application/json
 
 {
   "important": "true"
 }
+
+###
+DELETE http://localhost:3001/api/notes/5
