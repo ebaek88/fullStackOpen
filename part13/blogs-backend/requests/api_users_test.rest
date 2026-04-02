@@ -1,0 +1,37 @@
+###
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+  "username": "mluukkai",
+  "name": "Matti Luukkai",
+  "password": "secret"
+}
+
+###
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+  "username": "sonny",
+  "name": "Son Heung-min",
+  "password": "sonny"
+}
+
+###
+GET http://localhost:3001/api/users
+
+###
+GET http://localhost:3001/api/users/mluukkai
+
+###
+GET http://localhost:3001/api/users/sonny
+
+###
+PUT http://localhost:3001/api/users/mluukkai
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNvbm55IiwiaWQiOjUsImlhdCI6MTc3NTE3MDcyMywiZXhwIjoxNzc1MTcwOTAzfQ.RApHbHIGCUGaNCxQ0zpvT6uAYMEdbnfbWch-SDLaoTQ
+
+{
+  "name": "John Doe"
+}
