@@ -7,12 +7,14 @@ const {
   userExtractor,
 } = require("../util/middleware.js");
 
-const { BlogUser } = require("../models/index.js");
+const { Blog, BlogUser } = require("../models/index.js");
 
 router.get("/", async (req, res) => {
   const users = await BlogUser.findAll({
-    attributes: {
-      exclude: ["passwordHash"],
+    attributes: { exclude: ["passwordHash"] },
+    include: {
+      model: Blog,
+      attributes: { exclude: ["blogUserId"] },
     },
   });
 
@@ -49,32 +51,37 @@ router.get("/:username", async (req, res) => {
   user ? res.json(user) : res.status(404).end();
 });
 
-router.put("/:username", tokenExtractor, userExtractor, async (req, res, next) => {
-  const user = await BlogUser.findOne({
-    where: { username: req.params.username },
-    attributes: {
-      exclude: ["passwordHash"],
-    },
-  });
+router.put(
+  "/:username",
+  tokenExtractor,
+  userExtractor,
+  async (req, res, next) => {
+    const user = await BlogUser.findOne({
+      where: { username: req.params.username },
+      attributes: {
+        exclude: ["passwordHash"],
+      },
+    });
 
-  if (!user) {
-    return res.status(404).end();
-  }
+    if (!user) {
+      return res.status(404).end();
+    }
 
-  if (user.id !== req.user.id) {
-    return res
-      .status(401)
-      .json({ error: "the name can be changed only by its user" });
-  }
+    if (user.id !== req.user.id) {
+      return res
+        .status(401)
+        .json({ error: "the name can be changed only by its user" });
+    }
 
-  try {
-    user.name = req.body.name;
-    await user.save();
-    res.json(user);
-  } catch (error) {
-    next(error);
-  }
-});
+    try {
+      user.name = req.body.name;
+      await user.save();
+      res.json(user);
+    } catch (error) {
+      next(error);
+    }
+  },
+);
 
 router.use(errorHandler);
 

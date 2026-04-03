@@ -7,7 +7,7 @@ const {
   errorHandler,
 } = require("../util/middleware.js");
 
-const { Blog } = require("../models/index.js");
+const { Blog, BlogUser } = require("../models/index.js");
 
 const blogFinder = async (req, res, next) => {
   req.blog = await Blog.findByPk(req.params.id);
@@ -18,7 +18,13 @@ const blogFinder = async (req, res, next) => {
 };
 
 router.get("/", async (req, res) => {
-  const blogs = await Blog.findAll();
+  const blogs = await Blog.findAll({
+    attributes: { exclude: ["blogUserId"] },
+    include: {
+      model: BlogUser,
+      attributes: ["name"],
+    },
+  });
 
   // console.log(JSON.stringify(blogs, null, 2));
   res.json(blogs);
