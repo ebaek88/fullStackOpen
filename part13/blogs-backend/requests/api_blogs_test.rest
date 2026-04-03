@@ -34,7 +34,8 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:3001/api/blogs/4
+DELETE http://localhost:3001/api/blogs/10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sdXVra2FpIiwiaWQiOjYsImlhdCI6MTc3NTI0NTI5OCwiZXhwIjoxNzc1MjQ1NDc4fQ.P6JqoRQiUB8UzibmzBzZOEYDVixdrxdAnDf6507vTOU
 
 ###
 PUT http://localhost:3001/api/blogs/6
@@ -62,11 +63,22 @@ Content-Type: application/json
 
 ###
 POST http://localhost:3001/api/blogs
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNvbm55IiwiaWQiOjcsImlhdCI6MTc3NTI0NDAyMiwiZXhwIjoxNzc1MjQ0MjAyfQ.Jv0yOkWlBCKgSePDztbWLaQ20U2DyK_ZPTLFsr_yLyI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sdXVra2FpIiwiaWQiOjYsImlhdCI6MTc3NTI0NTA1MCwiZXhwIjoxNzc1MjQ1MjMwfQ.4EeE9EZCf_b5oLKZ_WPDhizyi8IsVdau0ql-VuPIdPQ
 Content-Type: application/json
 
 {
-  "author": "Lee Kang-in",
-  "url": "https://espn.com",
-  "title": "Son Heung-min scores"
+  "author": "Mikel Arteta",
+  "url": "https://mooc.fi",
+  "title": "Welcome new students"
+}
+
+###
+POST http://localhost:3001/api/blogs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNvbm55IiwiaWQiOjcsImlhdCI6MTc3NTI0NTI0MiwiZXhwIjoxNzc1MjQ1NDIyfQ.C9JUfLEJfuLMYpvNsLOtL-CdHSzxPs8bE9-w1QlUG6A
+Content-Type: application/json
+
+{
+  "author": "Fabrizio Romano",
+  "url": "https://x.com/fabrizioromano",
+  "title": "Here we go!"
 }

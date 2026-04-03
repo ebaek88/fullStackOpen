@@ -43,10 +43,25 @@ router.post("/", tokenExtractor, userExtractor, async (req, res, next) => {
   }
 });
 
-router.delete("/:id", blogFinder, async (req, res) => {
-  await req.blog.destroy();
-  res.status(204).end();
-});
+router.delete(
+  "/:id",
+  blogFinder,
+  tokenExtractor,
+  userExtractor,
+  async (req, res, next) => {
+    try {
+      if (req.user.id !== req.blog.blogUserId) {
+        return res.status(401).json({
+          error: "a note can be deleted only by the user who created it",
+        });
+      }
+      await req.blog.destroy();
+      res.status(204).end();
+    } catch (error) {
+      next(error);
+    }
+  },
+);
 
 router.put("/:id", blogFinder, async (req, res, next) => {
   try {
