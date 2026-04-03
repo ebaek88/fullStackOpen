@@ -1,7 +1,11 @@
 // controllers/blogs.js for routing REST requests for Blog model
 const router = require("express").Router();
 const logger = require("../util/logger.js");
-const middleware = require("../util/middleware.js");
+const {
+  tokenExtractor,
+  userExtractor,
+  errorHandler,
+} = require("../util/middleware.js");
 
 const { Blog } = require("../models/index.js");
 
@@ -24,10 +28,14 @@ router.get("/:id", blogFinder, async (req, res) => {
   res.json(req.blog);
 });
 
-router.post("/", async (req, res, next) => {
+router.post("/", tokenExtractor, userExtractor, async (req, res, next) => {
   try {
     logger.info(req.body);
-    const blog = await Blog.create({ ...req.body });
+    const blog = await Blog.create({
+      ...req.body,
+      blogUserId: req.user.id,
+      date: new Date(),
+    });
     return res.json(blog);
   } catch (error) {
     return next(error);
@@ -51,6 +59,6 @@ router.put("/:id", blogFinder, async (req, res, next) => {
   }
 });
 
-router.use(middleware.errorHandler);
+router.use(errorHandler);
 
 module.exports = router;

@@ -59,3 +59,14 @@ Content-Type: application/json
 {
   "author": "author4"
 }
+
+###
+POST http://localhost:3001/api/blogs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNvbm55IiwiaWQiOjcsImlhdCI6MTc3NTI0NDAyMiwiZXhwIjoxNzc1MjQ0MjAyfQ.Jv0yOkWlBCKgSePDztbWLaQ20U2DyK_ZPTLFsr_yLyI
+Content-Type: application/json
+
+{
+  "author": "Lee Kang-in",
+  "url": "https://espn.com",
+  "title": "Son Heung-min scores"
+}
