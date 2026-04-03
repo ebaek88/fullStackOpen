@@ -20,15 +20,20 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res, next) => {
-  const { username, name, password } = req.body;
+  const { username, name, email, password } = req.body;
 
   const saltRounds = 10;
 
   try {
     const passwordHash = await bcrypt.hash(password, saltRounds);
-    const userInfo = { username, name, passwordHash };
+    const userInfo = { username, name, email, passwordHash };
     const user = await BlogUser.create(userInfo);
-    res.json(user);
+    res.json({
+      id: user.id,
+      username: user.username,
+      name: user.name,
+      email: user.email,
+    });
   } catch (error) {
     next(error);
   }
@@ -44,13 +49,17 @@ router.get("/:username", async (req, res) => {
   user ? res.json(user) : res.status(404).end();
 });
 
-router.put("/:username", tokenExtractor, userExtractor, async (req, res) => {
+router.put("/:username", tokenExtractor, userExtractor, async (req, res, next) => {
   const user = await BlogUser.findOne({
     where: { username: req.params.username },
     attributes: {
       exclude: ["passwordHash"],
     },
   });
+
+  if (!user) {
+    return res.status(404).end();
+  }
 
   if (user.id !== req.user.id) {
     return res

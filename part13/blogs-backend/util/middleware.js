@@ -4,11 +4,12 @@ const logger = require("./logger.js");
 const { SECRET } = require("./config.js");
 
 const errorHandler = (error, req, res, next) => {
-  logger.error(error.message);
+  logger.error(error);
+  // logger.error(error.message);
 
   if (error.name === "SequelizeValidationError") {
     const errorMessage = error.errors.map((error) => error.message);
-    return res.status(400).json({ ...errorMessage });
+    return res.status(400).json({ errorMessage });
   }
 
   if (error.name === "SequelizeDatabaseError") {
@@ -22,7 +23,10 @@ const tokenExtractor = (req, res, next) => {
   const authorization = req.get("authorization");
   if (authorization && authorization.toLowerCase().startsWith("bearer ")) {
     try {
-      const token = authorization.substring(7).trim().replace(/^['"]|['"]$/g, "");
+      const token = authorization
+        .substring(7)
+        .trim()
+        .replace(/^['"]|['"]$/g, "");
       req.decodedToken = jwt.verify(token, SECRET);
     } catch (error) {
       return res.status(401).json({ error: "token invalid" });
