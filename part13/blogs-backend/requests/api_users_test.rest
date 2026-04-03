@@ -21,6 +21,17 @@ Content-Type: application/json
 }
 
 ###
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+  "username": "dino1",
+  "name": "T-Rex",
+  "email": "spurs7@spurs.com",
+  "password": "dino"
+}
+
+###
 GET http://localhost:3001/api/users
 
 ###

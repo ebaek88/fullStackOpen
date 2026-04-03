@@ -6,16 +6,22 @@ const { SECRET } = require("./config.js");
 const errorHandler = (error, req, res, next) => {
   logger.error(error);
   // logger.error(error.message);
+  let errorMessage = [];
 
-  if (error.name === "SequelizeValidationError") {
-    const errorMessage = error.errors.map((error) => error.message);
-    return res.status(400).json({ errorMessage });
+  if (
+    error.name === "SequelizeValidationError" ||
+    error.name === "SequelizeUniqueConstraintError"
+  ) {
+    errorMessage = errorMessage.concat(
+      error.errors.map((error) => error.message),
+    );
   }
 
   if (error.name === "SequelizeDatabaseError") {
-    return res.status(400).json({ error: error.name });
+    errorMessage = errorMessage.concat(error.name);
   }
 
+  res.status(400).json({ errorMessage });
   next(error);
 };
 
