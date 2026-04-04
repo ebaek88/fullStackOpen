@@ -74,6 +74,30 @@ Content-Type: application/json
 
 ###
 POST http://localhost:3001/api/blogs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNvbm55IiwiaWQiOjcsImlhdCI6MTc3NTMzMzY2OSwiZXhwIjoxNzc1MzMzODQ5fQ.NzPz0BQTSgxPAUQKPDYLpnvXRw0N8KBeSEWJt1l2UzM
+Content-Type: application/json
+
+{
+  "author": "Mikel Arteta",
+  "url": "https://microsoft.com",
+  "title": "Typescript generics",
+  "likes": 333
+}
+
+###
+POST http://localhost:3001/api/blogs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNvbm55IiwiaWQiOjcsImlhdCI6MTc3NTMzMzY2OSwiZXhwIjoxNzc1MzMzODQ5fQ.NzPz0BQTSgxPAUQKPDYLpnvXRw0N8KBeSEWJt1l2UzM
+Content-Type: application/json
+
+{
+  "author": "Mikel Arteta",
+  "url": "https://mooc.fi",
+  "title": "How to succeed in completing courses",
+  "likes": 200
+}
+
+###
+POST http://localhost:3001/api/blogs
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNvbm55IiwiaWQiOjcsImlhdCI6MTc3NTI0NTI0MiwiZXhwIjoxNzc1MjQ1NDIyfQ.C9JUfLEJfuLMYpvNsLOtL-CdHSzxPs8bE9-w1QlUG6A
 Content-Type: application/json
 
@@ -81,4 +105,16 @@ Content-Type: application/json
   "author": "Fabrizio Romano",
   "url": "https://x.com/fabrizioromano",
   "title": "Here we go!"
+}
+
+###
+POST http://localhost:3001/api/blogs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sdXVra2FpIiwiaWQiOjYsImlhdCI6MTc3NTMzMzE0MCwiZXhwIjoxNzc1MzMzMzIwfQ.-4cEnoboTsnYr4n6vg5UPBXpsfx2A9BWX7h4abKOxkA
+Content-Type: application/json
+
+{
+  "author": "Fabrizio Romano",
+  "url": "https://x.com/fabrizioromano",
+  "title": "Deal confirmed",
+  "likes": 111
 }
