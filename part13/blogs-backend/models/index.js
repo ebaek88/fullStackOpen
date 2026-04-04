@@ -1,4 +1,5 @@
 // models/index.js for grouping different models
+const { sequelize } = require("../util/db.js");
 const Blog = require("./blog.js");
 const BlogUser = require("./blog_user.js");
 
@@ -6,10 +7,12 @@ const BlogUser = require("./blog_user.js");
 BlogUser.hasMany(Blog);
 Blog.belongsTo(BlogUser);
 
-Blog.sync({ alter: true });
-BlogUser.sync({ alter: true });
+const syncModels = async () => {
+  await sequelize.sync({ alter: true });
+};
 
 module.exports = {
   Blog,
   BlogUser,
+  syncModels,
 };

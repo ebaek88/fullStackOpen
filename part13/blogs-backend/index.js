@@ -5,6 +5,7 @@ const app = express();
 
 const { PORT } = require("./util/config.js");
 const { connectToDatabase } = require("./util/db.js");
+const { syncModels } = require("./models/index.js");
 
 const blogsRouter = require("./controllers/blogs.js");
 const usersRouter = require("./controllers/users.js");
@@ -24,6 +25,7 @@ app.use("/api/reset", resetRouter);
 
 const start = async () => {
   await connectToDatabase();
+  await syncModels();
   app.listen(PORT, () => {
     logger.info(`Server running on port ${PORT}`);
   });
