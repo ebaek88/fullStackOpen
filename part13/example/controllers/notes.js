@@ -1,5 +1,6 @@
 // controllers/notes.js for routing REST requests for Note model
 const jwt = require("jsonwebtoken");
+const { Op } = require("sequelize");
 const { SECRET } = require("../util/config.js");
 
 const router = require("express").Router();
@@ -30,12 +31,23 @@ const tokenExtractor = (req, res, next) => {
 };
 
 router.get("/", async (req, res) => {
+  const where = {};
+
+  if (req.query.important) {
+    where.important = req.query.important === "true";
+  }
+
+  if (req.query.search) {
+    where.content = { [Op.substring]: req.query.search };
+  }
+
   const notes = await Note.findAll({
     attributes: { exclude: ["userId"] },
     include: {
       model: User,
       attributes: ["name"],
     },
+    where,
   });
 
   // console.log(JSON.stringify(notes, null, 2));

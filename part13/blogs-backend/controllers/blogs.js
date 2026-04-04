@@ -1,5 +1,6 @@
 // controllers/blogs.js for routing REST requests for Blog model
 const router = require("express").Router();
+const { Op } = require("sequelize");
 const logger = require("../util/logger.js");
 const {
   tokenExtractor,
@@ -18,12 +19,19 @@ const blogFinder = async (req, res, next) => {
 };
 
 router.get("/", async (req, res) => {
+  const where = {};
+
+  if (req.query.search) {
+    where.title = { [Op.substring]: req.query.search };
+  }
+
   const blogs = await Blog.findAll({
     attributes: { exclude: ["blogUserId"] },
     include: {
       model: BlogUser,
       attributes: ["name"],
     },
+    where,
   });
 
   // console.log(JSON.stringify(blogs, null, 2));
