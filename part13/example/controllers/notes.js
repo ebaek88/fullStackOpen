@@ -6,27 +6,13 @@ const { SECRET } = require("../util/config.js");
 const router = require("express").Router();
 
 const { Note, User } = require("../models/index.js");
+const { tokenExtractor } = require("../util/middleware.js");
 
 const noteFinder = async (req, res, next) => {
   req.note = await Note.findByPk(req.params.id);
   if (!req.note) {
     return res.status(404).end();
   }
-  next();
-};
-
-const tokenExtractor = (req, res, next) => {
-  const authorization = req.get("authorization");
-  if (authorization && authorization.toLowerCase().startsWith("bearer ")) {
-    try {
-      req.decodedToken = jwt.verify(authorization.substring(7), SECRET);
-    } catch (error) {
-      return res.status(401).json({ error: "token invalid" });
-    }
-  } else {
-    return res.status(401).json({ error: "token missing" });
-  }
-
   next();
 };
 
@@ -62,6 +48,10 @@ router.post("/", tokenExtractor, async (req, res) => {
   try {
     console.log(req.body);
     const user = await User.findByPk(req.decodedToken.id);
+    if (user.disabled) {
+      return res.status(401).json({ error: "the user is currently disabled" });
+    }
+
     const note = await Note.create({
       ...req.body,
       date: new Date(),

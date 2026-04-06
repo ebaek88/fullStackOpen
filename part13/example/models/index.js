@@ -6,8 +6,9 @@ const User = require("./user.js");
 User.hasMany(Note);
 Note.belongsTo(User);
 
-Note.sync({ alter: true });
-User.sync({ alter: true });
+// no longer needed to sync explicitly, since we are using migrations from now on
+// Note.sync({ alter: true });
+// User.sync({ alter: true });
 
 module.exports = {
   Note,

@@ -1,3 +1,4 @@
+###
 GET http://localhost:3001/api/notes
 
 ###
@@ -12,6 +13,7 @@ Content-Type: application/json
 ###
 POST http://localhost:3001/api/notes
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIxIiwiaWQiOjMsImlhdCI6MTc3NTM0ODM2NiwiZXhwIjoxNzc1MzQ4NTQ2fQ.D65leHGuJHy-QtuerbGqY789_MLcpZ8twV_XrdUnqSs
 
 {
   "content": "oops",
@@ -21,6 +23,7 @@ Content-Type: application/json
 ###
 POST http://localhost:3001/api/notes
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sdXVra2FpIiwiaWQiOjEsImlhdCI6MTc3NTM0ODI2OSwiZXhwIjoxNzc1MzQ4NDQ5fQ.Jn0Ky-yM1fiRmAoWVFaPS1r5BTcnesoubXAxBKZ1hFs
 
 {
   "content": "MongoDB is webscale",
@@ -30,11 +33,11 @@ Content-Type: application/json
 ###
 POST http://localhost:3001/api/notes
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sdXVra2FpIiwiaWQiOjEsImlhdCI6MTc3NTAwODkwMiwiZXhwIjoxNzc1MDA5MDgyfQ.q9JTJvuAkXkx89ULdrQKU9rKCqadn9rR69Jw1QI3WM8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sdXVra2FpIiwiaWQiOjEsImlhdCI6MTc3NTM0ODI2OSwiZXhwIjoxNzc1MzQ4NDQ5fQ.Jn0Ky-yM1fiRmAoWVFaPS1r5BTcnesoubXAxBKZ1hFs
 
 {
   "content": "I am thirsty",
-  "important": "false"
+  "important": "true"
 }
 
 ###
@@ -64,6 +67,33 @@ Content-Type: application/json
 }
 
 ###
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+  "username": "user1",
+  "name": "Random User1"
+}
+
+###
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+  "username": "jakousa",
+  "name": "Jami Kousa (The Docker Captain)"
+}
+
+###
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+  "username": "ousa",
+  "name": "Outi Savolainen"
+}
+
+###
 GET http://localhost:3001/api/users
 
 ###
@@ -73,4 +103,31 @@ Content-Type: application/json
 {
   "username": "mluukkai",
   "password": "secret"
+}
+
+###
+POST http://localhost:3001/api/login
+Content-Type: application/json
+
+{
+  "username": "user1",
+  "password": "secret"
+}
+
+###
+POST http://localhost:3001/api/login
+Content-Type: application/json
+
+{
+  "username": "jakousa",
+  "password": "secret"
+}
+
+###
+PUT http://localhost:3001/api/users/jakousa
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sdXVra2FpIiwiaWQiOjEsImlhdCI6MTc3NTQ1MjIyMCwiZXhwIjoxNzc1NDUyNDAwfQ.XDir6p-cBLwXEamSFPDRwxYcczZRJ-dACGoFk6Va7DQ
+Content-Type: application/json
+
+{
+  "disabled": false
 }
