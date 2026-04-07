@@ -7,12 +7,7 @@ const BlogUser = require("./blog_user.js");
 BlogUser.hasMany(Blog);
 Blog.belongsTo(BlogUser);
 
-const syncModels = async () => {
-  await sequelize.sync({ alter: true });
-};
-
 module.exports = {
   Blog,
   BlogUser,
-  syncModels,
 };
