@@ -26,7 +26,10 @@ module.exports = {
           isEmail: true,
         },
       },
-      passwordHash: {
+      // When defining in migrations, it is essential to remember that,
+      // unlike models, column and table names such as user_id are written in snake case form.
+      // So, "password_hash", not "passwordHash" in migrations.
+      password_hash: {
         type: DataTypes.STRING,
         allowNull: false,
       },
