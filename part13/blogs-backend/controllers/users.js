@@ -58,25 +58,31 @@ router.get("/:id", async (req, res) => {
     },
     include: {
       model: Blog,
-      attributes: { exclude: ["blogUserId"] },
+      attributes: { exclude: ["blogUserId", "createdAt", "updatedAt"] },
       through: {
-        attributes: [],
+        attributes: ["id", "read"],
       },
     },
   });
 
   if (user) {
     const result = {
-      id: user.id,
-      username: user.username,
       name: user.name,
+      username: user.username,
       email: user.email,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-      readings: user.blogs,
+      readings: user.blogs.map((blog) => ({
+        id: blog.id,
+        author: blog.author,
+        url: blog.url,
+        title: blog.title,
+        likes: blog.likes,
+        year: blog.year,
+        readinglists: [blog.reading_list],
+      })),
     };
 
     res.json(result);
+    // res.json(user);
   } else {
     res.status(404).end();
   }

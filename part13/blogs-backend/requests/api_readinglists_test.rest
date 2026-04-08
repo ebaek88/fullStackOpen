@@ -1,8 +1,17 @@
 ###
 POST http://localhost:3001/api/readinglists
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNvbm55IiwiaWQiOjIsImlhdCI6MTc3NTYxNzExNSwiZXhwIjoxNzc1NjE3Mjk1fQ.OnnzW1hGctaH-GdToQ576ny0ou05CHPsuBf2TNwz2Bw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNvbm55IiwiaWQiOjIsImlhdCI6MTc3NTYzMTE1OCwiZXhwIjoxNzc1NjMxMzM4fQ.9ETKid73EieasU1zGGCSBsP7y71i__JAWDt_Aey2FCA
 Content-Type: application/json
 
 {
-  "blogId": 1
+  "blogId": 5
+}
+
+###
+POST http://localhost:3001/api/readinglists
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sdXVra2FpIiwiaWQiOjEsImlhdCI6MTc3NTYzMTMzMiwiZXhwIjoxNzc1NjMxNTEyfQ.UqGjtCUglfDIo8cmVD1ex0ORTVw4dpCM5vwO-tpUIRI
+Content-Type: application/json
+
+{
+  "blogId": 5
 }
