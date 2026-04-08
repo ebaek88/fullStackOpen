@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const router = require("express").Router();
-const logger = require("../util/logger.js");
+const { Op } = require("sequelize");
 const {
   errorHandler,
   tokenExtractor,
@@ -52,6 +52,9 @@ router.post("/", async (req, res, next) => {
 // });
 
 router.get("/:id", async (req, res) => {
+  console.log("id: " + req.params.id);
+  console.log("read: " + req.query.read);
+
   const user = await BlogUser.findByPk(req.params.id, {
     attributes: {
       exclude: ["id", "passwordHash", "createdAt", "updatedAt"],
@@ -66,11 +69,16 @@ router.get("/:id", async (req, res) => {
   });
 
   if (user) {
+    // we use filtered blogs only when there is a query parameter "read"
+    const filteredBlogs = user.blogs?.filter(
+      (blog) => blog.reading_list.read === (req.query.read === "true"),
+    );
+
     const result = {
       name: user.name,
       username: user.username,
       email: user.email,
-      readings: user.blogs.map((blog) => ({
+      readings: (req.query.read ? filteredBlogs : user.blogs).map((blog) => ({
         id: blog.id,
         author: blog.author,
         url: blog.url,
