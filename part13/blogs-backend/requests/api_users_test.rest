@@ -35,6 +35,12 @@ Content-Type: application/json
 GET http://localhost:3001/api/users
 
 ###
+GET http://localhost:3001/api/users/1
+
+###
+GET http://localhost:3001/api/users/2
+
+###
 GET http://localhost:3001/api/users/mluukkai
 
 ###

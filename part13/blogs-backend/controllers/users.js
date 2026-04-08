@@ -7,7 +7,7 @@ const {
   userExtractor,
 } = require("../util/middleware.js");
 
-const { Blog, BlogUser } = require("../models/index.js");
+const { Blog, BlogUser, ReadingList } = require("../models/index.js");
 
 router.get("/", async (req, res) => {
   const users = await BlogUser.findAll({
@@ -41,14 +41,45 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.get("/:username", async (req, res) => {
-  const user = await BlogUser.findOne({
-    where: { username: req.params.username },
+// router.get("/:username", async (req, res) => {
+//   const user = await BlogUser.findOne({
+//     where: { username: req.params.username },
+//     attributes: {
+//       exclude: ["passwordHash"],
+//     },
+//   });
+//   user ? res.json(user) : res.status(404).end();
+// });
+
+router.get("/:id", async (req, res) => {
+  const user = await BlogUser.findByPk(req.params.id, {
     attributes: {
-      exclude: ["passwordHash"],
+      exclude: ["id", "passwordHash", "createdAt", "updatedAt"],
+    },
+    include: {
+      model: Blog,
+      attributes: { exclude: ["blogUserId"] },
+      through: {
+        attributes: [],
+      },
     },
   });
-  user ? res.json(user) : res.status(404).end();
+
+  if (user) {
+    const result = {
+      id: user.id,
+      username: user.username,
+      name: user.name,
+      email: user.email,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      readings: user.blogs,
+    };
+
+    res.json(result);
+  } else {
+    res.status(404).end();
+  }
 });
 
 router.put(
