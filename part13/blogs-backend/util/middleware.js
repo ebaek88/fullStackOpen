@@ -5,8 +5,19 @@ const { SECRET } = require("./config.js");
 
 const errorHandler = (error, req, res, next) => {
   logger.error(error);
-  // logger.error(error.message);
   let errorMessage = [];
+
+  if (res.headersSent) {
+    return next(error);
+  }
+
+  if (error.name === "JsonWebTokenError") {
+    return res.status(401).json({ error: "token invalid" });
+  }
+
+  if (error.name === "TokenExpiredError") {
+    return res.status(401).json({ error: "token expired" });
+  }
 
   if (
     error.name === "SequelizeValidationError" ||
@@ -21,8 +32,11 @@ const errorHandler = (error, req, res, next) => {
     errorMessage = errorMessage.concat(error.name);
   }
 
-  res.status(400).json({ errorMessage });
-  next(error);
+  if (errorMessage.length > 0) {
+    return res.status(400).json({ error: errorMessage });
+  }
+
+  return res.status(500).json({ error: "internal server error" });
 };
 
 const tokenExtractor = (req, res, next) => {
@@ -35,7 +49,7 @@ const tokenExtractor = (req, res, next) => {
         .replace(/^['"]|['"]$/g, "");
       req.decodedToken = jwt.verify(token, SECRET);
     } catch (error) {
-      return res.status(401).json({ error: "token invalid" });
+      return next(error);
     }
   } else {
     return res.status(401).json({ error: "token missing" });
@@ -57,4 +71,12 @@ const userExtractor = async (req, res, next) => {
   }
 };
 
-module.exports = { errorHandler, tokenExtractor, userExtractor };
+const isAdmin = async (req, res, next) => {
+  const user = await BlogUser.findByPk(req.decodedToken.id);
+  if (!user.admin) {
+    return res.status(401).json({ error: "operation not allowed" });
+  }
+  next();
+};
+
+module.exports = { errorHandler, tokenExtractor, userExtractor, isAdmin };

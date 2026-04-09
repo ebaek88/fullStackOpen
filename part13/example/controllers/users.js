@@ -53,25 +53,35 @@ router.get("/:id", async (req, res) => {
           attributes: ["name"],
         },
       },
-      {
-        model: Team,
-        attributes: ["name", "id"],
-        through: {
-          attributes: [],
-        },
-      },
+      // {
+      //   model: Team,
+      //   attributes: ["name", "id"],
+      //   through: {
+      //     attributes: [],
+      //   },
+      // },
     ],
   });
 
-  if (user) {
-    res.json(user);
-  } else {
-    res.status(400).end();
+  if (!user) {
+    return res.status(400).end();
   }
+
+  // for associated teams, lazy loading is used instead of eager loading
+  let teams = undefined;
+  if (req.query.teams) {
+    teams = await user.getTeams({
+      attributes: ["name"],
+      joinTableAttributes: [],
+    });
+  }
+
+  res.json({ ...user.toJSON(), teams });
 });
 
 router.put("/:username", tokenExtractor, isAdmin, async (req, res) => {
-  const user = await User.findOne({
+  // need to apply unscoped(), since the default scope in the model is set to filter out disabled users
+  const user = await User.unscoped().findOne({
     where: { username: req.params.username },
   });
 

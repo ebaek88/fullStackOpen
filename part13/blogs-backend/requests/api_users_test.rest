@@ -60,3 +60,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sd
 {
   "name": "John Doe"
 }
+
+###
+PUT http://localhost:3001/api/users/mluukkai/disable
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sdXVra2FpIiwiaWQiOjEsImlhdCI6MTc3NTcwMDA4NywiZXhwIjoxNzc1NzAwMjY3fQ.wBTHumRNLnIcOiI5jYGQWJE09IhqnBN_l7XcFIbS5eE
+
+{
+  "disabled": true
+}

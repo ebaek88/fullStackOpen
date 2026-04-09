@@ -8,6 +8,7 @@ const {
 } = require("../util/middleware.js");
 
 const { Blog, BlogUser, ReadingList } = require("../models/index.js");
+const adminRouter = require("./admin.js");
 
 router.get("/", async (req, res) => {
   const users = await BlogUser.findAll({
@@ -128,6 +129,7 @@ router.put(
   },
 );
 
+router.use("/:username/disable", adminRouter);
 router.use(errorHandler);
 
 module.exports = router;

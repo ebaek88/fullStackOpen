@@ -1,8 +1,31 @@
 // models/user.js for the table User to be stored in the db
-const { Model, DataTypes } = require("sequelize");
+const { Model, DataTypes, Op } = require("sequelize");
+const Note = require("./note.js");
 const { sequelize } = require("../util/db.js");
 
-class User extends Model {}
+class User extends Model {
+  async numberOfNotes() {
+    return (await this.getNotes()).length;
+  }
+
+  static async withNotes(limit) {
+    return await User.findAll({
+      attributes: {
+        include: [
+          [sequelize.fn("COUNT", sequelize.col("notes.id")), "note_count"],
+        ],
+      },
+      include: [
+        {
+          model: Note,
+          attributes: [],
+        },
+      ],
+      group: ["user.id"],
+      having: sequelize.literal(`COUNT(notes.id) > ${limit}`),
+    });
+  }
+}
 
 User.init(
   {
@@ -34,6 +57,33 @@ User.init(
     underscored: true,
     timestamps: false,
     modelName: "user",
+    defaultScope: {
+      // in order to disable the scopes, User.unscoped()... or User.scope("null")... should be applied
+      where: {
+        disabled: false,
+      },
+    },
+    scopes: {
+      admin: {
+        where: {
+          admin: true,
+        },
+      },
+      disabled: {
+        where: {
+          disabled: true,
+        },
+      },
+      name(value) {
+        return {
+          where: {
+            name: {
+              [Op.iLike]: value,
+            },
+          },
+        };
+      },
+    },
   },
 );
 
