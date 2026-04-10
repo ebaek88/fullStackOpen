@@ -11,7 +11,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: part11/
+        working-directory: part11
 
     steps:
       - name: Say hello
