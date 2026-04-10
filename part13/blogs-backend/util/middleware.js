@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const BlogUser = require("../models/blog_user.js");
+const { BlogUser, Session } = require("../models/index.js");
 const logger = require("./logger.js");
 const { SECRET } = require("./config.js");
 
@@ -60,10 +60,34 @@ const tokenExtractor = (req, res, next) => {
 
 const userExtractor = async (req, res, next) => {
   try {
+    const token = req
+      .get("authorization")
+      .substring(7)
+      .trim()
+      .replace(/^['"]|['"]$/g, "");
+
     const user = await BlogUser.findByPk(req.decodedToken.id);
     if (!user) {
       return res.status(400).json({ error: "user id missing or not valid " });
     }
+
+    // now find in the table session if the token is valid
+    const tokenInSession = await Session.findOne({
+      where: {
+        blogUserId: user.id,
+      },
+      attributes: {
+        exclude: ["createdAt", "updatedAt"],
+      },
+    });
+
+    if (
+      token !== tokenInSession?.token ||
+      user.id !== tokenInSession?.blogUserId
+    ) {
+      return res.status(401).json({ error: "token expired" });
+    }
+
     req.user = user;
     next();
   } catch (error) {

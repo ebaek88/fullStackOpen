@@ -1,6 +1,6 @@
 // used as a child router for usersRouter(./users.js)
 const router = require("express").Router({ mergeParams: true });
-const { BlogUser } = require("../models/index.js");
+const { BlogUser, Session } = require("../models/index.js");
 const {
   errorHandler,
   tokenExtractor,
@@ -11,6 +11,7 @@ router.put("/", tokenExtractor, isAdmin, async (req, res, next) => {
   try {
     const user = await BlogUser.unscoped().findOne({
       where: { username: req.params.username },
+      attributes: { exclude: ["passwordHash"] },
     });
 
     if (!user) {
@@ -21,6 +22,18 @@ router.put("/", tokenExtractor, isAdmin, async (req, res, next) => {
       return res.status(401).json({ error: "you cannot disable an admin" });
     }
 
+    // first remove the user from session if he or she has already logged in
+    const session = await Session.findOne({
+      where: {
+        blogUserId: user.id,
+      },
+    });
+
+    if (session) {
+      await session.destroy();
+    }
+
+    // then change the user's disabled status
     user.disabled = req.body.disabled;
     await user.save();
     res.json(user);
