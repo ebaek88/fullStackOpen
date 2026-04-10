@@ -1,9 +1,11 @@
 const router = require("express").Router();
-const { Blog, BlogUser } = require("../models/index.js");
+const { Blog, BlogUser, ReadingList, Session } = require("../models/index.js");
 const { errorHandler } = require("../util/middleware.js");
 
 router.post("/", async (req, res, next) => {
   try {
+    await ReadingList.destroy({ where: {} });
+    await Session.destroy({ where: {} });
     await Blog.destroy({ where: {} });
     await BlogUser.destroy({ where: {} });
     res.status(204).end();

@@ -13,6 +13,19 @@ router.post("/", tokenExtractor, userExtractor, async (req, res, next) => {
       return res.status(404).end();
     }
 
+    const existingReadingList = await ReadingList.findOne({
+      where: {
+        blogId: req.body.blogId,
+        blogUserId: req.user.id,
+      },
+    });
+
+    if (existingReadingList) {
+      return res.status(400).json({
+        error: "cannot add the same blog to a reading list more than once",
+      });
+    }
+
     const readingList = await ReadingList.create({
       blogId: req.body.blogId,
       blogUserId: req.user.id,
