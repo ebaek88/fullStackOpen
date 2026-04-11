@@ -10,4 +10,8 @@ describe('Pokedex', () => {
       ),
     ).toBeVisible()
   })
+  test('a particular Pokemon page can be navigated', async ({ page }) => {
+    await page.goto('/pokemon/charmander')
+    await expect(page.getByText('solar power')).toBeVisible()
+  })
 })
