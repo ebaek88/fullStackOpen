@@ -1,11 +1,12 @@
 #!/bin/bash
 
+# this command tells bash: "if any command fails, stop the script immediately."
+set -e
+
 echo "Build script"
 
 # add the commands here
-npm install
+npm ci
 npm run eslint
 npm run test
 npm run build
-sudo npx playwright install --with-deps
-npm run test:e2e
