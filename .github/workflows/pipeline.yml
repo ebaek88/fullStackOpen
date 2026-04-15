@@ -20,6 +20,11 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: "24"
+
+      - name: Intentionally fail pipeline for Discord test
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '#fail') }}
+        run: exit 1
+
       - name: Install dependencies
         run: npm install
       - name: Check style
@@ -71,7 +76,7 @@ jobs:
 
   discord_noti_failure:
     needs: [simple_deployment_pipeline]
-    if: ${{ github.event_name == 'push' && needs.simple_deployment_pipeline.result == 'failure' }}
+    if: ${{ always() && github.event_name == 'push' && needs.simple_deployment_pipeline.result == 'failure' }}
     runs-on: ubuntu-latest
     steps:
       - name: trigger failure noti
