@@ -8,7 +8,7 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  simple_deployment_pipeline:
+  build_and_test:
     runs-on: ubuntu-latest
 
     defaults:
@@ -32,12 +32,18 @@ jobs:
         run: npx playwright install --with-deps
       - name: Run Playwright tests
         run: npm run test:e2e
+
+  deploy:
+    needs: [build_and_test]
+    if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ''), '#skip') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
       - name: Trigger deployment
-        if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ''), '#skip') }}
         run: curl ${{ secrets.RENDER_DEPLOY_HOOK }}
 
   tag_release:
-    needs: [simple_deployment_pipeline]
+    needs: [deploy]
     if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ''), '#skip') }}
     runs-on: ubuntu-latest
     steps:
@@ -50,12 +56,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch
 
-  discord_noti_success:
-    needs: [simple_deployment_pipeline, tag_release]
+  discord_notify_success:
+    needs: [deploy]
     if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
-      - name: trigger success noti
+      - name: trigger success notification
         if: ${{ success() }}
         uses: sarisia/actions-status-discord@v1.16.0
         with:
@@ -69,12 +75,12 @@ jobs:
             **Message:** ${{ github.event.head_commit.message }}
             **Author:** ${{ github.actor }}
 
-  discord_noti_failure:
-    needs: [simple_deployment_pipeline]
-    if: ${{ always() && github.event_name == 'push' && needs.simple_deployment_pipeline.result == 'failure' }}
+  discord_notify_failure:
+    needs: [deploy]
+    if: ${{ always() && github.event_name == 'push' && needs.deploy.result == 'failure' }}
     runs-on: ubuntu-latest
     steps:
-      - name: trigger failure noti
+      - name: trigger failure notification
         uses: sarisia/actions-status-discord@v1.16.0
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
