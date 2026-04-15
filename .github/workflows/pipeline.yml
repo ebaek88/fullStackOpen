@@ -34,12 +34,12 @@ jobs:
         run: npm run test:e2e
 
   deploy:
-    runs-on: ubuntu-latest
     needs: [build_and_test]
+    if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ''), '#skip') }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - name: Trigger deployment
-        if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ''), '#skip') }}
         run: curl ${{ secrets.RENDER_DEPLOY_HOOK }}
 
   tag_release:
@@ -61,7 +61,7 @@ jobs:
     if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
-      - name: trigger success noti
+      - name: trigger success notification
         if: ${{ success() }}
         uses: sarisia/actions-status-discord@v1.16.0
         with:
@@ -80,7 +80,7 @@ jobs:
     if: ${{ always() && github.event_name == 'push' && needs.deploy.result == 'failure' }}
     runs-on: ubuntu-latest
     steps:
-      - name: trigger failure noti
+      - name: trigger failure notification
         uses: sarisia/actions-status-discord@v1.16.0
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
