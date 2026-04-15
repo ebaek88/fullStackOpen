@@ -33,12 +33,12 @@ jobs:
       - name: Run Playwright tests
         run: npm run test:e2e
       - name: Trigger deployment
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ github.event_name == 'push' && !contains(github.event.commits.*.message, '#skip') }}
         run: curl ${{ secrets.RENDER_DEPLOY_HOOK }}
 
   tag_release:
     needs: [simple_deployment_pipeline]
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' && !contains(github.event.commits.*.message, '#skip') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
