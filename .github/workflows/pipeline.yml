@@ -20,6 +20,11 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: "24"
+
+      - name: Intentionally fail pipeline for Discord test
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '#fail') }}
+        run: exit 1
+
       - name: Install dependencies
         run: npm install
       - name: Check style
@@ -49,3 +54,48 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch
+
+  discord_noti_success:
+    needs: [simple_deployment_pipeline, tag_release]
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: trigger success noti
+        if: ${{ success() }}
+        uses: sarisia/actions-status-discord@v1.16.0
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          content: "✅ **Deployment Successful!** A new version deployed to production"
+          title: "Deployment Details"
+          status: ${{ job.status }}
+          nodetail: true
+          description: |
+            **Commit:** ${{ github.sha }}
+            **Message:** ${{ github.event.head_commit.message }}
+            **Author:** ${{ github.event.head_commit.author }}
+
+  discord_noti_failure:
+    needs: [simple_deployment_pipeline]
+    if: ${{ always() && github.event_name == 'push' && needs.simple_deployment_pipeline.result == 'failure' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: trigger failure noti
+        if: ${{ failure() }}
+        uses: sarisia/actions-status-discord@v1.16.0
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          content: "❌ **Build Failed!** The pipeline encountered an error"
+          title: "Failure Details"
+          status: ${{ job.status }}
+          nodetail: true
+          description: |
+            **Repository:** ${{ github.action_repository }}
+            **Branch:** ${{ github.ref_name }}
+            **Commit:** ${{ github.sha }}
+            **Message:** ${{ github.event.head_commit.message }}
+            **Author:** ${{ github.event.head_commit.author }}
+            **Workflow:** ${{ github.workflow }}
+            **Job:** ${{ github.job }}
+
+            [[View Commit]](${{ github.event.head_commit.url }})
+            [[View Workflow Run]](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
