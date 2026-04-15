@@ -80,13 +80,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: trigger failure noti
-        if: ${{ failure() }}
         uses: sarisia/actions-status-discord@v1.16.0
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
           content: "❌ **Build Failed!** The pipeline encountered an error"
           title: "Failure Details"
-          status: ${{ job.status }}
+          status: failure
           nodetail: true
           description: |
             **Repository:** ${{ github.action_repository }}
