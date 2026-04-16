@@ -58,7 +58,7 @@ jobs:
 
   discord_notify_success:
     needs: [deploy]
-    if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' && contains(join(github.event.commits.*.message, ''), '#discord') }}
     runs-on: ubuntu-latest
     steps:
       - name: trigger success notification
@@ -77,7 +77,7 @@ jobs:
 
   discord_notify_failure:
     needs: [deploy]
-    if: ${{ always() && github.event_name == 'push' && needs.deploy.result == 'failure' }}
+    if: ${{ always() && github.event_name == 'push' && needs.deploy.result == 'failure' && contains(join(github.event.commits.*.message, ''), '#discord') }}
     runs-on: ubuntu-latest
     steps:
       - name: trigger failure notification
