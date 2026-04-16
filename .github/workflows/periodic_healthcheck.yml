@@ -2,9 +2,9 @@ name: Periodic Healthcheck
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "20 * * * *"
-      timezone: "America/Edmonton"
+  # schedule:
+  #   - cron: "20 * * * *"
+  #     timezone: "America/Edmonton"
 
 jobs:
   health_check:
